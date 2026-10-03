@@ -130,6 +130,7 @@ h1, h2, h3, p { margin: 0; }
 .status { color: var(--gold); font-size: 12px; line-height: 1.7; margin-top: 5px; }
 .status:empty { display: none; }
 .menu-footer { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; max-width: 1280px; margin: auto; padding: 12px 0; border-top: 1px solid var(--line); color: var(--faint); font-size: 11px; }
+.footer-actions { display: flex; align-items: center; gap: 16px; }
 .menu-footer .text-btn { font-size: 11px; padding: 6px 0; }
 
 /* ------------------------------ 房间 ------------------------------ */

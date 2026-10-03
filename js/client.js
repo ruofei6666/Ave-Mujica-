@@ -422,7 +422,7 @@
     $(`${channel}-volume`).addEventListener('input', () => { settings[channel] = Number($(`${channel}-volume`).value) / 100; $(`${channel}-value`).value = `${Math.round(settings[channel] * 100)}%`; sound('unlock'); sound('setVolumes', settings); persist(); });
   }
   for (const button of document.querySelectorAll('[data-voice-cue]')) button.addEventListener('click', () => sound('playVoice', settings.player, button.dataset.voiceCue));
-  const buttonCues = { 'mode-pve': 'pve', 'mode-pvp': 'pvp', 'start-btn': 'start', 'create-btn': 'create', 'leave-room': 'back', 'ready-btn': 'ready', 'copy-room': 'copy', 'pause-btn': 'pause', 'resume-btn': 'resume', 'quit-btn': 'back', 'result-menu': 'back', 'rematch-btn': 'rematch', 'settings-btn': 'settings', 'help-btn': 'help', 'credits-btn': 'credits', 'skill-info-btn': 'help', 'help-done': 'confirm' };
+  const buttonCues = { 'mode-pve': 'pve', 'mode-pvp': 'pvp', 'start-btn': 'start', 'create-btn': 'create', 'leave-room': 'back', 'ready-btn': 'ready', 'copy-room': 'copy', 'pause-btn': 'pause', 'resume-btn': 'resume', 'quit-btn': 'back', 'result-menu': 'back', 'rematch-btn': 'rematch', 'settings-btn': 'settings', 'help-btn': 'help', 'credits-btn': 'credits', 'skill-info-btn': 'help', 'help-done': 'confirm', 'install-btn': 'confirm' };
   document.addEventListener('click', event => {
     const button = event.target.closest('button'); if (!button || button.disabled || button.dataset.action) return;
     if (button.classList.contains('character-card') || button.classList.contains('voice-preview') || button.dataset.voiceCue) { sound('playUI', 'confirm'); return; }
@@ -464,6 +464,21 @@
   function releaseOnBackground() { clearInputs(); if (screen === 'battle' && !finished) { if (mode === 'pve') pauseGame(); else send({ type: 'input', input: takeInput(), seq: ++inputSeq }); } }
   window.addEventListener('blur', releaseOnBackground); document.addEventListener('visibilitychange', () => { if (document.hidden) releaseOnBackground(); }); window.addEventListener('pagehide', () => disconnect(true)); window.addEventListener('resize', () => { renderer.resize(); renderCardArt(); });
   setInterval(() => { syncVoiceStatus(); if (socket?.readyState !== WebSocket.OPEN) return; send({ type: 'ping', at: performance.now() }); if (performance.now() - lastMessageAt > 15000 && !document.hidden) { disconnect(false); if (screen === 'battle') interrupted('连接长时间没有响应，请重新建房。'); else { show('menu'); status('连接超时，请重试。'); } } }, 3000);
+  const installedApp = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
+  const installButton = $('install-btn');
+  let deferredInstall = null;
+  if (installButton && !installedApp) {
+    const wechat = /MicroMessenger/i.test(navigator.userAgent);
+    const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (wechat || ios) installButton.hidden = false;
+    window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault(); deferredInstall = event; installButton.hidden = false; });
+    window.addEventListener('appinstalled', () => { deferredInstall = null; installButton.hidden = true; });
+    installButton.addEventListener('click', async () => {
+      if (wechat) { toast('请点右上角 ···，选择在浏览器中打开，再添加到主屏幕。'); return; }
+      if (deferredInstall) { deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall = null; installButton.hidden = true; return; }
+      toast(ios ? '点底部分享按钮，选择「添加到主屏幕」，再从桌面图标打开。' : '打开浏览器菜单，选择「安装应用」或「添加到主屏幕」。');
+    });
+  }
   renderMenu(); updateRecordLine(); sound('setScene', 'menu'); requestAnimationFrame(frame);
   const invited = new URLSearchParams(location.search).get('room'); if (invited && /^\d{6}$/.test(invited)) { changeMode('pvp'); $('room-code').value = invited; status(/(^|\.)github\.io$/i.test(location.hostname) ? '邀请链接需要游戏服务器。GitHub Pages 只能进行人机对战。' : '已填入邀请房间码，选择角色后点击加入。'); }
   if (!read('ave-theatre-help-seen-v2', false)) { $('help-dialog').showModal(); write('ave-theatre-help-seen-v2', true); }

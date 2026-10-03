@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0e0b24">
   <meta name="description" content="Ave Mujica乱斗剧场：五名角色，手机触屏格斗与房间码双人对战。">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="乱斗剧场">
   <title>Ave Mujica · 乱斗剧场</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="stylesheet" href="css/game.css">
   <script defer src="lib/combat.js"></script>
   <script defer src="js/character-assets.js"></script>
@@ -76,7 +82,7 @@
           </div>
         </section>
       </div>
-      <footer class="menu-footer"><span>手机横屏，展开舞台。</span><span id="record-line">今晚，从第一场开始。</span><button id="credits-btn" class="text-btn">作品与素材</button></footer>
+      <footer class="menu-footer"><span>手机横屏，展开舞台。</span><span id="record-line">今晚，从第一场开始。</span><span class="footer-actions"><button id="install-btn" class="text-btn" hidden>全屏安装</button><button id="credits-btn" class="text-btn">作品与素材</button></span></footer>
     </section>
     <section id="room" class="screen room-screen" hidden>
       <header class="masthead"><div class="wordmark"><span class="wordmark-name">Ave <i>Mujica</i><small>双人剧场</small></span></div><button id="leave-room" class="secondary-btn small">退出房间</button></header>
@@ -152,5 +158,8 @@
     <dialog id="credits-dialog" class="modal"><form method="dialog"><button class="dialog-close" aria-label="关闭作品说明">×</button></form><p class="eyebrow">作品与素材</p><h2>乱斗剧场</h2><p>娱乐用途的同人小游戏。角色名称与形象来自 Ave Mujica / BanG Dream!，相关权利归原权利方。</p><p>角色立绘、头像和对战动作参照官方舞台形象重新制作；每位出演者以自己的乐器作战。日语语音来自联动游戏的真实配音，具体短句与来源已记录。</p><a class="text-btn" href="CREDITS.md" target="_blank" rel="noopener">查看素材来源记录 ↗</a></dialog>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </main>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  </script>
 </body>
 </html>
