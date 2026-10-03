@@ -90,7 +90,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       jump: 14,
       airJumps: 0,
       punch: { name: "听我的", dmg: 11.2, kb: 6.5, stun: 14, reach: 55, startup: 5, active: 7, recover: 10 },
-      s0: { name: "改你的剧本", cd: 258, hint: "两侧幕刃同时合拢夹击。", detail: "动作 0.43 秒。0.15 秒时从场地左右两侧各出一道幕刃，速度每秒 810，存活 1.33 秒。每道伤害 33.2，击退 8，硬直 0.27 秒，判定半径 34。两侧各能命中一次，全中 66.4。冷却 4.3 秒。" },
+      s0: { name: "改你的剧本", cd: 258, hint: "两侧幕刃同时合拢夹击。", detail: "动作 0.43 秒。0.15 秒时从场地左右两侧各出一道幕刃，速度每秒 810，持续飞行直到碰到对手或飞出场地。每道伤害 33.2，击退 8，硬直 0.27 秒，判定半径 34。两侧各能命中一次，全中 66.4。冷却 4.3 秒。" },
       s1: { name: "忘了吧", cd: 246, hint: "直线音符，命中把人推开。", detail: "动作 0.40 秒。0.18 秒时向前射出音符，速度每秒 720，存活 0.90 秒，最远约 648。伤害 43.7，击退 8，硬直 0.25 秒，判定半径 16。冷却 4.1 秒。" },
       s2: { name: "箱庭塌了", cd: 258, hint: "贴地乐浪推开近中距离。", detail: "动作 0.40 秒。0.17 秒时贴地推出乐浪，速度每秒 528，存活 0.73 秒，最远约 387。伤害 50.0，击退 14，硬直 0.25 秒。判定 96×92。冷却 4.3 秒。" },
       ult: { name: "我要成为神", cost: 200, hint: "终幕砸向预判落点，高伤强击退。", detail: "耗蓝 200。动作 0.63 秒。按对手当前速度超前 0.30 秒预判落点。陨石从高度 80 以每秒 930 下落，约 0.55 秒后落地。伤害 60，击退 20，硬直 0.43 秒。下落判定 36×36；若落地则爆炸 0.23 秒，范围 180×80。" },
@@ -607,13 +607,16 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       } else if (move === "pyro_s0") {
         if (t === 9) {
           const targetY = Math.max(110, Math.min(GROUND - 35, opponent.y - 52));
+          const curtainSpeed = 13.5;
+          // Survive a full arena crossing even when the scrolling stage is wider.
+          const curtainLife = Math.ceil(CANVAS_W / curtainSpeed) + 1;
           projectiles.push({
             type: "curtain",
             x: LEFT_WALL + 12,
             y: targetY,
-            vx: 13.5,
+            vx: curtainSpeed,
             vy: 0,
-            life: 80,
+            life: curtainLife,
             owner: this,
             color: "#60a5fa",
             dmg: 15.8,
@@ -626,9 +629,9 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
             type: "curtain",
             x: RIGHT_WALL - 12,
             y: targetY + 18,
-            vx: -13.5,
+            vx: -curtainSpeed,
             vy: 0,
-            life: 80,
+            life: curtainLife,
             owner: this,
             color: "#f9a8d4",
             dmg: 15.8,

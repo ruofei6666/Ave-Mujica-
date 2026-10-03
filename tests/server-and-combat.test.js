@@ -435,6 +435,49 @@ test('shadow ultimate switches sides on all five teleports', () => {
   assert.deepEqual(directions, [-1, 1, -1, 1, -1]);
 });
 
+test('both pyro curtains reach opponents near either wall from either player seat', () => {
+  for (const seat of [0, 1]) for (const targetX of [combat.constants.LEFT_WALL + 50, combat.constants.RIGHT_WALL - 50]) {
+    const world = localWorld({ left: seat === 0 ? 'pyro' : 'gale', right: seat === 1 ? 'pyro' : 'gale' });
+    const target = world.fighters[1 - seat];
+    target.x = targetX;
+    const input = [{}, {}]; input[seat] = { special: true };
+    world.step(input);
+    const hits = new Map();
+    for (let frame = 0; frame < 240; frame++) {
+      world.step(emptyInputs);
+      for (const event of world.snapshot().events) {
+        if (event.kind === 'hit' && event.id === 'pyro_s0') hits.set(event.seq, event);
+      }
+    }
+    assert.equal(hits.size, 2, `seat ${seat}, target x=${targetX}: both curtains must arrive`);
+    assert.ok([...hits.values()].every(hit => hit.actor === seat && hit.target === 1 - seat));
+    assert.ok(Math.abs(target.hp - (target.maxHp - 2 * 15.8 * 2.1)) < 1e-8);
+    assert.equal(world.snapshot().projectiles.length, 0, 'each curtain is consumed by its hit');
+  }
+});
+
+test('missed pyro curtains pass the arena center and only expire outside the arena', () => {
+  const world = localWorld({ left: 'pyro' });
+  const target = world.fighters[1];
+  world.step([{ special: true }, {}]);
+  advance(world, 9);
+  assert.equal(world.snapshot().projectiles.length, 2);
+  for (let frame = 0; frame < 90; frame++) {
+    target.y = 100; target.vy = 0;
+    world.step(emptyInputs);
+  }
+  const curtains = world.snapshot().projectiles;
+  assert.equal(curtains.length, 2, 'curtains must survive the old 80-frame limit');
+  assert.ok(curtains.find(p => p.vx > 0).x > combat.constants.CANVAS_W / 2);
+  assert.ok(curtains.find(p => p.vx < 0).x < combat.constants.CANVAS_W / 2);
+  for (let frame = 0; frame < 100; frame++) {
+    target.y = 100; target.vy = 0;
+    world.step(emptyInputs);
+  }
+  assert.equal(target.hp, target.maxHp, 'dodging still avoids damage');
+  assert.equal(world.snapshot().projectiles.length, 0, 'missed curtains do not accumulate beyond the arena');
+});
+
 test('pyro meteor reaches the ground, explodes, and expires instead of vanishing in the air', () => {
   const world = localWorld({ left: 'pyro' });
   const [pyro, target] = world.fighters;
