@@ -1,7 +1,8 @@
-import type { Action, AttackBox, Character, CharacterId, CombatEvent, CombatEventDetail, CombatEventKind, Difficulty, DifficultyConfig, FighterSnapshot, FighterState, Hazard, Hit, HitSpec, Input, MatchResult, Projectile, Rect, Seat, SkillActionSlot, SkillMove, SkillSlot, Snapshot, WorldOptions } from './types';
+import type { Action, AttackBox, Character, CharacterId, CombatEvent, CombatEventDetail, CombatEventKind, Difficulty, FighterSnapshot, FighterState, Hazard, Hit, HitSpec, Input, MatchResult, Projectile, Rect, Seat, SkillActionSlot, SkillMove, SkillSlot, Snapshot, WorldOptions } from './types';
 import { crossedFootPlant, cyclePhase, WALK_CYCLE_DISTANCE } from './locomotion';
 import { ARENA } from './arena';
-type AiInput = Omit<Input, 'down'> & { wait: number };
+import { AI_DIFFICULTIES, createAiMemory, thinkAi } from './ai';
+import type { AiMemory } from './ai';
 interface ImpactRing { x: number; y: number; life: number; max: number; radius: number; speed: number; color: string }
   const CANVAS_W = ARENA.width, CANVAS_H = ARENA.height, GROUND = ARENA.ground, SIZE = 1.5;
   const GRAVITY = 0.82, LEFT_WALL = ARENA.leftWall, RIGHT_WALL = ARENA.rightWall, MAX_MP = 200;
@@ -115,11 +116,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
     },
   ];
 
-  const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
-    easy: { label: "普通", miss: 0.38, skill: 0.26, ult: 0.14, aggro: 0.4, jump: 0.07, think: 14, precision: 0.52 },
-    normal: { label: "困难", miss: 0.1, skill: 0.72, ult: 0.55, aggro: 0.82, jump: 0.16, think: 4, precision: 0.88 },
-    hard: { label: "挑战", miss: 0.012, skill: 0.96, ult: 0.9, aggro: 0.97, jump: 0.2, think: 1, precision: 0.98 },
-  };
+  const DIFFICULTIES = AI_DIFFICULTIES;
   deepFreeze(CHARACTERS); deepFreeze(DIFFICULTIES);
   function createWorld(options?: WorldOptions) {
     options = options || {};
@@ -193,7 +190,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
   declare dashT: number;
   declare lockX: number;
   declare heavyT: number;
-  declare ai: AiInput;
+  declare ai: AiMemory;
   declare stunMax: number;
 
     constructor(def: Character, x: number, facing: number, isCpu: boolean) {
@@ -229,17 +226,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       this.dashT = 0;
       this.lockX = 0;
       this.heavyT = 0;
-      this.ai = {
-        wait: 0,
-        left: false,
-        right: false,
-        up: false,
-        punch: false,
-        special: false,
-        skill1: false,
-        skill2: false,
-        ult: false,
-      };
+      this.ai = createAiMemory();
     }
 
     grounded() {
@@ -1008,141 +995,9 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
     return null;
   }
   function cpuThink() {
-    const cfg = DIFFICULTIES[selection.difficulty];
-    const me = cpu;
-    const opp = player;
-    const dist = opp.x - me.x;
-    const abs = Math.abs(dist);
-    const faceOpp = dist > 0;
-    const oppMove = String(opp.skillMove || "");
-    const oppAttacking = opp.state === "punch" || (opp.state === "skill" && !oppMove.includes("iron_s1") && !oppMove.includes("shadow_s0"));
-    const oppStun = opp.state === "stun";
-    const preferred = me.id === "pyro" ? 240 : me.id === "gale" ? 88 : me.id === "shadow" ? 90 : me.id === "iron" ? 86 : 155;
-    const roll = (p: number) => random() < p;
-    const toward = () => { me.ai.left = !faceOpp; me.ai.right = faceOpp; };
-    const away = () => { me.ai.left = faceOpp; me.ai.right = !faceOpp; };
-    const stay = () => { me.ai.left = false; me.ai.right = false; };
-
-    me.ai.punch = false;
-    me.ai.special = false;
-    me.ai.skill1 = false;
-    me.ai.skill2 = false;
-    me.ai.ult = false;
-    me.ai.up = false;
-    me.facing = faceOpp ? 1 : -1;
-
-    const incoming = projectiles.find((p) => {
-      if (p.owner === me) return false;
-      const closing = (p.vx > 0 && p.x < me.x + 20) || (p.vx < 0 && p.x > me.x - 20);
-      return closing && Math.abs(p.x - me.x) < 230;
+    return thinkAi(cpu, player, cpu.def, cpu.ai, {
+      difficulty: selection.difficulty, projectiles, hazards, random,
     });
-    const meteor = hazards.find((h) => h.owner !== me && (h.type === "meteor" || h.type === "boom") && Math.abs(h.x - me.x) < 110);
-    const threatened = !!(incoming || meteor || (oppAttacking && abs < 130));
-
-    if (threatened && roll(cfg.precision)) {
-      if (incoming) {
-        if (me.id === "iron" && me.cd2 <= 0 && abs < 240) { toward(); me.ai.skill2 = true; return me.ai; }
-        if (me.id === "iron" && me.cd1 <= 0) { toward(); me.ai.skill1 = true; return me.ai; }
-        if (me.id === "gale" && me.cd1 <= 0) { me.ai.skill1 = true; return me.ai; }
-        if (me.id === "shadow" && me.cd1 <= 0 && abs < 360) { me.ai.skill1 = true; return me.ai; }
-        if (me.id === "bastion" && me.cd2 <= 0 && abs < 200) { toward(); me.ai.skill2 = true; return me.ai; }
-        me.ai.up = true;
-        away();
-        return me.ai;
-      }
-      if (meteor) {
-        away();
-        if (me.id === "gale" && me.cd1 <= 0) me.ai.skill1 = true;
-        else if (me.id === "shadow" && me.cd1 <= 0) me.ai.skill1 = true;
-        return me.ai;
-      }
-      if (oppAttacking) {
-        if (oppMove.includes("iron_s0")) {
-          away();
-          me.ai.up = true;
-          return me.ai;
-        }
-        if (me.id === "shadow" && me.cd2 <= 0 && abs < 145) { me.ai.skill2 = true; return me.ai; }
-        if (me.id === "gale" && me.cd1 <= 0 && abs < 240) { me.ai.skill1 = true; return me.ai; }
-        if (me.id === "bastion" && me.cd2 <= 0 && abs < 170) { toward(); me.ai.skill2 = true; return me.ai; }
-        if (me.id === "iron" && me.cd1 <= 0) { me.ai.skill1 = true; return me.ai; }
-        if (abs < 80) away();
-        else stay();
-        return me.ai;
-      }
-    }
-
-    me.ai.wait -= 1;
-    if (me.ai.wait > 0 && !oppStun) {
-      if (abs > preferred + 28) toward();
-      else if (abs < preferred - 40) away();
-      else stay();
-      return me.ai;
-    }
-    me.ai.wait = cfg.think + Math.floor(random() * 3);
-
-    if (roll(cfg.miss) && !oppStun && !threatened) {
-      if (abs > 60) toward();
-      return me.ai;
-    }
-
-    if (me.mp >= me.def.ult.cost && roll(cfg.ult)) {
-      const ultOk =
-        (me.id === "pyro" && abs < 390) ||
-        (me.id === "shadow" && abs < 250) ||
-        (me.id === "gale" && abs < 165) ||
-        (me.id === "iron" && abs < 145) ||
-        (me.id === "bastion" && abs < 230);
-      if (ultOk) {
-        me.ai.ult = true;
-        return me.ai;
-      }
-    }
-
-    if (roll(cfg.skill)) {
-      if (me.id === "pyro") {
-        if (me.cd2 <= 0 && abs < 290 && abs > 36) { me.ai.skill2 = true; return me.ai; }
-        if (me.cd1 <= 0 && abs > 64 && abs < 460) { me.ai.skill1 = true; return me.ai; }
-        if (me.cd0 <= 0 && abs > 70) { me.ai.special = true; return me.ai; }
-      } else if (me.id === "gale") {
-        if (me.cd1 <= 0 && (abs > 110 || oppAttacking) && abs < 250) { me.ai.skill1 = true; return me.ai; }
-        if (me.cd2 <= 0 && abs < 155) { me.ai.skill2 = true; return me.ai; }
-        if (me.cd0 <= 0 && abs < 190 && abs > 46) { me.ai.special = true; return me.ai; }
-      } else if (me.id === "iron") {
-        if (me.cd0 <= 0 && abs < 112) { me.ai.special = true; return me.ai; }
-        if (me.cd1 <= 0 && me.hp < me.maxHp * 0.7) { me.ai.skill1 = true; return me.ai; }
-        if (me.cd2 <= 0 && abs < 175) { me.ai.skill2 = true; return me.ai; }
-      } else if (me.id === "shadow") {
-        if (me.cd0 <= 0 && me.hp > me.maxHp * 0.52 && (me.cd1 > 24 || me.cd2 > 24 || me.mp < 90)) { me.ai.special = true; return me.ai; }
-        if (me.cd2 <= 0 && abs < 145 && (oppAttacking || opp.busy() || me.mp < 130)) { me.ai.skill2 = true; return me.ai; }
-        if (me.cd1 <= 0 && abs < 340) { me.ai.skill1 = true; return me.ai; }
-      } else if (me.id === "bastion") {
-        if (me.cd1 <= 0 && abs < 280) { me.ai.skill1 = true; return me.ai; }
-        if (me.cd2 <= 0 && abs < 190) { me.ai.skill2 = true; return me.ai; }
-        if (me.cd0 <= 0 && abs < 150) { me.ai.special = true; return me.ai; }
-      }
-    }
-
-    if (oppStun && cfg.aggro > 0.5) {
-      toward();
-      if (abs < 100 && roll(cfg.aggro)) {
-        if (me.cd0 <= 0 && abs < 110 && me.id !== "pyro") me.ai.special = true;
-        else me.ai.punch = true;
-      }
-      return me.ai;
-    }
-
-    if (abs > preferred + 32) {
-      toward();
-      if (roll(cfg.jump) && abs > 150) me.ai.up = true;
-    } else if (abs < preferred - 42) {
-      away();
-    } else if (abs < 95 && roll(cfg.aggro)) {
-      me.ai.punch = true;
-    } else {
-      stay();
-    }
-    return me.ai;
   }
 
     function pushApart() {

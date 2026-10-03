@@ -250,7 +250,15 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     await clickClock(page, '[data-action="ult"]'); await clockAdvance(page, 80);
     s = await state(page); assert.notEqual(s.snapshot.fighters[0].skillMove, 'shadow_ult'); assert.ok(s.snapshot.fighters[0].mp >= beforeMp);
     record('uncharged ultimate blocked and energy percentage visible', { label: await page.locator('[data-action="ult"] .cooldown').textContent() });
-    await clickClock(page, '[data-action="special"]'); await clockAdvance(page, 160);
+    // Wait for recovery just as for the other skill buttons below. Smarter AI
+    // can hit during this check; an input during hitstun is not an input failure.
+    for (let retry = 0; retry < 40; retry++) {
+      s = await state(page);
+      if (!['skill','punch','stun','dead'].includes(s.snapshot.fighters[0].state)) await clickClock(page, '[data-action="special"]');
+      await clockAdvance(page, 40); s = await state(page);
+      if (s.snapshot.fighters[0].cd0 > 0) break;
+    }
+    await clockAdvance(page, 120);
     s = await state(page); assert.ok(s.snapshot.fighters[0].cd0 > 0); assert.equal(s.snapshot.fighters[0].mp, 200);
     assert.match(await page.locator('[data-action="special"] .cooldown').textContent(), /\d/);
     record('special cooldown and original shadow energy skill work', { cooldown: s.snapshot.fighters[0].cd0, mp: s.snapshot.fighters[0].mp });
