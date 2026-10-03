@@ -1,75 +1,40 @@
-﻿$ErrorActionPreference = "Stop"
+﻿param([string]$ConfigPath = (Join-Path $PSScriptRoot '.deploy/target.json'), [switch]$PackageOnly)
+$ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
-
-Add-Type -AssemblyName System.Windows.Forms | Out-Null
-
-function Text([int[]]$codes) {
-  -join ($codes | ForEach-Object { [char]$_ })
-}
-
-$tOk = Text 0x90E8, 0x7F72, 0x6210, 0x529F
-$tFail = Text 0x90E8, 0x7F72, 0x5931, 0x8D25
-$site = "https://ruofei6666.github.io/Ave-Mujica-/"
-$hint = (Text 0x5927, 0x7EA6, 0x0031, 0x5206, 0x949F, 0x540E, 0x5237, 0x65B0, 0x5373, 0x53EF) + "`r`n" + $site
-$latest = (Text 0x6CA1, 0x6709, 0x65B0, 0x4FEE, 0x6539, 0xFF0C, 0x7F51, 0x7AD9, 0x5DF2, 0x662F, 0x6700, 0x65B0) + "`r`n" + $site
-
-function Popup($ok, $body) {
-  $title = if ($ok) { $tOk } else { $tFail }
-  $icon = if ($ok) { [System.Windows.Forms.MessageBoxIcon]::Information } else { [System.Windows.Forms.MessageBoxIcon]::Error }
-  Write-Host ""
-  Write-Host $title -ForegroundColor $(if ($ok) { "Green" } else { "Red" })
-  Write-Host $body
-  [System.Windows.Forms.MessageBox]::Show($body, $title, [System.Windows.Forms.MessageBoxButtons]::OK, $icon) | Out-Null
-}
-
+function Quote-Shell([string]$Value) { "'" + $Value.Replace("'", "'\''") + "'" }
+function Run-Native([string]$Program, [string[]]$Arguments) { & $Program @Arguments; if ($LASTEXITCODE -ne 0) { throw "$Program 失败，退出码 $LASTEXITCODE。" } }
 try {
-  Write-Host ""
-  Write-Host "Ave Mujica" -ForegroundColor Cyan
-
-  $src = Get-ChildItem -File -Filter "*.html" |
-    Where-Object { $_.Name -ne "index.html" } |
-    Select-Object -First 1
-
-  if (-not $src) {
-    Popup $false "HTML not found"
-    exit 1
-  }
-
-  Copy-Item -LiteralPath $src.FullName -Destination (Join-Path $PSScriptRoot "index.html") -Force
-
-  $gitName = git config --get user.name
-  if (-not $gitName) {
-    $env:GIT_AUTHOR_NAME = "ruofei6666"
-    $env:GIT_AUTHOR_EMAIL = "ruofei6666@users.noreply.github.com"
-    $env:GIT_COMMITTER_NAME = "ruofei6666"
-    $env:GIT_COMMITTER_EMAIL = "ruofei6666@users.noreply.github.com"
-  }
-
-  git add -A
-  $status = git status --porcelain
-  if (-not $status) {
-    Popup $true $latest
-    exit 0
-  }
-
-  $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
-  $msg = "Update Ave Mujica ($stamp)"
-  & git.exe @("commit", "-m", $msg)
-  if ($LASTEXITCODE -ne 0) {
-    Popup $false "git commit failed"
-    exit 1
-  }
-
-  git push origin HEAD
-  if ($LASTEXITCODE -ne 0) {
-    Popup $false "git push failed"
-    exit 1
-  }
-
-  Popup $true $hint
-  exit 0
-}
-catch {
-  Popup $false $_.Exception.Message
-  exit 1
-}
+    $release = & (Join-Path $PSScriptRoot 'scripts/build-release.ps1')
+    if ($PackageOnly) { Write-Host '仅打包：未连接服务器、未上传、未部署。'; exit 0 }
+    if (-not (Test-Path -LiteralPath $ConfigPath -PathType Leaf)) { throw '请先按 README 安装云服务器，把 scripts/deploy.example.json 复制到 .deploy/target.json 并填写 SSH 信息。发布包已生成。' }
+    $target = Get-Content -LiteralPath $ConfigPath -Raw | ConvertFrom-Json
+    $targetHost = [string]$target.host; $targetUser = [string]$target.user; $targetPort = [int]$target.port; $remotePath = [string]$target.remotePath
+    $service = if ($target.service) { [string]$target.service } else { 'ave-mujica' }
+    if ($targetHost -notmatch '^[A-Za-z0-9][A-Za-z0-9_.:-]*$' -or $targetUser -notmatch '^[a-z_][a-z0-9_-]{0,31}$' -or $targetPort -lt 1 -or $targetPort -gt 65535) { throw 'SSH host/user/port 无效。' }
+    if ($remotePath -notmatch '^/(opt|srv)/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$' -or $remotePath.Split('/') -contains '..' -or $remotePath.Split('/') -contains '.') { throw 'remotePath 必须是 /opt 或 /srv 下的专用目录，例如 /opt/ave-mujica。' }
+    if ($service -notmatch '^[a-z][a-z0-9-]{0,63}$') { throw '服务名无效。' }
+    Get-Command ssh, scp -ErrorAction Stop | Out-Null
+    $destination = "$targetUser@$targetHost"
+    $scpHost = if ($targetHost.Contains(':')) { "[$targetHost]" } else { $targetHost }
+    $remoteArchive = '/tmp/ave-mujica-' + $release.Release + '.tar.gz'
+    $sshOptions = @('-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes')
+    Run-Native 'scp' ($sshOptions + @('-P', [string]$targetPort, $release.Archive, "${targetUser}@${scpHost}:$remoteArchive"))
+    $command = @'
+set -eu
+archive=__ARCHIVE__
+test "$(sha256sum "$archive" | cut -d ' ' -f 1)" = __HASH__
+work=$(mktemp -d /tmp/ave-mujica-update.XXXXXX)
+trap 'case "$work" in /tmp/ave-mujica-update.*) rm -rf -- "$work" ;; esac' EXIT
+tar -xzf "$archive" -C "$work" ./scripts/update-release.sh
+if [ "$(id -u)" -eq 0 ]; then
+  bash "$work/scripts/update-release.sh" __ROOT__ "$archive" __SERVICE__ __RELEASE__
+else
+  sudo -n bash "$work/scripts/update-release.sh" __ROOT__ "$archive" __SERVICE__ __RELEASE__
+fi
+rm -f -- "$archive"
+'@
+    $command = $command.Replace('__ARCHIVE__', (Quote-Shell $remoteArchive)).Replace('__HASH__', (Quote-Shell $release.Sha256)).Replace('__ROOT__', (Quote-Shell $remotePath)).Replace('__SERVICE__', (Quote-Shell $service)).Replace('__RELEASE__', (Quote-Shell $release.Release)).Replace("`r`n", "`n")
+    Run-Native 'ssh' ($sshOptions + @('-p', [string]$targetPort, $destination, $command))
+    Write-Host '更新完成，服务器已通过健康检查。' -ForegroundColor Green
+    Write-Host '服务重启会结束已有房间；公网 HTTPS 与手机速度须另外实测。'
+} catch { Write-Host $_.Exception.Message -ForegroundColor Red; Write-Host '切换后健康检查失败会恢复上一版本；首次安装没有旧版本可恢复。'; exit 1 }

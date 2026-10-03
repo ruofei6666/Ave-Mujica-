@@ -1,0 +1,237 @@
+/*
+ * UI kit: the shapes every screen is built from.
+ *
+ * Shape language
+ *   - 45deg chamfers instead of rounded corners (panels cut top-left/bottom-right,
+ *     buttons cut top-right/bottom-left)
+ *   - 1px hairline edges that follow the chamfer (two clipped layers)
+ *   - parallelogram tags, mono micro-labels, hazard stripes, corner brackets
+ */
+@layer components {
+  /* ---------- frame: chamfered panel with an edge ---------- */
+  .frame {
+    --cut: 1rem;
+    --edge: rgb(255 255 255 / .16);
+    --fill: rgb(10 12 18 / .84);
+    position: relative;
+    isolation: isolate;
+    background: var(--edge);
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  }
+  .frame::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    background: var(--fill);
+    /* a 1px edge on a 45deg cut shortens the inner cut by (2 - sqrt 2) px */
+    clip-path: polygon(calc(var(--cut) - .586px) 0, 100% 0, 100% calc(100% - var(--cut) + .586px), calc(100% - var(--cut) + .586px) 100%, 0 100%, 0 calc(var(--cut) - .586px));
+  }
+  .frame-sm { --cut: .55rem; }
+  .frame-lg { --cut: 1.6rem; }
+  .frame-volt { --edge: var(--volt); }
+  .frame-hot { --edge: var(--hot); }
+  .frame-accent { --edge: var(--accent); }
+  .frame-solid { --fill: var(--carbon); }
+  .frame-brackets::after {
+    content: '';
+    position: absolute;
+    inset: .35rem;
+    pointer-events: none;
+    --b: var(--volt);
+    --len: .8rem;
+    background:
+      linear-gradient(var(--b), var(--b)) right top / var(--len) 2px no-repeat,
+      linear-gradient(var(--b), var(--b)) right top / 2px var(--len) no-repeat,
+      linear-gradient(var(--b), var(--b)) left bottom / var(--len) 2px no-repeat,
+      linear-gradient(var(--b), var(--b)) left bottom / 2px var(--len) no-repeat;
+  }
+
+  /* ---------- micro typography ---------- */
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font: 500 .75rem/1 var(--font-mono);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--fog);
+  }
+  .kicker::before {
+    content: '';
+    flex: none;
+    width: .45rem;
+    height: .45rem;
+    background: var(--volt);
+  }
+  .headline {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: .95;
+    letter-spacing: .02em;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .18rem 1rem .18rem .8rem;
+    background: var(--volt);
+    color: var(--ink);
+    font: 600 .75rem/1.3 var(--font-mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, 100% 0, calc(100% - .5rem) 100%, 0 100%);
+  }
+  .tag-dark { background: rgb(255 255 255 / .1); color: var(--bone); }
+  .tag-hot { background: var(--hot); color: #fff; }
+  .subtle { color: var(--fog); font-size: .9rem; }
+  .status { min-height: 1.4em; color: var(--volt); font: 500 .85rem/1.4 var(--font-mono); }
+  .status:empty { min-height: 0; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    --btn-cut: .8rem;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    min-height: 2.9rem;
+    padding: 0 1.6rem;
+    border: 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: .12em;
+    transition: transform .12s ease, filter .15s ease, background-color .15s ease, color .15s ease;
+    clip-path: polygon(0 0, calc(100% - var(--btn-cut)) 0, 100% var(--btn-cut), 100% 100%, var(--btn-cut) 100%, 0 calc(100% - var(--btn-cut)));
+  }
+  .btn:active:not(:disabled) { transform: translateY(1px) scale(.985); }
+  .btn:disabled { cursor: not-allowed; }
+  .btn .ui-ic { width: 1.3em; height: 1.3em; flex: none; }
+
+  .btn-primary { background: var(--volt); color: var(--ink); }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: .9rem;
+    background: repeating-linear-gradient(-45deg, var(--ink) 0 .2rem, transparent .2rem .4rem);
+    opacity: .85;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1) saturate(1.15); }
+  .btn-primary:hover:not(:disabled) .ui-chev { animation: chev-run .7s linear infinite; }
+  .btn-primary:disabled { background: #272b36; color: #6b7384; }
+  .btn-primary:disabled::before { opacity: .3; }
+
+  .btn-line {
+    --edge: rgb(255 255 255 / .3);
+    --fill: rgb(12 14 20 / .92);
+    background: var(--edge);
+    color: var(--bone);
+  }
+  .btn-line::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    background: var(--fill);
+    clip-path: polygon(0 0, calc(100% - var(--btn-cut) + .586px) 0, 100% calc(var(--btn-cut) - .586px), 100% 100%, calc(var(--btn-cut) - .586px) 100%, 0 calc(100% - var(--btn-cut) + .586px));
+  }
+  .btn-line:hover:not(:disabled) { --edge: var(--volt); color: var(--volt); }
+  .btn-line:disabled { color: #6b7384; --edge: rgb(255 255 255 / .12); }
+  .btn-sm { min-height: 2.3rem; padding: 0 1.1rem; font-size: 1rem; --btn-cut: .6rem; }
+
+  .text-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .2rem 0;
+    border: 0;
+    background: none;
+    color: var(--bone);
+    font: 500 .8rem/1.2 var(--font-mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-decoration-color: rgb(255 255 255 / .3);
+    text-underline-offset: .3em;
+    transition: color .15s ease, text-decoration-color .15s ease;
+  }
+  .text-btn:hover { color: var(--volt); text-decoration-color: var(--volt); }
+  .text-btn .ui-ic { width: 1em; height: 1em; }
+
+  .icon-btn {
+    --cut: .55rem;
+    --fill: rgb(12 14 20 / .8);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .15rem;
+    width: 3.1rem;
+    height: 3.1rem;
+    border: 0;
+    color: var(--bone);
+    transition: color .15s ease, transform .12s ease;
+  }
+  .icon-btn:hover { color: var(--volt); --edge: var(--volt); }
+  .icon-btn:active { transform: scale(.94); }
+  .icon-btn .ui-ic { width: 1.25rem; height: 1.25rem; }
+  .icon-btn small { font: 500 .6rem/1 var(--font-mono); letter-spacing: .14em; }
+
+  /* ---------- icons ---------- */
+  .ui-ic, .ic {
+    display: inline-block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linejoin: miter;
+    stroke-linecap: square;
+  }
+  .ui-ic.solid { fill: currentColor; stroke: none; }
+
+  /* ---------- decoration ---------- */
+  .hazard { background: var(--hazard, repeating-linear-gradient(-45deg, var(--volt) 0 .4rem, var(--ink) .4rem .8rem)); }
+  .barcode {
+    height: 1.1rem;
+    background:
+      repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 4px, currentColor 4px 5px, transparent 5px 9px, currentColor 9px 12px, transparent 12px 14px, currentColor 14px 15px, transparent 15px 20px);
+    opacity: .55;
+  }
+
+  /* ---------- progress / segmented controls ---------- */
+  .segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: .3rem; }
+  .segmented button {
+    min-height: 2.2rem;
+    border: 0;
+    background: rgb(255 255 255 / .07);
+    color: var(--fog);
+    font: 800 1rem/1 var(--font-display);
+    letter-spacing: .12em;
+    clip-path: polygon(.5rem 0, 100% 0, calc(100% - .5rem) 100%, 0 100%);
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .segmented button:hover { color: var(--bone); background: rgb(255 255 255 / .14); }
+  .segmented button.active, .segmented button[aria-pressed='true'] { background: var(--volt); color: var(--ink); }
+
+  .btn-block { display: flex; width: 100%; }
+
+  /* clip-path would cut a normal outline off, so focus is drawn inside the shape */
+  .frame:focus-visible, .btn:focus-visible, .icon-btn:focus-visible, .segmented button:focus-visible,
+  .character-card:focus-visible, .opponent-card:focus-visible, .mode-tab:focus-visible, .voice-preview:focus-visible, .action-btn:focus-visible {
+    outline: 2px solid var(--volt);
+    outline-offset: -.4rem;
+  }
+  .btn-primary:focus-visible, .punch-btn:focus-visible { outline-color: var(--ink); }
+}
+
+@keyframes chev-run {
+  from { transform: translateX(0); }
+  50% { transform: translateX(.25rem); }
+  to { transform: translateX(0); }
+}

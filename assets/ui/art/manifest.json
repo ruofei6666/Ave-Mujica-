@@ -1,0 +1,167 @@
+{
+  "version": 1791027258,
+  "slots": {
+    "bg-arena-a": {
+      "file": "bg-arena-a.webp",
+      "width": 1920,
+      "height": 1080,
+      "kind": "plate"
+    },
+    "bg-arena-b": {
+      "file": "bg-arena-b.webp",
+      "width": 1920,
+      "height": 1080,
+      "kind": "plate"
+    },
+    "bg-menu": {
+      "file": "bg-menu.webp",
+      "width": 1920,
+      "height": 1080,
+      "kind": "plate"
+    },
+    "deco-marks-1": {
+      "file": "deco-marks-1.webp",
+      "width": 285,
+      "height": 141,
+      "kind": "mask"
+    },
+    "deco-marks-10": {
+      "file": "deco-marks-10.webp",
+      "width": 285,
+      "height": 153,
+      "kind": "mask"
+    },
+    "deco-marks-11": {
+      "file": "deco-marks-11.webp",
+      "width": 216,
+      "height": 215,
+      "kind": "mask"
+    },
+    "deco-marks-12": {
+      "file": "deco-marks-12.webp",
+      "width": 340,
+      "height": 65,
+      "kind": "mask"
+    },
+    "deco-marks-2": {
+      "file": "deco-marks-2.webp",
+      "width": 262,
+      "height": 155,
+      "kind": "mask"
+    },
+    "deco-marks-3": {
+      "file": "deco-marks-3.webp",
+      "width": 231,
+      "height": 226,
+      "kind": "mask"
+    },
+    "deco-marks-4": {
+      "file": "deco-marks-4.webp",
+      "width": 65,
+      "height": 174,
+      "kind": "mask"
+    },
+    "deco-marks-5": {
+      "file": "deco-marks-5.webp",
+      "width": 63,
+      "height": 174,
+      "kind": "mask"
+    },
+    "deco-marks-6": {
+      "file": "deco-marks-6.webp",
+      "width": 340,
+      "height": 99,
+      "kind": "mask"
+    },
+    "deco-marks-7": {
+      "file": "deco-marks-7.webp",
+      "width": 204,
+      "height": 202,
+      "kind": "mask"
+    },
+    "deco-marks-8": {
+      "file": "deco-marks-8.webp",
+      "width": 326,
+      "height": 77,
+      "kind": "mask"
+    },
+    "deco-marks-9": {
+      "file": "deco-marks-9.webp",
+      "width": 233,
+      "height": 512,
+      "kind": "mask"
+    },
+    "deco-shards-1": {
+      "file": "deco-shards-1.webp",
+      "width": 165,
+      "height": 436,
+      "kind": "mask"
+    },
+    "deco-shards-2": {
+      "file": "deco-shards-2.webp",
+      "width": 321,
+      "height": 331,
+      "kind": "mask"
+    },
+    "deco-shards-3": {
+      "file": "deco-shards-3.webp",
+      "width": 316,
+      "height": 389,
+      "kind": "mask"
+    },
+    "deco-shards-4": {
+      "file": "deco-shards-4.webp",
+      "width": 310,
+      "height": 363,
+      "kind": "mask"
+    },
+    "deco-shards-5": {
+      "file": "deco-shards-5.webp",
+      "width": 155,
+      "height": 418,
+      "kind": "mask"
+    },
+    "deco-shards-6": {
+      "file": "deco-shards-6.webp",
+      "width": 354,
+      "height": 390,
+      "kind": "mask"
+    },
+    "deco-shards-7": {
+      "file": "deco-shards-7.webp",
+      "width": 257,
+      "height": 381,
+      "kind": "mask"
+    },
+    "deco-shards-8": {
+      "file": "deco-shards-8.webp",
+      "width": 348,
+      "height": 347,
+      "kind": "mask"
+    },
+    "emblem": {
+      "file": "emblem.webp",
+      "width": 512,
+      "height": 512,
+      "kind": "mask"
+    },
+    "fx-burst": {
+      "file": "fx-burst.webp",
+      "width": 768,
+      "height": 768,
+      "kind": "mask"
+    },
+    "fx-grunge": {
+      "file": "fx-grunge.webp",
+      "width": 1600,
+      "height": 900,
+      "kind": "mask"
+    },
+    "fx-speed": {
+      "file": "fx-speed.webp",
+      "width": 1600,
+      "height": 900,
+      "kind": "mask"
+    }
+  }
+}

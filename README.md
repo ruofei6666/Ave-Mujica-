@@ -1,18 +1,190 @@
-# Ave Mujica 乱斗
+# Ave Mujica · 乱斗剧场
 
-单机火柴人格斗小游戏。打开即玩，无需安装。
+五名 Ave Mujica 乐队成员（祥子、初华、睦、海铃、喵梦）的浏览器格斗小游戏，工业科幻界面搭配二次元角色与剧场舞台，支持人机对战和六位房间码双人邀请。人人对战由同一个 Node 服务模拟战斗，浏览器负责输入和画面；页面、声音、图片和 WebSocket 都从同一服务读取。
 
-## 在线游玩
+## Vue 工程与开发
 
-https://ruofei6666.github.io/Ave-Mujica-/
+页面采用 **Vue 3 + Vite + TypeScript + Tailwind CSS + ESLint**，由 **pnpm** 管理依赖和工程命令，支持电脑和手机浏览器。选人、房间、战斗、弹窗分别是 Vue 单文件组件；角色列表、房间席位、招式列表和结算数据采用 Vue 响应式状态。
 
-## 本地运行
+客户端控制器、联机协议、页面状态、Node 房间服务，以及底层战斗模拟、AI、Canvas 渲染、舞台、粒子特效、图集和 Web Audio 实现均使用 TypeScript。`shared/types.ts` 定义浏览器与服务器共用的输入、角色、伤害、弹射物、场地危险物和快照类型；`tsconfig.json` 开启 `strict` 并关闭 `allowJs`，直接检查实现代码。Vite/esbuild 将源码编译为浏览器和 Node 可运行的 JavaScript。运行时通过模块导入关联，不再依赖 HTML 中的全局脚本加载顺序。页面卸载会取消动画帧、监听器、计时器、音频和 WebSocket。
 
-用浏览器打开 `Ave Mujica乱斗.html` 或 `index.html` 即可。
 
-## 一键部署
+| 位置                                                               | 用途                        |
+| ---------------------------------------------------------------- | ------------------------- |
+| `src/main.ts`、`src/App.vue`                                      | Vue 应用入口、状态注入和挂载/卸载生命周期 |
+| `src/components/`                                                | 选人、房间、战斗、弹窗、角色列表和 SVG 图标  |
+| `src/game/client.ts`、`types.ts`、`theatre-state.ts`               | 客户端控制、页面状态与音量设置类型         |
+| `src/game/art.ts`、`fx.ts`、`stage.ts`、`renderer.ts`、`audio.ts`  | Canvas、图集动画、粒子特效和 Web Audio 实现 |
+| `src/game/asset-types.ts`、`fx-types.ts`、`canvas.ts`              | 素材、粒子图元类型与 Canvas 上下文检查     |
+| `shared/combat.ts`、`shared/types.ts`                              | 浏览器和服务器共用的确定性战斗模拟与类型契约 |
+| `server/index.ts`、`server/types.ts`                              | 权威房间服务器、输入校验和公共文件隔离       |
+| `simulate-balance.ts`                                            | 使用共享战斗内核的本地双 AI 平衡诊断      |
+| `src/styles/tailwind.css`、`kit.css`、`screens.css`、`battle.css`  | 设计令牌与入口、切角面板/按钮/标签、菜单房间弹窗、战斗 HUD 与触控 |
+| `src/game/ui-art.ts`、`scripts/prepare-ui-art.py`、`art-inbox/`    | 生成的界面素材：运行时加载、处理脚本，以及给生图模型的提示词 |
+| `dist/client/`、`dist/server/index.cjs`                           | 浏览器和 Node 的生产构建产物       |
 
-改完游戏后，双击 `一键部署.bat`。脚本会把最新内容同步到网站并推到 GitHub，大约 1 分钟后刷新即可：
 
-https://ruofei6666.github.io/Ave-Mujica-/
+开发环境使用 **Node.js 22.13+、pnpm 11.25.0**，版本固定在 `package.json`。未安装 pnpm 时，可先运行一次 `npm install --global pnpm@11.25.0`；后续项目操作统一使用 pnpm。
+
+```powershell
+pnpm install --frozen-lockfile
+pnpm dev             # 同时启动 Vite 5173 和房间服务 3000，支持热更新
+pnpm check           # ESLint、TypeScript、回归测试和生产构建
+pnpm build
+pnpm start           # 在 3000 提供构建后的页面和联机服务
+```
+
+开发时打开 `http://localhost:5173`；Vite 将 `/ws`、`/health` 和原始游戏素材代理到 3000。可分别用 `pnpm dev:client` 和 `pnpm dev:server` 启动前后端。若端口被已有服务占用，可在 PowerShell 设置 `$env:PORT='3030'; $env:VITE_PORT='5180'` 后执行 `pnpm dev`，代理会使用相同的后端端口。生产服务仅公开 `dist/client` 的页面和资源，源代码、依赖目录和测试文件不可通过 HTTP 读取。改动源码后应重新 `pnpm build`；`pnpm start` 只在产物缺失时自动构建。
+
+Vite 使用官方 `@vitejs/plugin-vue` 编译 Vue 单文件组件，构建产物统一写入 `dist/client`。Tailwind 使用 3.4 系列和 PostCSS 并启用 Preflight；颜色、字体、切角/斜切工具类和屏幕断点（`short`、`tight`、`portrait`、`fine`）在 `tailwind.config.cjs`，字体来自 `@fontsource/barlow-condensed` 与 `@fontsource/jetbrains-mono`（OFL，随包分发，不读 CDN）。所有依赖均在 `pnpm-lock.yaml` 中锁定；`pnpm-workspace.yaml` 固定安装策略，通过 overrides 统一 Vite/Tailwind 的 PostCSS 版本，仅允许 esbuild 执行必要的安装脚本。启动和测试脚本显式包含各自的构建步骤。GitHub Actions 使用相同 pnpm 版本、锁文件和 pnpm 缓存。
+
+Vue 组件直接使用原生 Canvas、按钮和表单；战斗控制器处理 DOM 指针事件、Web Audio、切后台与窗口失焦。`onMounted` 初始化游戏，`onBeforeUnmount` 清理控制器及其资源；原生 `dialog` 在桌面、横屏和竖屏视口中居中。
+
+## 画面、角色与特效
+
+界面采用“暗色广播控制台”视觉：以《明日方舟：终末地》的精密工业感（45° 切角面板、细线框、技术标注、警示条）加《绝区零》的街头直播感（斜切、半调网点、粗斜体数字、强对比）为参考。近黑底、骨白文字、信号黄 `#ffe81a` 为系统主色，警示红与科技青做点缀，五位角色各带自己的主题色，选人时整个界面随之换色。
+
+分工是：**面板、按钮、血条、图标全部由代码绘制**（`clip-path` 切角与 SVG，任何分辨率边缘都锐利）；**AI 只画代码画不出来的背景和纹理**。生成素材是可选的：没有素材时界面使用代码绘制的备用背景和原有哥特舞台，不会缺图。
+
+素材流程：提示词在 `art-inbox/PROMPTS.md`，生成的原图按文件名放进 `art-inbox/`，运行 `python scripts/prepare-ui-art.py`（`--check` 先看缺哪些）。脚本把背景裁成 16:9 的 WebP，把黑底白图转成“白色＋透明度”的遮罩，图集自动切成单图，写入 `assets/ui/art/` 和 `manifest.json`。`src/game/ui-art.ts` 启动时读取清单，给每张图设置 CSS 变量 `--art-<名称>` 和 `<html data-art>` 标记，样式据此切换；战斗背景 `bg-arena-*` 按每局轮换，地面线固定在画面高度 83.6% 处，与角色脚底线对齐。控件与文字由 Vue 和 CSS 渲染，原生弹窗继续在视口居中。
+
+五名角色的旧美术已替换为参照官方舞台形象生成的透明图片，游戏不依赖图片 CDN：
+
+
+| 文件                                                                    | 内容                                                                                                                    |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `assets/characters/`、`src/game/character-assets.ts`、`src/game/art.ts` | 每人一张透明 WebP 图集，包含 24 张动作帧：待机 4、步行 6、跳跃 2、普攻 4、技能 4、受击 2、胜利 2；另有独立高清立绘、头像与大招半身像。每帧持有各自乐器，人物为 AI 同人再创作，旧贴纸、程序人物和外部描边已移除 |
+| `src/game/fx.ts`                                                      | 特效引擎：粒子、斩击月牙、星爆、法阵、闪电、光柱、残影、镜头抖动与缩放；20 个技能各有独立演出，弹射物与陨石、音柱等场上物体也在这里绘制。命中是分层冲击：炽白闪光核心与放射状冲击线先到，再是星爆、冲击环和火花，重击追加玻璃碎片与短促推镜；大招与 K.O. 另有一到四帧的冲击反相帧（受“减少闪光”控制，1.2 秒内最多一次）。大场面的光晕、放射线和冲击环画在角色身后、放射线从身体外围起笔，施放者始终清晰；伤害数字从肩颈高度弹出并飘过头顶，不长时间压在身上                                                 |
+| `src/game/stage.ts`                                                   | 舞台：月夜哥特剧院——五色玫瑰窗、彩窗、帷幕、聚光灯光束、反光地板与旋转法阵                                                                                |
+| `src/game/renderer.ts`                                                | 竞技场渲染器：把战斗核心的快照与事件翻译成画面和特效；角色先绘制到精灵缓冲再合成，倒影与残影复用同一张缓冲；画质自适应                                                           |
+| `src/styles/battle.css`、`src/components/BattleScreen.vue`、`src/game/client.ts` | 战斗界面：角色色斜切血条与滞后伤害条、连击数、开场对阵、大招横幅、K.O. 演出、技能图标与冷却、结算。大招横幅只占血条下方的顶部窄条，不压暗、不遮挡战斗区（对局在横幅播放时仍在进行）                                                                  |
+| `src/game/sfx.ts`、`src/game/audio.ts`                                  | 音效配方与调度：命中、挥拳、起手、14 个招式关键时刻、大招、K.O.、倒计时、能量蓄满和界面点击，全部由振荡器与滤波噪声分层合成                                                                  |
+
+
+选人面板的五张立绘使用独立生成的高清原图，保留约 1500 像素的人物高度；不再从动作图集裁出小图后放大。`scripts/character-portrait-spec.json` 记录立绘提示词与来源，`node scripts/prepare-character-assets.cjs --portraits-only` 可单独打包立绘。显示时支持最高 3 倍设备像素比，并通过素材版本号更新浏览器缓存。
+
+静止时固定第一张待机帧，取消呼吸缩放；步行六帧按头部位置、身高和承重脚底校准，减少原画切换时整个人物的跳动，加入短过渡和轻微重心变化。步频按碰撞处理后的实际移动距离推进，抵住墙壁时收脚停步；起步、收脚姿势平滑衔接，联机快照在行走和待机切换时也插值步行相位。地面松开方向键后位置立即停住，跳跃和受击仍保留各自的运动。五人的立绘、头像、大招半身像和 24 张动作帧统一按官方舞台形象重新制作：初华使用黑金七弦吉他，睦使用粉色闪光七弦吉他，海铃使用淡紫五弦贝斯，喵梦使用木色细鼓棒，祥子的键盘参照 Roland FA-08 的外观并做战斗携带适配。生成记录在 `scripts/character-restoration-spec.json` 和 `scripts/character-restoration-animation-spec.json`，型号、资料来源和改编范围见 `CREDITS.md`。
+
+2026-10-03 步行修复验证：`pnpm check`（包含 39 项测试）、55 项浏览器交互检查，以及 15 组各 600 帧战斗渲染全部通过。测试画布中五人六张步行帧的头部横向偏移均小于 0.42 像素，脚底高度偏移为 0；起停相位连续、松键立即停住，浏览器和资源错误均为零。报告保存在 `.scratch/walk-natural/`。
+
+战斗核心 `shared/combat.ts` 是无画面的，所有演出都由快照里的状态与事件推导，因此人机与联机的表现一致。设置里的「减少闪光与镜头晃动」会关闭闪白、抖动、缩放与大部分粒子；系统开启“减少动态效果”时默认启用。
+
+这里的 Windows 启动、打包与部署操作均从**原项目目录**执行。`dist/ave-mujica-*.tar.gz` 是供 Linux 云服务器使用的运行包，含服务器、资产与 Linux 运维脚本；不是完整源码发行，也不含 Windows 双击启动或部署工具。
+
+## Windows 本机启动
+
+双击 **启动游戏.bat**，保持窗口打开，然后访问 `http://localhost:3000`。需要 Node.js 22.13 或更新版本和 pnpm 11.25.0。脚本按锁文件安装依赖并构建 Vue 客户端和 TypeScript 服务，再启动游戏。
+
+同一 Wi-Fi 的两台设备可尝试启动窗口显示的局域网地址，使用手机浏览器打开、选人人对战，再建房或输入对方的房间码。Windows 防火墙需允许专用网络访问；路由器的客户端隔离也可能阻止互访。显示局域网 IP 不等于公网可用。
+
+命令行等效方式：
+
+```powershell
+pnpm install --frozen-lockfile
+pnpm build
+pnpm start
+```
+
+`HOST` 默认 `0.0.0.0`，`PORT` 默认 `3000`。需要改端口时，在启动前设置环境变量。新版包含外部脚本和资源，应通过 HTTP 服务打开，直接双击 HTML 文件不是完整运行方式。
+
+## GitHub Pages 与 PWA
+
+公开地址：<https://ruofei6666.github.io/Ave-Mujica-/>
+
+Android / 电脑用 Chrome 或 Edge 打开后，点击底部「安装到桌面」；iPhone / iPad 用 Safari 的分享菜单选择「添加到主屏幕」，再从桌面图标打开。首次访问需联网，等到底部显示「离线可玩」后，人机对战的程序、五名角色、背景、字体和声音均已缓存，可以断网启动。浏览器清除网站数据后需要重新联网缓存。
+
+此 Pages 地址提供静态客户端，支持人机对战；房间联机仍需 Node/WebSocket 服务。HTTPS、安装与离线缓存不需要额外服务器。
+
+向 `main` 推送会触发 `.github/workflows/pages.yml`：按锁文件安装、执行 `pnpm check`，只上传 `dist/client` 到 Pages。Vite 使用相对路径，构建时按全部产物内容生成 Service Worker 版本与预缓存清单。更新准备好后菜单显示「更新版本」；点击才刷新，正在进行的对局不会被自动刷新。缓存按站点路径隔离，不会清除同一 GitHub 用户下其他项目的缓存。
+
+PWA 浏览器验收：安装 Python Playwright 并准备 Chromium 浏览器后，运行 `pnpm build` 和 `python tests/pwa-smoke.py`；`--browser` 可指定浏览器。使用 `python tests/pwa-smoke.py --url https://ruofei6666.github.io/Ave-Mujica-/` 检查线上版本。脚本使用独立临时浏览器配置，验证安装条件、全部资源离线读取和离线人机；本地模式还检查对局期间更新等待、用户确认更新、缓存隔离及下载失败回退。
+
+## 操作与房间规则
+
+- 电脑：A/D 移动，W/空格跳跃，J 普攻，K/U/I 三个技能，L 大招；Esc 暂停人机或退出在线对战。
+- 手机：左侧摇杆移动、上推跳跃，右侧五个攻击按钮；建议横屏。
+- 每局 90 秒；生命归零或时间结束判胜，同时倒下是平局。技能有冷却，大招需要满能量；没有防御按键。
+- 两人选角并准备后开场。重赛需要双方请求；一人退出或连接中断会结束房间，另一人可回选人重新建房。
+- 在线对战没有独立暂停。输入失活会清除持续移动；手机切后台可能中断连接。服务器重启会结束已有房间，没有断线重连或主机迁移。
+
+声音需要首次点击后才能播放。配乐、音效、语音默认均为 100%，可独立调整，没有推荐音量按钮。音效增加 3.6 倍内部增益。本次更新会把已有音量设置调整到满音量一次，之后保留手动选择。角色台词仅在选人、大招、K.O. 时触发，K.O. 播放获胜角色的台词；语音期间自动压低配乐与打击声。开场 Round 1 / Fight 已换为 VoiceBosch MR. HAPPY 素材中的真人格斗男声，两句按 CC BY-SA 4.0 分发，随文件附署名与修改说明；按钮仅有短促点击反馈，归音效滑块控制。角色台词使用 PRTS 的真实日语原声。
+
+战斗音效以二次元动作游戏（绝区零一类）的质感为目标，每个声音是几层短音的叠加，而不是一声嘟：**瞬态**（带通噪声“啪”与方波短啾）、**咬合**（经失真的锯齿波，手机喇叭也能听到）、**低频体**（下落的正弦，重击再加次低音与低通轰鸣）、**空气与金属泛音**。命中按伤害分层，护甲命中是金属铿锵，吸蓝是上行“嗖”；挥拳、起手按角色乐器区分（键盘亮闪、吉他拨弦与滑切、贝斯低沉、鼓是鼓皮与镲）；战斗核心发出的 `gale_ult_bolt`、`iron_ult_slam`、`bastion_ult_quake` 等 14 个关键时刻各有自己的“招牌音”；同一人连续命中会逐级升调；重击和大招会短暂压低配乐，让冲击更干净；音位按事件所在的横坐标偏左或偏右。倒计时 3/2/1、本方大招蓄满、开场 Round 1/Fight 也都有合成提示音。各类事件分别限流，同一帧里命中和起手不会互相吞掉。
+
+这些声音只能由自动检查验证，没有人工听感：离线渲染时按 A 计权响度（接近人耳）和 180Hz 以上频段（接近手机喇叭）核对层级，轻击比旧版响约 10 dB，大招和 K.O. 最响，命中次之，挥拳起手更轻，界面点击最轻；另有 47 项单元测试。听感请以实际试听为准，不合适的地方改 `src/game/sfx.ts` 里对应配方的数值即可。来源、原句与制作记录见 [CREDITS.md](CREDITS.md) 和 `assets/audio/manifest.json`。
+
+## 首次云服务器安装
+
+首次安装需要你已有 Linux 云服务器、SSH 访问权限、可用域名和 HTTPS 证书。面向中国大陆部署时，节点、域名备案及网络准入按云服务商要求准备。这里提供安装材料，不会替你购买服务器或操作云账户。
+
+Linux 需有 systemd、全局可执行的 Node.js ≥20、`tar`、`curl`、`flock` 和 Nginx。Node 应安装在系统位置；root 私有的 nvm 目录不能供受限服务用户使用。以下假设应用目录 `/opt/ave-mujica`，服务名 `ave-mujica`：
+
+1. 在 Windows **原项目目录**运行 `powershell -NoProfile -ExecutionPolicy Bypass -File .\deploy.ps1 -PackageOnly`，生成 `dist/ave-mujica-*.tar.gz` 与 SHA256 校验文件。打包脚本会解析 pnpm 的 `ws` 链接并复制其实际文件；发布包不含依赖链接，服务器启动或更新无需安装包管理器或下载依赖。云端运行包不提供 Windows 打包工具，运行时仍兼容 Node.js ≥20。
+2. 用正常 SSH 首次连接服务器，核对服务商提供的主机指纹，再将发布包及校验文件上传到服务器临时目录。示例配置支持 root SSH 密钥；也可使用已有受信任 SSH 配置/agent。更新脚本不关闭主机密钥检查。
+3. 在服务器解包运维脚本并校验上传文件，例如：
+  ```bash
+   cd /tmp
+   sha256sum -c ave-mujica-实际发布编号.tar.gz.sha256
+   mkdir -p ave-mujica-install
+   tar -xzf ave-mujica-实际发布编号.tar.gz -C ave-mujica-install ./scripts
+   sudo bash ave-mujica-install/scripts/install-linux.sh /opt/ave-mujica /tmp/ave-mujica-实际发布编号.tar.gz ave-mujica
+   curl --fail http://127.0.0.1:3000/health
+  ```
+4. 将 `scripts/nginx.conf.example` 中的域名和证书路径改成实际值，放到 Nginx 的 `http` 配置上下文中，执行 `nginx -t` 后重载。样例将 `/ws` 代理为 WebSocket，其他请求同样转给 Node。开放所需 SSH、80/443 端口，游戏 Node 端口只绑定 `127.0.0.1`。域名 DNS、TLS 证书签发和云防火墙需要你在服务商处配置。
+5. 在手机访问实际 `https://你的域名`，确认页面、声音、`wss://你的域名/ws`、两人整局与重赛，再做不同网络的测速。
+
+安装脚本创建没有登录 shell 的 `ave-fighter` 服务用户，生成 systemd 服务和 `/etc/ave-mujica.env`。修改 `PORT` 后需同步 Nginx 上游端口。查看状态与日志：
+
+```bash
+systemctl status ave-mujica
+journalctl -u ave-mujica -n 100 --no-pager
+```
+
+## 之后的双击更新
+
+首次安装、SSH 密钥和已核对的主机密钥完成后，在 **Windows 原项目目录**把 `scripts/deploy.example.json` 复制成 `.deploy/target.json`，填写 `host/user/port/remotePath/service`。该本地目录已被 Git 忽略，也不会进入发布包；不要填写密码或把密钥放进项目。非 root 的 SSH 用户需要具备运行更新脚本的既有非交互 sudo 权限。应用目录仅允许 `/opt` 或 `/srv` 下的专用目录，例如 `/opt/ave-mujica`；`/home`、`/root`、`/tmp`、`/var/tmp` 等位置会被服务隔离，因此脚本拒绝。
+
+以后从 **Windows 原项目目录**双击 **一键部署.bat** 即可打包、上传、验证 SHA256、在服务器预检随机端口健康状态，再切换 `current` 版本并重启服务。健康检查会核对 `/health` 中的进程 PID 与 systemd 的 `MainPID`，并要求至少两次连续成功，避免把占端口的旧实例当作新版本。失败会恢复上一版本并重启；首次安装没有旧版本可回滚。旧 release 会保留供排查，不自动清理。所有正在运行的房间会在重启时结束，建议无人对战时更新。
+
+发布包采用运行文件白名单：dist/client 中的页面和素材、dist/server/index.cjs 中的服务器与战斗核心、启动入口与固定 `ws` 依赖、必要运维脚本。不会包含 `.git`、测试、`.scratch`、源码采集记录、SSH 配置或完整原视频。一键部署不执行 Git 提交或推送，也不负责首次购机、备案、证书或防火墙配置。未生成 Docker 镜像或 `image.tar`。
+
+## 验证范围
+
+```powershell
+pnpm test
+python tests/ui-smoke.py       # 真实浏览器：桌面 / 横屏 / 竖屏界面与联机整局
+python tests/audio-smoke.py    # 原生音频解码与语音触发
+python tests/render-fuzz.py    # 渲染与特效随机对打检查
+```
+
+浏览器检查依赖本机的 Edge 与 Playwright，路径可用 `--edge`、`--playwright` 覆盖。
+
+2026-10-03 血条与生成素材核对：战斗血条原先随标签行的内容伸缩，1440 宽桌面上左条 102.7px、右条 114.4px，每出现一次技能名还会再变长（最长到 174px 与 186px），手机横屏只有 68px。现在两侧各占满自己的网格列（上限 27rem），技能名只在标签行内裁切，不再影响血条：长度固定、左右相等、以计时器为中线镜像，1440×900 为 388.5px，844×390 为 285.4px，390×844 为 116.8px；技能名出现前后几何不变，`tests/ui-smoke.py` 新增三项断言防止回退。同时逐项核对了生成素材：战斗里只有 `fx-burst`（KO 爆裂）和 `fx-speed`（开场 VS）两张图进入画面，都不在血条区域；两张舞台图在 HUD 所在的顶部几行平均亮度不超过 58/255，没有横跨画面的亮条（最亮的一行也只有 7.6% 的像素亮度超过 150），所以问题出在布局而不在素材。ESLint、严格 TypeScript、47 项核心/服务器/音频事件测试、生产构建和真实浏览器交互 58 项通过。检查脚本见 `.scratch/hud-width.cjs` 与 `.scratch/hud-shot.cjs`。
+
+2026-10-03 “暗色广播控制台”界面重做验收：ESLint、严格 TypeScript、39 项核心/服务器测试和生产构建通过；真实浏览器交互 55 项、原生音频 13 项、15 组各 600 帧渲染随机对打全部通过，浏览器与资源错误均为零。1440×900、1024×768、844×390、390×844、320×568 的菜单、PvP 面板和战斗界面无水平溢出，五个技能键在各尺寸下都落在可视区内、互不重叠，触控尺寸不小于 46px。素材管线用合成图端到端验证过：背景淡入、遮罩染色、标志替换、冲击爆裂挂载正常，合成图中画在 83.6% 高度的地面线在游戏里落在世界坐标 y=601.8，与角色脚底线 602 对齐。验证后合成素材已清除，当时 `assets/ui/art/manifest.json` 为空；真实生成素材随后交付，见 `CREDITS.md`。检查脚本见 `.scratch/shots.cjs` 与 `.scratch/art-check.cjs`，冒烟报告为 `.scratch/ui-report.json`。这些是浏览器视口检查，不等于真机验收。
+
+2026-10-03 Vue 迁移验收：入口改为 Vue 3 原生挂载和卸载，组件直接使用浏览器控件，客户端构建目录改为 `dist/client`，开发、Windows 启动、GitHub Actions 和发布脚本同步更新。`pnpm install --frozen-lockfile`、`pnpm peers check` 和 `pnpm check` 通过，包含 ESLint、严格 TypeScript、37 项核心/服务器/音频事件测试及浏览器/Node 构建；浏览器交互 55 项、原生音频 13 项、15 组各 600 帧随机渲染检查全部通过，浏览器及资源错误均为零。四种弹窗在三种视口中的水平和垂直中心偏移均为 0；开发模式的 Tailwind、Canvas 和真实房间代理通过检查。报告见 `.scratch/vue-only-*.log`、`.scratch/ui-report.json`、`.scratch/ui-audio-report.json`、`.scratch/render-fuzz-report.json`、`.scratch/dialog-production-report.json` 和 `.scratch/vue-only-dev-report.json`。
+
+更新后的发布包通过本地独立启动检查：包内 `ws` 为实际文件，Vue 构建、图片、音频、PWA 的启动路径和图标、内部文件隔离，以及真实 WebSocket 建房均正常。报告见 `.scratch/vue-only-release-report.json`。开发预览使用 Vite 5180、房间服务 3030。
+
+2026-10-03 底层 TypeScript 迁移验收：移除了战斗、渲染和音频的旧 `.js` 实现及同名 `.d.ts` 包装；共享战斗、AI、图集、特效、舞台和声音由严格 TypeScript 直接检查。25 个有序角色配对共 22,500 个确定性快照与迁移前逐字节一致；浏览器交互 55 项、原生音频 13 项、15 组各 600 帧随机渲染检查全部通过，四种弹窗在三种视口保持居中。报告保存在 `.scratch/bottom-ts-*.log` 和 `.scratch/bottom-ts-before.json`、`bottom-ts-after.json`。素材生成脚本同步输出有类型的 `character-assets.ts`，双 AI 诊断入口为 `simulate-balance.ts`。
+
+本地 AI 平衡诊断（不会进入生产发布包）：
+
+```powershell
+pnpm balance [rounds] [difficulty] [seed]
+pnpm balance 100 hard 12345
+```
+
+该 CLI 运行同一共享战斗核心的双 AI，对局结果只说明所选 AI 策略下的表现，不能证明真人竞技平衡。
+
+已在本机真实 HTTP/WebSocket 客户端检查建房、选角、准备、公共权威快照、输入序号去重、失活清输入、满房/错码、双人重赛、掉线、消息/载荷/连接限额、心跳，以及公开资源和内部文件隔离；共享战斗核心的回归检查见测试文件。部署包另做离线依赖启动和资产完整性检查。
+
+2026-10-02 原版本验证：37 项战斗核心/服务器/语音事件测试（`npm test`）与 53 项浏览器交互检查（`python tests/ui-smoke.py`，覆盖 1440×900 桌面、844×390 横屏、390×844 竖屏和真实双客户端联机）通过。`python tests/render-fuzz.py` 验证五人全部 120 帧图片互不重复、打包边缘无裁切，实际使用每人 21 个动作姿势（静止固定一帧）；待机像素在不同时刻完全一致、步行过渡正常、网络包间的位置和步行相位匀速推进，人物光照不扩展透明轮廓。15 种配对各 600 帧随机对打通过，覆盖普通、减少动态效果和降级模式，以及技能、K.O. 和重开。浏览器视口检查不等于两台真实手机验收，没有新增真机帧率结论。
+
+原生音频专项检查（`python tests/audio-smoke.py`）13 项通过：17 个 WAV 可解码为非零信号，三条真实音量总线可分别静音/恢复；旧设置迁移到 100% 后可保留后续选择，音效放大增益已进入实际播放链；Round 1 与 Fight 各播放一次，按钮只有音效，普通技能不播角色台词、大招与三类试听按预期播放。报告为 `.scratch/ui-audio-report.json`、`.scratch/ui-report.json` 和 `.scratch/render-fuzz-report.json`。历史四技能语音与系统按钮朗读方案已替换，旧 WAV 存档在忽略的 `.scratch/audio-previous/`。
+
+固定模拟为 60 Hz、快照为 20 Hz。25 个角色配对、40,137 个模拟帧采样的快照 JSON 平均 1,417 字节、峰值 2,527 字节，估算每客户端 27.7 KiB/s、每房间服务器出站 55.3 KiB/s；不含 WebSocket/TCP/TLS 开销，不能当作公网测速或服务器容量承诺。
+
+2026-10-01 已在阿里云杭州 Ubuntu 24.04 服务器安装运行包，Node 24.21.0、Nginx 1.24.0 和 systemd 服务运行正常。云端内部代理检查已通过 HTTP 页面与资源、健康状态、两名 WebSocket 客户端建房/加入/准备/开局、操作与权威快照同步、离房；Node 仅绑定 `127.0.0.1:3000`，预览代理仅绑定 `127.0.0.1:8080`。域名、备案、公共 HTTPS 和公网开放尚未完成，也未完成两台真实手机或中国公网跨网络整局测试。建议上线后验证同 Wi-Fi、不同 Wi-Fi、Wi-Fi＋蜂窝网络，记录连接耗时、RTT、抖动、帧率，并检查切后台、断网退出和服务重启。实际可用容量需测量。
 

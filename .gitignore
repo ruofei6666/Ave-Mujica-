@@ -1,3 +1,12 @@
 dist/
 .DS_Store
 Thumbs.db
+node_modules/
+.scratch/
+.firecrawl/
+.deploy/
+scripts/source-evidence/
+*.log
+# 生图原始文件只放在 art-inbox/，处理后的素材在 assets/ui/art/；提示词文档保留在版本库
+art-inbox/*
+!art-inbox/PROMPTS.md

@@ -3,163 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0e0b24">
+  <meta name="theme-color" content="#07080c">
+  <meta name="color-scheme" content="dark">
+  <!-- dark from the first paint: the stylesheet arrives a moment after the HTML -->
+  <style>html,body{background:#07080c;color:#f3f1ea}</style>
   <meta name="description" content="Ave Mujica乱斗剧场：五名角色，手机触屏格斗与房间码双人对战。">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="乱斗剧场">
   <title>Ave Mujica · 乱斗剧场</title>
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="css/game.css">
-  <script defer src="lib/combat.js"></script>
-  <script defer src="js/character-assets.js"></script>
-  <script defer src="js/art.js"></script>
-  <script defer src="js/fx.js"></script>
-  <script defer src="js/stage.js"></script>
-  <script defer src="js/renderer.js"></script>
-  <script defer src="js/audio.js"></script>
-  <script defer src="js/client.js"></script>
 </head>
-<body>
-  <svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
-    <defs>
-      <symbol id="ic-fist" viewBox="0 0 24 24"><path d="M12 2l2.2 6.3L21 6l-3.3 6.1L22 16l-6.6-.6L12 22l-3.4-6.6L2 16l4.3-3.9L3 6l6.8 2.3z"/></symbol>
-      <symbol id="ic-curtain" viewBox="0 0 24 24"><path d="M3 4c4 1 6 6 6 8s-2 7-6 8M21 4c-4 1-6 6-6 8s2 7 6 8M12 6v12"/></symbol>
-      <symbol id="ic-note" viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></symbol>
-      <symbol id="ic-wave" viewBox="0 0 24 24"><path d="M2 16c3-9 6-9 10 0 2-5 5-6 10-2M2 21h20"/></symbol>
-      <symbol id="ic-meteor" viewBox="0 0 24 24"><circle cx="8" cy="16" r="4.5"/><path d="M12 12L21 3M14.5 16.5L21 10M7.5 11.5L12 7"/></symbol>
-      <symbol id="ic-string" viewBox="0 0 24 24"><path d="M5 3v7l4 2-3 3 4 2v5M19 3v18M15 8h8"/></symbol>
-      <symbol id="ic-mask" viewBox="0 0 24 24"><path d="M3 9c3-3 6-3 9-1 3-2 6-2 9 1-1 6-4 8-7 6l-2-1-2 1c-3 2-6 0-7-6z"/><path d="M7 11h3M14 11h3"/></symbol>
-      <symbol id="ic-shadow" viewBox="0 0 24 24"><path d="M6 21V10a6 6 0 1112 0v11l-3-2-3 2-3-2z"/><path d="M9.5 10h.01M14.5 10h.01"/></symbol>
-      <symbol id="ic-cross" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4L4 20M12 1v4M12 19v4"/></symbol>
-      <symbol id="ic-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 7.5L21 19M8.5 16.5L21 5"/></symbol>
-      <symbol id="ic-dash" viewBox="0 0 24 24"><path d="M3 7h9M1 12h13M3 17h9M15 5l7 7-7 7"/></symbol>
-      <symbol id="ic-slash3" viewBox="0 0 24 24"><path d="M5 4l7 16M10 3l8 17M15 4l6 14"/></symbol>
-      <symbol id="ic-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
-      <symbol id="ic-camera" viewBox="0 0 24 24"><path d="M3 7h4l2-3h6l2 3h4v13H3z"/><circle cx="12" cy="13" r="4"/></symbol>
-      <symbol id="ic-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-4 9-8 11-4-2-8-6-8-11V5z"/></symbol>
-      <symbol id="ic-flame" viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 11-12 0c0-3 2-4 3-7 1 2 2 2 3-5z"/></symbol>
-      <symbol id="ic-quake" viewBox="0 0 24 24"><path d="M2 20l6-5-2-4 6-2-1-5 6 5-3 2 7 2M2 22h20"/></symbol>
-      <symbol id="ic-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol>
-      <symbol id="ic-slash2" viewBox="0 0 24 24"><path d="M3 6l18 5M3 18l18-5M7 12h10"/></symbol>
-      <symbol id="ic-pillars" viewBox="0 0 24 24"><path d="M4 22V12h4v10M10 22V4h4v18M16 22V9h4v13"/></symbol>
-    </defs>
-  </svg>
-  <canvas id="backdrop" class="backdrop" aria-hidden="true"></canvas>
-  <main id="app">
-    <section id="menu" class="screen menu">
-      <header class="masthead">
-        <a class="wordmark" href="#" aria-label="Ave Mujica 乱斗剧场">
-          <span class="wordmark-name">Ave <i>Mujica</i><small>乱斗剧场</small></span>
-        </a>
-        <div class="header-tools"><button id="help-btn" class="icon-btn" aria-label="操作说明"><span aria-hidden="true">?</span><small>操作</small></button><button id="settings-btn" class="icon-btn" aria-label="声音设置"><span aria-hidden="true">⚙</span><small>设置</small></button></div>
-      </header>
-      <div class="menu-layout">
-        <section class="character-showcase" aria-label="角色立绘">
-          <canvas id="portrait" width="420" height="560" aria-label="选中角色的立绘"></canvas>
-        </section>
-        <section class="play-panel">
-          <div class="panel-heading"><h2>选择出演者</h2><span class="panel-seal" aria-hidden="true">✦</span></div>
-          <div id="character-roster" class="roster" aria-label="你的角色"></div>
-          <div class="match-ticket">
-            <div class="mode-switch" role="group" aria-label="对战模式"><button id="mode-pve" class="active" aria-pressed="true">人机对战<span>选择对手，随时练习</span></button><button id="mode-pvp" aria-pressed="false">人人对战<span>房间码邀请朋友</span></button></div>
-            <div id="pve-options">
-              <div class="option-heading"><span>对手</span><span id="opponent-name">初华</span></div>
-              <div id="opponent-roster" class="opponents" aria-label="电脑对手"></div>
-              <div class="difficulty-row"><span>难度</span><div id="difficulty" class="segmented"><button data-difficulty="easy" class="active">普通</button><button data-difficulty="normal">困难</button><button data-difficulty="hard">挑战</button></div></div>
-              <button id="start-btn" class="primary-btn">开始对战 <span aria-hidden="true">→</span></button>
-            </div>
-            <div id="pvp-options" hidden>
-              <p class="room-hint">每人一台设备。建房后，将邀请链接或六位房间码发给朋友。</p>
-              <button id="create-btn" class="primary-btn">创建房间 <span aria-hidden="true">＋</span></button>
-              <form id="join-form" class="join-form"><label class="sr-only" for="room-code">六位房间码</label><input id="room-code" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]{6}" placeholder="六位房间码" required><button type="submit" class="secondary-btn">加入</button></form>
-              <p id="online-status" class="subtle">双方选好角色并准备后开始。</p>
-            </div>
-            <div class="ticket-footer"><button id="skill-info-btn" class="text-btn">查看角色招式 <span aria-hidden="true">↗</span></button></div>
-            <p id="menu-status" class="status" role="status" aria-live="polite"></p>
-          </div>
-        </section>
-      </div>
-      <footer class="menu-footer"><span>手机横屏，展开舞台。</span><span id="record-line">今晚，从第一场开始。</span><span class="footer-actions"><button id="install-btn" class="text-btn" hidden>全屏安装</button><button id="credits-btn" class="text-btn">作品与素材</button></span></footer>
-    </section>
-    <section id="room" class="screen room-screen" hidden>
-      <header class="masthead"><div class="wordmark"><span class="wordmark-name">Ave <i>Mujica</i><small>双人剧场</small></span></div><button id="leave-room" class="secondary-btn small">退出房间</button></header>
-      <div class="room-content">
-        <p class="eyebrow">邀请朋友出演</p><h1 class="room-title">房间 <span id="room-display">------</span></h1><button id="copy-room" class="text-btn">复制邀请链接 ↗</button>
-        <div id="room-seats" class="room-seats"></div><div id="room-roster" class="roster" aria-label="房间角色选择"></div><button id="ready-btn" class="primary-btn">准备开场</button><p id="room-status" class="status" role="status" aria-live="polite">等待另一位出演者。</p>
-      </div>
-    </section>
-    <section id="battle" class="screen battle" hidden>
-      <canvas id="arena" width="1280" height="720" aria-label="对战舞台"></canvas>
-      <div class="battle-hud">
-        <div class="fighter-hud left-hud">
-          <div class="fh-face"><img id="left-face" alt="" decoding="async"></div>
-          <div class="fh-body">
-            <div class="fighter-label"><span id="left-name"></span><small id="left-seat"></small><em id="left-skill" class="skill-flash"></em></div>
-            <div class="health-track"><div id="left-lag" class="lag"></div><div id="left-hp"></div></div>
-            <div class="energy-track"><div id="left-mp"></div><b class="ult-tag">ULT</b></div>
-          </div>
-        </div>
-        <div class="match-clock"><span id="clock">90</span><small id="connection-label">人机对战</small></div>
-        <div class="fighter-hud right-hud">
-          <div class="fh-face"><img id="right-face" alt="" decoding="async"></div>
-          <div class="fh-body">
-            <div class="fighter-label"><span id="right-name"></span><small id="right-seat"></small><em id="right-skill" class="skill-flash"></em></div>
-            <div class="health-track"><div id="right-lag" class="lag"></div><div id="right-hp"></div></div>
-            <div class="energy-track"><div id="right-mp"></div><b class="ult-tag">ULT</b></div>
-          </div>
-        </div>
-      </div>
-      <div id="combo" class="combo" hidden aria-hidden="true"><b id="combo-n">0</b><span>HITS</span></div>
-      <button id="pause-btn" class="battle-pause" aria-label="暂停或退出对战">Ⅱ</button><div id="battle-callout" class="battle-callout" aria-live="polite"></div>
-      <div id="ko-banner" class="ko-banner" hidden aria-hidden="true"><span>K.O.</span></div>
-      <div id="versus" class="versus" hidden aria-hidden="true">
-        <div id="vs-left" class="vs-band vs-left"><canvas id="vs-art-left" width="360" height="360"></canvas><div class="vs-name"><small id="vs-role-left"></small><b id="vs-name-left"></b></div></div>
-        <div id="vs-right" class="vs-band vs-right"><canvas id="vs-art-right" width="360" height="360"></canvas><div class="vs-name"><small id="vs-role-right"></small><b id="vs-name-right"></b></div></div>
-        <div class="vs-mark">VS</div>
-      </div>
-      <div id="cutin" class="cutin" hidden aria-hidden="true">
-        <div class="cutin-band"></div><div class="cutin-lines"></div>
-        <canvas id="cutin-art" width="420" height="420"></canvas>
-        <div class="cutin-text"><small id="cutin-role">ULTIMATE</small><strong id="cutin-skill"></strong><span id="cutin-name"></span></div>
-      </div>
-      <div id="touch-controls" class="touch-controls">
-        <div id="joystick" class="joystick" aria-label="拖动摇杆移动，向上跳跃"><div class="stick-guide">移动 · 上推跳跃</div><div id="stick-knob" class="stick-knob"></div></div>
-        <div class="attack-controls">
-          <button data-action="special" class="action-btn skill-btn"><svg class="ic" aria-hidden="true"><use href="#ic-note"/></svg><span class="action-key">K</span><span class="action-name">技能一</span><span class="cooldown"></span></button>
-          <button data-action="skill1" class="action-btn skill-btn"><svg class="ic" aria-hidden="true"><use href="#ic-note"/></svg><span class="action-key">U</span><span class="action-name">技能二</span><span class="cooldown"></span></button>
-          <button data-action="skill2" class="action-btn skill-btn"><svg class="ic" aria-hidden="true"><use href="#ic-note"/></svg><span class="action-key">I</span><span class="action-name">技能三</span><span class="cooldown"></span></button>
-          <button data-action="ult" class="action-btn ult-btn"><svg class="ic" aria-hidden="true"><use href="#ic-bolt"/></svg><span class="action-key">L</span><span class="action-name">大招</span><span class="cooldown"></span></button>
-          <button data-action="punch" class="action-btn punch-btn"><svg class="ic" aria-hidden="true"><use href="#ic-fist"/></svg><span class="action-key">J</span><span class="action-name">普攻</span></button>
-        </div>
-      </div>
-      <p class="keyboard-guide">A D 移动 · W / 空格 跳跃 · J 普攻 · K U I 技能 · L 大招 · Esc 暂停</p>
-      <div id="rotate-hint" class="rotate-hint"><span aria-hidden="true">↻</span><p>横过手机，展开舞台</p><button id="portrait-play" class="secondary-btn">继续竖屏游玩</button></div>
-      <div id="pause-overlay" class="overlay" hidden><div class="overlay-card"><p class="eyebrow">幕间</p><h2 id="pause-title">已暂停</h2><p id="pause-description">准备好了就继续。</p><button id="resume-btn" class="primary-btn">继续对战</button><button id="quit-btn" class="secondary-btn">结束本场</button></div></div>
-      <div id="result-overlay" class="overlay result-overlay" hidden><div class="overlay-card result-card"><p id="result-reason" class="eyebrow">K.O.</p><h2 id="result-title">谢幕</h2><p id="result-description"></p><div id="result-stats" class="result-stats"></div><button id="rematch-btn" class="primary-btn">再来一场</button><button id="result-menu" class="secondary-btn">返回选人</button><p id="rematch-status" class="subtle" role="status"></p></div></div>
-    </section>
-    <dialog id="settings-dialog" class="modal">
-      <form method="dialog"><button class="dialog-close" aria-label="关闭设置">×</button></form><p class="eyebrow">剧场设置</p><h2>听见舞台</h2>
-      <label class="volume-label">背景配乐 <input id="music-volume" type="range" min="0" max="100" value="100"><output id="music-value">100%</output></label>
-      <label class="volume-label">打击音效 <input id="sfx-volume" type="range" min="0" max="100" value="100"><output id="sfx-value">100%</output></label>
-      <label class="volume-label">语音 <input id="voice-volume" type="range" min="0" max="100" value="100"><output id="voice-value">100%</output></label>
-      <p id="voice-status" class="subtle"></p><p class="voice-rule">角色台词在选人、大招和 K.O. 时播放；K.O. 使用获胜角色的台词。语音播放时配乐与打击声自动降低。</p>
-      <p id="voice-preview-role" class="subtle"></p><div class="voice-previews"><button type="button" class="voice-preview" data-voice-cue="select">选人</button><button type="button" class="voice-preview" data-voice-cue="ult">大招</button><button type="button" class="voice-preview" data-voice-cue="ko">K.O.</button></div>
-      <label class="checkbox-label"><input id="low-motion" type="checkbox">减少闪光与镜头晃动</label><p class="subtle">设置与战绩保存在这台设备的浏览器中。</p>
-    </dialog>
-    <dialog id="help-dialog" class="modal wide-modal">
-      <form method="dialog"><button class="dialog-close" aria-label="关闭说明">×</button></form><p class="eyebrow">第一次出演</p><h2>三步开场</h2>
-      <ol class="help-steps"><li><b>选择角色与模式</b><p>人机立即开始；人人对战由一人建房，另一人输入房间码。双方准备后开场。</p></li><li><b>移动、跳跃、抓住空隙</b><p>左侧摇杆移动，向上推跳跃；右侧五个按钮攻击。电脑用 A / D 移动，W / 空格跳跃。</p></li><li><b>技能冷却，蓄能放大招</b><p>命中可以积蓄能量，大招需要满能量。按钮显示剩余冷却。出招期间提前按下的动作会短暂保留。</p></li></ol>
-      <p class="subtle">每场 90 秒，时间到按剩余生命判胜，双方同时倒下则平局。没有防御操作。</p><button id="help-done" class="primary-btn">知道了，开始选人</button>
-    </dialog>
-    <dialog id="skills-dialog" class="modal wide-modal"><form method="dialog"><button class="dialog-close" aria-label="关闭招式">×</button></form><p id="skill-role" class="eyebrow"></p><h2 id="skill-title"></h2><div id="skill-list" class="skill-list"></div></dialog>
-    <dialog id="credits-dialog" class="modal"><form method="dialog"><button class="dialog-close" aria-label="关闭作品说明">×</button></form><p class="eyebrow">作品与素材</p><h2>乱斗剧场</h2><p>娱乐用途的同人小游戏。角色名称与形象来自 Ave Mujica / BanG Dream!，相关权利归原权利方。</p><p>角色立绘、头像和对战动作参照官方舞台形象重新制作；每位出演者以自己的乐器作战。日语语音来自联动游戏的真实配音，具体短句与来源已记录。</p><a class="text-btn" href="CREDITS.md" target="_blank" rel="noopener">查看素材来源记录 ↗</a></dialog>
-    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-  </main>
-  <script>
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-  </script>
-</body>
+<body><div id="app"></div><script type="module" src="/src/main.ts"></script></body>
 </html>

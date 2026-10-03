@@ -1,0 +1,7 @@
+{
+  "host": "game-server.example.com",
+  "user": "root",
+  "port": 22,
+  "remotePath": "/opt/ave-mujica",
+  "service": "ave-mujica"
+}

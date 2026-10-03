@@ -1,0 +1,81 @@
+/*
+ * Entry stylesheet. @import rules must stay first; Vite inlines them before
+ * Tailwind runs, so kit.css can use @layer components.
+ *   kit.css     shapes every screen is built from (frame, btn, tag, icons)
+ *   screens.css backdrop, menu, roster, room, dialogs, toast
+ *   battle.css  HUD, touch controls, intro / cut-in / K.O. / result overlays
+ */
+@import '@fontsource/barlow-condensed/latin-700.css';
+@import '@fontsource/barlow-condensed/latin-800.css';
+@import '@fontsource/barlow-condensed/latin-800-italic.css';
+@import '@fontsource/jetbrains-mono/latin-500.css';
+@import './kit.css';
+@import './screens.css';
+@import './battle.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+
+    /* neutral ramp */
+    --ink: #07080c;
+    --carbon: #0c0e14;
+    --slate: #151821;
+    --steel: #232834;
+    --fog: #8a93a6;
+    --bone: #f3f1ea;
+
+    /* system signals */
+    --volt: #ffe81a;
+    --hot: #ff3b3b;
+    --ion: #35e1ff;
+
+    /* per-character colors; client.ts rewrites these when a performer is picked */
+    --accent: #8fb1ea;
+    --accent-rgb: 143 177 234;
+    --accent2: #dbe8ff;
+    --dark: #243a78;
+    --glow: rgb(126 164 242 / .55);
+
+    --font-display: 'Barlow Condensed', Bahnschrift, 'Arial Narrow', 'HarmonyOS Sans SC', MiSans, 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    --font-body: 'HarmonyOS Sans SC', MiSans, 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Cascadia Mono', Consolas, 'Microsoft YaHei UI', monospace;
+
+    --ease-snap: cubic-bezier(.2, .8, .2, 1);
+  }
+
+  /* Root size follows the shorter edge: a phone in landscape lands on 12px, a desktop near 17px. */
+  html {
+    font-size: clamp(12px, calc(.45vw + 1.15vh), 18px);
+    background: var(--ink);
+    color: var(--bone);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--steel) var(--ink);
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    line-height: 1.5;
+    background: var(--ink);
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* display:flex style rules would otherwise beat the [hidden] attribute client.ts toggles */
+  [hidden] { display: none !important; }
+
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; touch-action: manipulation; }
+  button:disabled { cursor: not-allowed; }
+  canvas { display: block; }
+  dialog { color: inherit; }
+
+  ::selection { background: var(--volt); color: var(--ink); }
+  :focus-visible { outline: 2px solid var(--volt); outline-offset: 2px; }
+}

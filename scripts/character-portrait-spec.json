@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-02",
+  "generator": "built-in image_gen",
+  "intent": "Standalone high-resolution redraws of the existing full-body portraits",
+  "characters": [
+    {
+      "id": "pyro",
+      "name": "Sakiko Togawa / 祥子 / Oblivionis",
+      "subject": "Long pale periwinkle-blue hair tied into two LOW side ponytails with black ribbons, straight blunt bangs and golden eyes; straight crown hair, no invented crown braid. Burgundy high-neck short puff-sleeved top, black ruffled neck ribbon and oval blue jewel, fitted black corset with brown front lacing and waist belt, asymmetric tiered charcoal/black/cream skirt with fine gold hem embroidery, dark tights and black lace-up boots with cream toe caps. Black lace gloves with wrist frills. Preserve exact costume layers and modest natural proportions in the official image.",
+      "instrument": "ROLAND FA-08-style BLACK workstation keyboard, faithful flat rectangular casing, 88-key piano keybed with natural repeating groups of TWO and THREE black keys, central display/control panel, left pitch/modulation lever and knobs, SIXTEEN small pink/red sampler pads in a 4 by4 group on the right TOP panel. Match the instrument reference closely; do not make a guitar-shaped keytar, accordion or a toy keyboard. Scale the whole instrument uniformly to fit an action-game carried prop without cropping its keys or changing its casing proportions; add only a plain black carrying strap so she can fight while holding it. Both gloved hands visibly contact and support the keyboard.",
+      "prompt": "Use case: identity-preserve\nAsset type: high-resolution full-body transparent character portrait for a 2D anime fighting game.\nPrimary request: restore Sakiko's OFFICIAL ORIGINAL Ave Mujica stage face, hairstyle and outfit, with a faithful Roland FA-08-style keyboard instead of the old generic toy keyboard.\nInput images: Image 1 controls official character identity, hairstyle, face, eye color and original anime stage costume. Image 2 controls keyboard geometry, controls and keys only. Image 3 is the existing game portrait, a style/composition reference only; correct its braided crown hair and inaccurate instrument.\nCharacter: Long pale periwinkle-blue hair tied into two LOW side ponytails with black ribbons, straight blunt bangs and golden eyes; straight crown hair, no invented crown braid. Burgundy high-neck short puff-sleeved top, black ruffled neck ribbon and oval blue jewel, fitted black corset with brown front lacing and waist belt, asymmetric tiered charcoal/black/cream skirt with fine gold hem embroidery, dark tights and black lace-up boots with cream toe caps. Black lace gloves with wrist frills. Preserve exact costume layers and modest natural proportions in the official image.\nInstrument: ROLAND FA-08-style BLACK workstation keyboard, faithful flat rectangular casing, 88-key piano keybed with natural repeating groups of TWO and THREE black keys, central display/control panel, left pitch/modulation lever and knobs, SIXTEEN small pink/red sampler pads in a 4 by4 group on the right TOP panel. Match the instrument reference closely; do not make a guitar-shaped keytar, accordion or a toy keyboard. Scale the whole instrument uniformly to fit an action-game carried prop without cropping its keys or changing its casing proportions; add only a plain black carrying strap so she can fight while holding it. Both gloved hands visibly contact and support the keyboard.\nComposition: one complete standing full-body girl in calm 3/4 view toward RIGHT. Entire head, hair, both hands, skirt, boots and instrument fit with 3-5 percent transparent margins. Native resolution at least 1024 wide and1536 tall, preferably1024x1792. Natural approximately6.5-head anime proportions, sharp clean facial details, crisp restrained cel shading and fine natural internal linework. Face uncovered, no mask. Match official bangs, low ponytail attachment and black ribbons, do not add braids.\nBackground: genuine transparent alpha, no copied reference shadow or background. No floor, scenery, haze, glow, external silhouette outline, matte, white specks, labels, watermark, extra figure or extra limbs. Keep all keyboard keys mechanically plausible and the casing black.",
+      "generatorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-648b239b-9efd-41f7-85be-23910964b069.png",
+      "referenceImage": ".scratch/character-reference/img_sakiko_2.png",
+      "generatedImage": ".scratch/character-restored-portraits/pyro.png",
+      "runtimeImage": "assets/characters/pyro/portrait.png",
+      "previousGeneratorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-9adc74f0-18f5-4bd5-80b4-63b86ddc03dd.png",
+      "instrumentReference": ".scratch/character-instrument-reference/fa08-official.jpg",
+      "officialReference": "https://anime.bang-dream.com/avemujica/character/sakiko/",
+      "avatarCrop": [
+        270,
+        10,
+        350,
+        360
+      ],
+      "cutinCrop": [
+        185,
+        0,
+        570,
+        570
+      ]
+    },
+    {
+      "id": "shadow",
+      "name": "Uika Misumi / 初华 / Doloris",
+      "subject": "Shoulder-length straight pale blonde bob with subtly pink ends and straight bangs; purple-violet eyes. The official black sweetheart stage bodice has a cream lace-yoke with small black studs, black choker with gold button, detached long black sleeves, a brown front-laced waist corset and brown diagonal strap belts. Black knee-length bloomers/shorts with gold embroidered hem, bare knees, asymmetric long black coat tails with burgundy lining and sheer cream layers. Pale gray knee-high boots with black toes and black trim. Preserve the actual shorts/bloomers and long tails; do not turn them into a miniskirt.",
+      "instrument": "SCHECTER AC-AR-07-AveMujica/Doloris/SIG SEVEN-STRING electric guitar. Match the product photograph closely: black asymmetric offset double-cutaway body with broad rounded lower bout, gold hardware and gold metal control plates, one black neck single-coil and one black bridge humbucker, gold two-piece fixed bridge and tailpiece, pale maple fretboard with small flower and crescent inlays. Black headstock, EXACTLY SEVEN gold tuning keys in ONE straight row along the upper edge, EXACTLY SEVEN parallel strings and seven bridge saddles. No tuning keys on the opposite edge. Black shoulder strap, left hand on fretboard, right hand on strings.",
+      "prompt": "Use case: identity-preserve\nAsset type: replacement high-resolution full-body transparent anime game character portrait.\nPrimary request: restore this character's original official Ave Mujica anime stage identity and her true instrument. The old illustration in Image 3 has wrong instrument details; replace those mistakes faithfully.\nInput images: Image 1 is the OFFICIAL CHARACTER identity and costume reference, authoritative for face, hair, eye color, clothing and proportions. Image 2 is the INSTRUMENT photo, authoritative only for instrument geometry, color and hardware. Image 3 is the OLD GAME PORTRAIT, a reference for crisp finished anime illustration style and the calm 3/4 standing composition; do not retain its incorrect guitar/bass/drumsticks or costume departures.\nStyle: crisp Japanese anime game illustration close to the official face and silhouette, clean precise eyes and hair, restrained cel shading, resolved fabric seams and hardware. Fine natural internal lines, no thick exterior outline or halo. Avoid painterly blur, oversized eyes or invented braids/accessories.\nComposition: ONE full-body girl only, head through both complete boots, standing in a calm 3/4 view toward RIGHT, held instrument fully visible and supported by exactly two hands. Keep a black shoulder strap for a guitar/bass. Native portrait resolution at least 1024 pixels wide and 1536 pixels tall, preferably 1024x1792. Clear transparent margins of 3-5 percent, no cropping of hair, feet or instrument neck. Her face is uncovered, no mask.\nBackground: genuine transparent alpha, remove the official reference's black drop shadow. No floor, shadow, scene, gradients, glow, border, collage, labels, watermark or advertising text. No extra character or extra limbs.\n\nCharacter: Shoulder-length straight pale blonde bob with subtly pink ends and straight bangs; purple-violet eyes. The official black sweetheart stage bodice has a cream lace-yoke with small black studs, black choker with gold button, detached long black sleeves, a brown front-laced waist corset and brown diagonal strap belts. Black knee-length bloomers/shorts with gold embroidered hem, bare knees, asymmetric long black coat tails with burgundy lining and sheer cream layers. Pale gray knee-high boots with black toes and black trim. Preserve the actual shorts/bloomers and long tails; do not turn them into a miniskirt.\nInstrument: SCHECTER AC-AR-07-AveMujica/Doloris/SIG SEVEN-STRING electric guitar. Match the product photograph closely: black asymmetric offset double-cutaway body with broad rounded lower bout, gold hardware and gold metal control plates, one black neck single-coil and one black bridge humbucker, gold two-piece fixed bridge and tailpiece, pale maple fretboard with small flower and crescent inlays. Black headstock, EXACTLY SEVEN gold tuning keys in ONE straight row along the upper edge, EXACTLY SEVEN parallel strings and seven bridge saddles. No tuning keys on the opposite edge. Black shoulder strap, left hand on fretboard, right hand on strings.\nCheck the exact instrument string count, tuner count and color before completing. Keep the authentic outfit hem lengths.",
+      "generatorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-3221ea0a-ced8-4592-a441-600fc15b3f67.png",
+      "referenceImage": ".scratch/character-reference/img_uika_2.png",
+      "generatedImage": ".scratch/character-restored-portraits/shadow.png",
+      "runtimeImage": "assets/characters/shadow/portrait.png",
+      "previousGeneratorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-c25d3489-eb51-4456-9ca7-1f849ff54c55.png",
+      "instrumentReference": ".scratch/character-instrument-reference/doloris-official.png",
+      "officialReference": "https://anime.bang-dream.com/avemujica/character/uika/",
+      "avatarCrop": [
+        235,
+        12,
+        380,
+        375
+      ],
+      "cutinCrop": [
+        190,
+        0,
+        590,
+        590
+      ]
+    },
+    {
+      "id": "gale",
+      "name": "Mutsumi Wakaba / 睦 / Mortis",
+      "subject": "Long straight pale mint-green hair, blunt straight fringe, quiet hazel-golden eyes, burgundy round beret with black band. Official black knee-length coat/dress with burgundy double-pointed lapels and pale gold edging, gold embroidery on short outer sleeves, translucent cream puff inner sleeves and black cuffs, cream jabot and oval green jewel. Burgundy front panel with two rows of gold buttons, cream underskirt edge, dark gray tights, black ankle ruffle socks and burgundy low-heeled Mary Jane shoes. Keep the coat's length near the knees, calm small face and slender proportions.",
+      "instrument": "SCHECTER AC-EX-7-AveMujica/Mortis/SIG SEVEN-STRING electric guitar. Pink glitter finish, rounded Strat-style double-cutaway body, pearlescent WHITE pickguard, TWO black humbuckers, black fixed bridge and black knobs, pale maple neck/fretboard and natural maple headstock with black flower and crescent inlays. EXACTLY SEVEN black tuning keys in ONE row along the upper edge; EXACTLY SEVEN parallel strings and seven bridge saddles. No pegs on the opposite edge, no dark red pointed fantasy guitar. Black shoulder strap; both hands support and play the instrument.",
+      "prompt": "Use case: identity-preserve\nAsset type: replacement high-resolution full-body transparent anime game character portrait.\nPrimary request: restore this character's original official Ave Mujica anime stage identity and her true instrument. The old illustration in Image 3 has wrong instrument details; replace those mistakes faithfully.\nInput images: Image 1 is the OFFICIAL CHARACTER identity and costume reference, authoritative for face, hair, eye color, clothing and proportions. Image 2 is the INSTRUMENT photo, authoritative only for instrument geometry, color and hardware. Image 3 is the OLD GAME PORTRAIT, a reference for crisp finished anime illustration style and the calm 3/4 standing composition; do not retain its incorrect guitar/bass/drumsticks or costume departures.\nStyle: crisp Japanese anime game illustration close to the official face and silhouette, clean precise eyes and hair, restrained cel shading, resolved fabric seams and hardware. Fine natural internal lines, no thick exterior outline or halo. Avoid painterly blur, oversized eyes or invented braids/accessories.\nComposition: ONE full-body girl only, head through both complete boots, standing in a calm 3/4 view toward RIGHT, held instrument fully visible and supported by exactly two hands. Keep a black shoulder strap for a guitar/bass. Native portrait resolution at least 1024 pixels wide and 1536 pixels tall, preferably 1024x1792. Clear transparent margins of 3-5 percent, no cropping of hair, feet or instrument neck. Her face is uncovered, no mask.\nBackground: genuine transparent alpha, remove the official reference's black drop shadow. No floor, shadow, scene, gradients, glow, border, collage, labels, watermark or advertising text. No extra character or extra limbs.\n\nCharacter: Long straight pale mint-green hair, blunt straight fringe, quiet hazel-golden eyes, burgundy round beret with black band. Official black knee-length coat/dress with burgundy double-pointed lapels and pale gold edging, gold embroidery on short outer sleeves, translucent cream puff inner sleeves and black cuffs, cream jabot and oval green jewel. Burgundy front panel with two rows of gold buttons, cream underskirt edge, dark gray tights, black ankle ruffle socks and burgundy low-heeled Mary Jane shoes. Keep the coat's length near the knees, calm small face and slender proportions.\nInstrument: SCHECTER AC-EX-7-AveMujica/Mortis/SIG SEVEN-STRING electric guitar. Pink glitter finish, rounded Strat-style double-cutaway body, pearlescent WHITE pickguard, TWO black humbuckers, black fixed bridge and black knobs, pale maple neck/fretboard and natural maple headstock with black flower and crescent inlays. EXACTLY SEVEN black tuning keys in ONE row along the upper edge; EXACTLY SEVEN parallel strings and seven bridge saddles. No pegs on the opposite edge, no dark red pointed fantasy guitar. Black shoulder strap; both hands support and play the instrument.\nCheck the exact instrument string count, tuner count and color before completing. Keep the authentic outfit hem lengths.",
+      "generatorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-7fcfed2f-6df4-4c1e-aca5-e21f9592ca50.png",
+      "referenceImage": ".scratch/character-reference/img_mutsumi_2.png",
+      "generatedImage": ".scratch/character-restored-portraits/gale.png",
+      "runtimeImage": "assets/characters/gale/portrait.png",
+      "previousGeneratorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-1f202fec-8b6c-4fea-ace2-dc1ee5dbeb76.png",
+      "instrumentReference": ".scratch/character-instrument-reference/mortis-official.png",
+      "officialReference": "https://anime.bang-dream.com/avemujica/character/mutsumi/",
+      "avatarCrop": [
+        245,
+        4,
+        360,
+        380
+      ],
+      "cutinCrop": [
+        185,
+        0,
+        580,
+        580
+      ]
+    },
+    {
+      "id": "bastion",
+      "name": "Umiri Yahata / 海铃 / Timoris",
+      "subject": "Dark charcoal shoulder-length layered hair with side-swept bangs, cool teal eyes, calm expression. Official deep red short capelet with fine gold trim and embroidered black lapels, high-neck cream front strip with black buttons, fitted black waistcoat with fine gold details, translucent cream puff inner sleeves and black cuffs. CREAM KNEE-LENGTH SHORTS with black side panels and broad black cuffs just above the knees, dark thigh-high stockings and slim black heeled boots. Keep the correct knee-length shorts and natural thigh proportions, not a short skirt or thigh-length hotpants. Follow the reference's hair arrangement.",
+      "instrument": "SCHECTER AC-EXB-5-AveMujica/Timoris/SIG FIVE-STRING BASS. Official muted LILAC / lavender body and matching lilac headstock, black large pickguard, two black rectangular soapbar pickups, silver five-saddle bridge, dark rosewood fretboard with pale flower and crescent inlays, black knobs. Exactly FIVE thicker bass strings and FIVE tuning machines in a 4+1 arrangement: FOUR silver keys on the upper/long edge and ONE on the opposite lower edge. Five bridge saddles. NOT navy or black, not a six-string guitar. Black strap; left hand grips neck, right hand naturally rests over strings.",
+      "prompt": "Use case: identity-preserve\nAsset type: replacement high-resolution full-body transparent anime game character portrait.\nPrimary request: restore this character's original official Ave Mujica anime stage identity and her true instrument. The old illustration in Image 3 has wrong instrument details; replace those mistakes faithfully.\nInput images: Image 1 is the OFFICIAL CHARACTER identity and costume reference, authoritative for face, hair, eye color, clothing and proportions. Image 2 is the INSTRUMENT photo, authoritative only for instrument geometry, color and hardware. Image 3 is the OLD GAME PORTRAIT, a reference for crisp finished anime illustration style and the calm 3/4 standing composition; do not retain its incorrect guitar/bass/drumsticks or costume departures.\nStyle: crisp Japanese anime game illustration close to the official face and silhouette, clean precise eyes and hair, restrained cel shading, resolved fabric seams and hardware. Fine natural internal lines, no thick exterior outline or halo. Avoid painterly blur, oversized eyes or invented braids/accessories.\nComposition: ONE full-body girl only, head through both complete boots, standing in a calm 3/4 view toward RIGHT, held instrument fully visible and supported by exactly two hands. Keep a black shoulder strap for a guitar/bass. Native portrait resolution at least 1024 pixels wide and 1536 pixels tall, preferably 1024x1792. Clear transparent margins of 3-5 percent, no cropping of hair, feet or instrument neck. Her face is uncovered, no mask.\nBackground: genuine transparent alpha, remove the official reference's black drop shadow. No floor, shadow, scene, gradients, glow, border, collage, labels, watermark or advertising text. No extra character or extra limbs.\n\nCharacter: Dark charcoal shoulder-length layered hair with side-swept bangs, cool teal eyes, calm expression. Official deep red short capelet with fine gold trim and embroidered black lapels, high-neck cream front strip with black buttons, fitted black waistcoat with fine gold details, translucent cream puff inner sleeves and black cuffs. CREAM KNEE-LENGTH SHORTS with black side panels and broad black cuffs just above the knees, dark thigh-high stockings and slim black heeled boots. Keep the correct knee-length shorts and natural thigh proportions, not a short skirt or thigh-length hotpants. Follow the reference's hair arrangement.\nInstrument: SCHECTER AC-EXB-5-AveMujica/Timoris/SIG FIVE-STRING BASS. Official muted LILAC / lavender body and matching lilac headstock, black large pickguard, two black rectangular soapbar pickups, silver five-saddle bridge, dark rosewood fretboard with pale flower and crescent inlays, black knobs. Exactly FIVE thicker bass strings and FIVE tuning machines in a 4+1 arrangement: FOUR silver keys on the upper/long edge and ONE on the opposite lower edge. Five bridge saddles. NOT navy or black, not a six-string guitar. Black strap; left hand grips neck, right hand naturally rests over strings.\nCheck the exact instrument string count, tuner count and color before completing. Keep the authentic outfit hem lengths.",
+      "generatorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-cad71fba-5d0e-414e-8175-99c2caf2ab1e.png",
+      "referenceImage": ".scratch/character-reference/img_umiri_2.png",
+      "generatedImage": ".scratch/character-restored-portraits/bastion.png",
+      "runtimeImage": "assets/characters/bastion/portrait.png",
+      "previousGeneratorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-b0adf779-caeb-4a8a-b7bb-804a233f669e.png",
+      "instrumentReference": ".scratch/character-instrument-reference/timoris-official.png",
+      "officialReference": "https://anime.bang-dream.com/avemujica/character/umiri/",
+      "repairPrompt": "Use case: precise-object-edit\nAsset type: existing transparent full-body Umiri / Timoris game portrait.\nInput images: Image 1 is the EDIT TARGET, Image 2 is the OFFICIAL anime character reference, Image 3 is the correct instrument photo.\nChange only the CREAM AND BLACK SHORTS: match Image 2's KNEE-LENGTH tailored shorts, with broad black cuffs ending just above the knees. Extend the current shorts down the thighs to that correct hem height; keep the same natural leg shape, full body height and boots. Do not leave hotpants-length cuffs halfway up the thighs. Preserve her exact face, teal eyes, layered hairstyle, capelet, cream sleeves, black gold-detailed waistcoat, instrument position and grip. Keep the corrected lilac FIVE-STRING bass from Image 1: exactly five strings and five saddles, four upper silver tuners plus one opposite tuner, black pickguard and two soapbar pickups. Do not add an extra tuner or string. Also remove all isolated white/background specks outside the silhouette and any exterior fringe. Genuine clean transparent alpha, crisp anime linework and shading. No backdrop, cast shadow, halo or words. Entire hair, feet and bass remain within canvas.",
+      "avatarCrop": [
+        145,
+        0,
+        405,
+        390
+      ],
+      "cutinCrop": [
+        90,
+        0,
+        610,
+        610
+      ]
+    },
+    {
+      "id": "iron",
+      "name": "Nyamu Yutenji / 喵梦 / Amoris",
+      "subject": "Short lavender-purple bob with long side strands, asymmetric side-swept bangs and pink-magenta eyes, playful confident expression. Use Image 1's ORIGINAL ANIME stage costume: high-neck BLACK PINSTRIPED sleeveless top under fitted black front-laced corset, sheer smoky-gray long puff sleeves with black cuffs and small gold buttons, asymmetric black long coat tails with burgundy lining, burgundy shorts, fine translucent stockings with vertical burgundy seams and garter bands, burgundy ankle-strap heeled shoes. Do not copy the red corset/outfit or necklace from the drumstick advertisement; Image 1 alone controls costume.",
+      "instrument": "Exactly TWO LERNI H-140AM-style signature drumsticks, one naturally held in each hand. Natural pale honey/beige hickory WOOD, narrow cylindrical shafts, slim taper and small rounded oval wood tips. Real 406mm by14mm proportions: long slender sticks rather than thick dark-red batons or mallets. Black small grip-area printing can be understated; do not reproduce advertising text or background. No floating sticks and no extra drumstick.",
+      "prompt": "Use case: identity-preserve\nAsset type: replacement high-resolution full-body transparent anime game character portrait.\nPrimary request: restore this character's original official Ave Mujica anime stage identity and her true instrument. The old illustration in Image 3 has wrong instrument details; replace those mistakes faithfully.\nInput images: Image 1 is the OFFICIAL CHARACTER identity and costume reference, authoritative for face, hair, eye color, clothing and proportions. Image 2 is the INSTRUMENT photo, authoritative only for instrument geometry, color and hardware. Image 3 is the OLD GAME PORTRAIT, a reference for crisp finished anime illustration style and the calm 3/4 standing composition; do not retain its incorrect guitar/bass/drumsticks or costume departures.\nStyle: crisp Japanese anime game illustration close to the official face and silhouette, clean precise eyes and hair, restrained cel shading, resolved fabric seams and hardware. Fine natural internal lines, no thick exterior outline or halo. Avoid painterly blur, oversized eyes or invented braids/accessories.\nComposition: ONE full-body girl only, head through both complete boots, standing in a calm 3/4 view toward RIGHT, held instrument fully visible and supported by exactly two hands. Keep a black shoulder strap for a guitar/bass. Native portrait resolution at least 1024 pixels wide and 1536 pixels tall, preferably 1024x1792. Clear transparent margins of 3-5 percent, no cropping of hair, feet or instrument neck. Her face is uncovered, no mask.\nBackground: genuine transparent alpha, remove the official reference's black drop shadow. No floor, shadow, scene, gradients, glow, border, collage, labels, watermark or advertising text. No extra character or extra limbs.\n\nCharacter: Short lavender-purple bob with long side strands, asymmetric side-swept bangs and pink-magenta eyes, playful confident expression. Use Image 1's ORIGINAL ANIME stage costume: high-neck BLACK PINSTRIPED sleeveless top under fitted black front-laced corset, sheer smoky-gray long puff sleeves with black cuffs and small gold buttons, asymmetric black long coat tails with burgundy lining, burgundy shorts, fine translucent stockings with vertical burgundy seams and garter bands, burgundy ankle-strap heeled shoes. Do not copy the red corset/outfit or necklace from the drumstick advertisement; Image 1 alone controls costume.\nInstrument: Exactly TWO LERNI H-140AM-style signature drumsticks, one naturally held in each hand. Natural pale honey/beige hickory WOOD, narrow cylindrical shafts, slim taper and small rounded oval wood tips. Real 406mm by14mm proportions: long slender sticks rather than thick dark-red batons or mallets. Black small grip-area printing can be understated; do not reproduce advertising text or background. No floating sticks and no extra drumstick.\nCheck the exact instrument string count, tuner count and color before completing. Keep the authentic outfit hem lengths.",
+      "generatorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-ad2136c6-1c21-4e98-9ee2-51f51f608ae2.png",
+      "referenceImage": ".scratch/character-reference/img_nyamu_2.png",
+      "generatedImage": ".scratch/character-restored-portraits/iron.png",
+      "runtimeImage": "assets/characters/iron/portrait.png",
+      "previousGeneratorOutput": "C:\\Users\\ruofa\\.codex\\generated_images\\01a0fc3d-12ef-79a1-885b-cd2879c0f978\\exec-43e63849-d9c1-4eec-96a5-2e050e6988b6.png",
+      "instrumentReference": ".scratch/character-instrument-reference/amoris-sticks.jpg",
+      "officialReference": "https://anime.bang-dream.com/avemujica/character/nyamu/",
+      "avatarCrop": [
+        300,
+        4,
+        310,
+        330
+      ],
+      "cutinCrop": [
+        235,
+        0,
+        555,
+        555
+      ]
+    }
+  ]
+}

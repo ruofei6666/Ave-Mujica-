@@ -1,0 +1,11 @@
+packages:
+  - .
+
+pmOnFail: error
+engineStrict: true
+savePrefix: ''
+# Vite and Tailwind must use the same PostCSS runtime and type declarations.
+overrides:
+  postcss: 8.5.6
+allowBuilds:
+  esbuild: true
