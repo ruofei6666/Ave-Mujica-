@@ -55,7 +55,7 @@ const ui = useTheatreState();
     </div>
 
     <div id="touch-controls" class="touch-controls">
-      <div id="joystick" class="joystick" aria-label="拖动摇杆移动，向上跳跃"><div class="stick-guide">移动 · 上推跳跃</div><div id="stick-knob" class="stick-knob"></div></div>
+      <div id="joystick" class="joystick" aria-label="拖动摇杆移动，向上跳跃"><div id="stick-knob" class="stick-knob"></div></div>
       <div class="attack-controls">
         <button data-action="special" class="action-btn skill-btn"><svg class="ic" aria-hidden="true"><use href="#ic-note" /></svg><span class="action-key">K</span><span class="action-name">技能一</span><span class="cooldown"></span></button>
         <button data-action="skill1" class="action-btn skill-btn"><svg class="ic" aria-hidden="true"><use href="#ic-note" /></svg><span class="action-key">U</span><span class="action-name">技能二</span><span class="cooldown"></span></button>

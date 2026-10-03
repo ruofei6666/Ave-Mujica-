@@ -214,7 +214,6 @@ html[data-art~='fx-speed'] .vs-speed { background: var(--art-fx-speed) center / 
   position: absolute; left: 50%; top: 50%; width: 3.8rem; height: 3.8rem; margin: -1.9rem 0 0 -1.9rem; border-radius: 50%; pointer-events: none;
   background: radial-gradient(circle at 35% 30%, #fff, var(--volt) 55%, #a89600); box-shadow: 0 .2rem .8rem rgb(0 0 0 / .6);
 }
-.stick-guide { position: absolute; top: -1.5rem; left: -25%; width: 150%; text-align: center; font: 500 .62rem/1 var(--font-mono); letter-spacing: .16em; color: var(--bone); text-shadow: 0 1px 4px #000; pointer-events: none; }
 
 /* thumb arc: punch sits in the corner, skills fan out above and to the left, ultimate on top */
 .attack-controls { position: relative; flex: none; width: 10.2rem; height: 13.6rem; pointer-events: none; }
@@ -331,19 +330,29 @@ html[data-art~='fx-speed'] .vs-speed { background: var(--art-fx-speed) center / 
   }
   .joystick { flex: 0 0 var(--stick-size); width: var(--stick-size); height: var(--stick-size); }
   .stick-knob { width: 40%; height: 40%; margin: -20% 0 0 -20%; }
-  .stick-guide { font-size: 11px; top: -22px; letter-spacing: .08em; }
-  .attack-controls { width: calc(var(--control-unit) * 10.2); height: calc(var(--control-unit) * 13.6); }
+  /* Four skills sweep from the left of the attack button to directly above it. */
+  .attack-controls { width: calc(var(--control-unit) * 16.5); height: calc(var(--control-unit) * 16.8); }
   .skill-btn { width: calc(var(--control-unit) * 3.9); height: calc(var(--control-unit) * 3.9); }
-  .skill-btn[data-action='special'] { right: calc(var(--control-unit) * 5.6); bottom: calc(var(--control-unit) * .1); }
-  .skill-btn[data-action='skill1'] { right: calc(var(--control-unit) * 5.3); bottom: calc(var(--control-unit) * 4.6); }
-  .skill-btn[data-action='skill2'] { right: var(--control-unit); bottom: calc(var(--control-unit) * 5.7); }
-  .ult-btn { right: calc(var(--control-unit) * 5.2); bottom: calc(var(--control-unit) * 9.1); width: calc(var(--control-unit) * 4.5); height: calc(var(--control-unit) * 4.5); }
+  .skill-btn[data-action='special'] { right: calc(var(--control-unit) * 12.6); bottom: calc(var(--control-unit) * .6); }
+  .skill-btn[data-action='skill1'] { right: calc(var(--control-unit) * 10.99); bottom: calc(var(--control-unit) * 6.6); }
+  .skill-btn[data-action='skill2'] { right: calc(var(--control-unit) * 6.6); bottom: calc(var(--control-unit) * 10.99); }
+  .ult-btn { right: calc(var(--control-unit) * .3); bottom: calc(var(--control-unit) * 12.3); width: calc(var(--control-unit) * 4.5); height: calc(var(--control-unit) * 4.5); }
   .punch-btn { width: calc(var(--control-unit) * 5.1); height: calc(var(--control-unit) * 5.1); }
   .action-btn .ic { width: calc(var(--control-unit) * 1.55); height: calc(var(--control-unit) * 1.55); }
   .punch-btn .ic { width: calc(var(--control-unit) * 2); height: calc(var(--control-unit) * 2); }
   .action-name { font-size: calc(var(--control-unit) * .65); }
   .action-key { font-size: 9px; }
   .cooldown { font-size: calc(var(--control-unit) * 1.05); }
+}
+
+/* A steeper arc on narrow portrait screens leaves the existing joystick clear. */
+@media (orientation: portrait) and (max-width: 700px) and (pointer: coarse),
+       (orientation: portrait) and (max-width: 700px) and (hover: none) {
+  .attack-controls { width: calc(var(--control-unit) * 10.6); height: calc(var(--control-unit) * 14.9); }
+  .skill-btn[data-action='special'] { right: calc(var(--control-unit) * 5.8); bottom: calc(var(--control-unit) * .6); }
+  .skill-btn[data-action='skill1'] { right: calc(var(--control-unit) * 6.7); bottom: calc(var(--control-unit) * 4.95); }
+  .skill-btn[data-action='skill2'] { right: calc(var(--control-unit) * 4.9); bottom: calc(var(--control-unit) * 9); }
+  .ult-btn { right: calc(var(--control-unit) * .3); bottom: calc(var(--control-unit) * 10.4); }
 }
 
 /* ---------- motion ---------- */
