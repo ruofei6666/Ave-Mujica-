@@ -1,0 +1,516 @@
+{
+  "version": 4,
+  "available": true,
+  "checkedOn": "2026-10-02",
+  "status": "选人、大招与获胜角色 K.O. 台词已加载；开场使用格斗播报，按钮使用点击音效。",
+  "defaultVolumes": {
+    "music": 1,
+    "sfx": 1,
+    "voice": 1
+  },
+  "sfxGain": 3.6,
+  "clips": {
+    "pyro": {
+      "select": [
+        "assets/audio/pyro/select.wav"
+      ],
+      "ult": [
+        "assets/audio/pyro/ult.wav"
+      ],
+      "ko": [
+        "assets/audio/pyro/ko.wav"
+      ]
+    },
+    "shadow": {
+      "select": [
+        "assets/audio/shadow/select.wav"
+      ],
+      "ult": [
+        "assets/audio/shadow/ult.wav"
+      ],
+      "ko": [
+        "assets/audio/shadow/ko.wav"
+      ]
+    },
+    "gale": {
+      "select": [
+        "assets/audio/gale/select.wav"
+      ],
+      "ult": [
+        "assets/audio/gale/ult.wav"
+      ],
+      "ko": [
+        "assets/audio/gale/ko.wav"
+      ]
+    },
+    "bastion": {
+      "select": [
+        "assets/audio/bastion/select.wav"
+      ],
+      "ult": [
+        "assets/audio/bastion/ult.wav"
+      ],
+      "ko": [
+        "assets/audio/bastion/ko.wav"
+      ]
+    },
+    "iron": {
+      "select": [
+        "assets/audio/iron/select.wav"
+      ],
+      "ult": [
+        "assets/audio/iron/ult.wav"
+      ],
+      "ko": [
+        "assets/audio/iron/ko.wav"
+      ]
+    }
+  },
+  "clipMetadata": [
+    {
+      "id": "pyro",
+      "character": "丰川祥子",
+      "cue": "select",
+      "sourceCue": "CN_021",
+      "label": "选中干员1",
+      "file": "assets/audio/pyro/select.wav",
+      "sourcePage": "https://prts.wiki/w/丰川祥子/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4182_oblvns/cn_021.wav",
+      "translationZh": "你我现在的判断应该是一致的。",
+      "verifiedSourceTranscriptJa": "ドクターと私、きっと今同じ作戦を描いていますわね。",
+      "sourceIntervalSeconds": [
+        0,
+        5.3717233560090705
+      ],
+      "cropped": false,
+      "sourceSha256": "553c97a85cee58c686a5edbefaf734d3474f599c3009946aebf95cf88d680132",
+      "inputSha256": "553c97a85cee58c686a5edbefaf734d3474f599c3009946aebf95cf88d680132",
+      "outputSha256": "d1acc5c298609fe58e31f120357cea17220c424ee39fd83ba76dc02a91d0b29a",
+      "durationSeconds": 5.3717233560090705,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 26038,
+      "rmsPcm16": 4766.21
+    },
+    {
+      "id": "pyro",
+      "character": "丰川祥子",
+      "cue": "ult",
+      "sourceCue": "CN_028",
+      "label": "作战中4",
+      "file": "assets/audio/pyro/ult.wav",
+      "sourcePage": "https://prts.wiki/w/丰川祥子/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4182_oblvns/cn_028.wav",
+      "translationZh": null,
+      "verifiedSourceTranscriptJa": "私は君臨し続ける。",
+      "sourceIntervalSeconds": [
+        2.9,
+        4.581360544217687
+      ],
+      "cropped": true,
+      "sourceSha256": "396e1517dafb0a85afe4319ac9e01eae6d6403e917312a229ac35587ae5fc693",
+      "inputSha256": "ec7ea62123b610668ff2578d54d4df8e64ebc695d5a0eed48bef255963d4333d",
+      "outputSha256": "b316fdfa90acbb2261bfb3870e6d4d87b0650b4bea79b06548cf98c3bbef32f5",
+      "durationSeconds": 1.681360544217687,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 16262,
+      "rmsPcm16": 3629.58
+    },
+    {
+      "id": "pyro",
+      "character": "丰川祥子",
+      "cue": "ko",
+      "sourceCue": "CN_030",
+      "label": "3星结束行动",
+      "file": "assets/audio/pyro/ko.wav",
+      "sourcePage": "https://prts.wiki/w/丰川祥子/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4182_oblvns/cn_030.wav",
+      "translationZh": "精彩的作战——大家都辛苦了。",
+      "verifiedSourceTranscriptJa": "素晴らしい作戦でしたわ。皆さん、お疲れ様でした。",
+      "sourceIntervalSeconds": [
+        0,
+        4.35702947845805
+      ],
+      "cropped": false,
+      "sourceSha256": "6575ba0643b9be49e727b1d0c10b887a5d815d2868dac486628f9a5b8843ecd1",
+      "inputSha256": "6575ba0643b9be49e727b1d0c10b887a5d815d2868dac486628f9a5b8843ecd1",
+      "outputSha256": "fdf3090e312d7b7c75d82dd24ea9f14fe84027ace30af7200247df88dca296f1",
+      "durationSeconds": 4.35702947845805,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 23711,
+      "rmsPcm16": 3607.34
+    },
+    {
+      "id": "shadow",
+      "character": "三角初华",
+      "cue": "select",
+      "sourceCue": "CN_021",
+      "label": "选中干员1",
+      "file": "assets/audio/shadow/select.wav",
+      "sourcePage": "https://prts.wiki/w/三角初华/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4184_dolris/cn_021.wav",
+      "translationZh": "我来帮忙！",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        0.6987074829931973
+      ],
+      "cropped": false,
+      "sourceSha256": "695d97a913664320e47ae303af5be8e0be75b7937d77d36fac767f18a916f0fc",
+      "inputSha256": "695d97a913664320e47ae303af5be8e0be75b7937d77d36fac767f18a916f0fc",
+      "outputSha256": "17aaf7b83ba1eac29360ac107dd66f98e1aeab519d241791df632e1afc771c3a",
+      "durationSeconds": 0.6987074829931973,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 16378,
+      "rmsPcm16": 3512.11
+    },
+    {
+      "id": "shadow",
+      "character": "三角初华",
+      "cue": "ult",
+      "sourceCue": "CN_028",
+      "label": "作战中4",
+      "file": "assets/audio/shadow/ult.wav",
+      "sourcePage": "https://prts.wiki/w/三角初华/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4184_dolris/cn_028.wav",
+      "translationZh": null,
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0.0,
+        1.014965986394558
+      ],
+      "cropped": false,
+      "sourceSha256": "7e759ccb35e40b945d970f8a89026defba54a3a6883f6997a165c5cc5a8015ad",
+      "inputSha256": "8088442cb98b0d25387de0346bcc88dc76b64c9b6a53ceef06e906314e834f99",
+      "outputSha256": "08a0f8824c9d5938fb4f86f8ec561b914d746d43094d7a5160e334e78f2818e0",
+      "durationSeconds": 1.014965986394558,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 15669,
+      "rmsPcm16": 3659.97
+    },
+    {
+      "id": "shadow",
+      "character": "三角初华",
+      "cue": "ko",
+      "sourceCue": "CN_030",
+      "label": "3星结束行动",
+      "file": "assets/audio/shadow/ko.wav",
+      "sourcePage": "https://prts.wiki/w/三角初华/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4184_dolris/cn_030.wav",
+      "translationZh": "大家的配合越来越有默契了！",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        2.7995238095238095
+      ],
+      "cropped": false,
+      "sourceSha256": "a3f6bc35151a460a8c874c4a9ae241dff18643a93d1015b16340ece2ba5c66d9",
+      "inputSha256": "a3f6bc35151a460a8c874c4a9ae241dff18643a93d1015b16340ece2ba5c66d9",
+      "outputSha256": "ecf3fa62617224e66cf24edd3e0452b920266c15e3ab02fae9d235cd49c096ca",
+      "durationSeconds": 2.7995238095238095,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 17068,
+      "rmsPcm16": 4075.56
+    },
+    {
+      "id": "gale",
+      "character": "若叶睦",
+      "cue": "select",
+      "sourceCue": "CN_021",
+      "label": "选中干员1",
+      "file": "assets/audio/gale/select.wav",
+      "sourcePage": "https://prts.wiki/w/若叶睦/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4183_mortis/cn_021.wav",
+      "translationZh": "准备好了。",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        1.796938775510204
+      ],
+      "cropped": false,
+      "sourceSha256": "3016dcb25f6dabf28d33b7a92f2f316b3794680bf1ad2bd8979b8a971990d5cc",
+      "inputSha256": "3016dcb25f6dabf28d33b7a92f2f316b3794680bf1ad2bd8979b8a971990d5cc",
+      "outputSha256": "c5d2582a65478199273ad9025e618f17b837b0012cc048ab6b178a8f982e3847",
+      "durationSeconds": 1.796938775510204,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 26013,
+      "rmsPcm16": 3438.77
+    },
+    {
+      "id": "gale",
+      "character": "若叶睦",
+      "cue": "ult",
+      "sourceCue": "CN_028",
+      "label": "作战中4",
+      "file": "assets/audio/gale/ult.wav",
+      "sourcePage": "https://prts.wiki/w/若叶睦/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4183_mortis/cn_028.wav",
+      "translationZh": null,
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0.0,
+        1.7390022675736962
+      ],
+      "cropped": false,
+      "sourceSha256": "37e481bf8d273e62ebeb6a39d978f9a936b637e354cfc4edc9671f8f879152db",
+      "inputSha256": "a65082d8440d33a9e4dab902db1d459c73fe23dfaaf8ca2ec970554df3d16449",
+      "outputSha256": "24b65f8721ad5bf623afcbc627c8d18aaf224040083b48996e9145f91530320d",
+      "durationSeconds": 1.7390022675736962,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 15702,
+      "rmsPcm16": 4151.68
+    },
+    {
+      "id": "gale",
+      "character": "若叶睦",
+      "cue": "ko",
+      "sourceCue": "CN_029",
+      "label": "完成高难行动",
+      "file": "assets/audio/gale/ko.wav",
+      "sourcePage": "https://prts.wiki/w/若叶睦/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4183_mortis/cn_029.wav",
+      "translationZh": "太好了。",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        0.8425850340136054
+      ],
+      "cropped": false,
+      "sourceSha256": "9a61510ef6603c1182d7fc75c2017931f18870b9ee1d0cee8b0a3bae3791e3b5",
+      "inputSha256": "9a61510ef6603c1182d7fc75c2017931f18870b9ee1d0cee8b0a3bae3791e3b5",
+      "outputSha256": "b81963af979c79632b7495973cf61434608244ce00449d28f7e14122e2fa4397",
+      "durationSeconds": 0.8425850340136054,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 24332,
+      "rmsPcm16": 3392.52
+    },
+    {
+      "id": "bastion",
+      "character": "八幡海铃",
+      "cue": "select",
+      "sourceCue": "CN_021",
+      "label": "选中干员1",
+      "file": "assets/audio/bastion/select.wav",
+      "sourcePage": "https://prts.wiki/w/八幡海铃/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4186_tmoris/cn_021.wav",
+      "translationZh": "是。",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        0.3421995464852608
+      ],
+      "cropped": false,
+      "sourceSha256": "9f929ade2e35aee3559680ebc3aeaab27cecad9b07dc10a54fef7445073d84c4",
+      "inputSha256": "9f929ade2e35aee3559680ebc3aeaab27cecad9b07dc10a54fef7445073d84c4",
+      "outputSha256": "45140b6f1984fa0081a447573a174fa129cb647ea891c8171d21b3646dc0adb0",
+      "durationSeconds": 0.3421995464852608,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 26014,
+      "rmsPcm16": 4732.71
+    },
+    {
+      "id": "bastion",
+      "character": "八幡海铃",
+      "cue": "ult",
+      "sourceCue": "CN_028",
+      "label": "作战中4",
+      "file": "assets/audio/bastion/ult.wav",
+      "sourcePage": "https://prts.wiki/w/八幡海铃/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4186_tmoris/cn_028.wav",
+      "translationZh": null,
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0.0,
+        0.8019274376417234
+      ],
+      "cropped": false,
+      "sourceSha256": "e9ae810f79047cc5b7242f11c2ba2be3ef4388b1e1531285c032eab7b8718cb6",
+      "inputSha256": "4a2c4d68ca5d2305f77b09b099ecb7cee0c84a147207e6375f1cc2e469866dfc",
+      "outputSha256": "dba953fdcb871ace9940907764c5e3f70d7367eb985220071e3d6b37acf6f0c0",
+      "durationSeconds": 0.8019274376417234,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 19551,
+      "rmsPcm16": 3325.96
+    },
+    {
+      "id": "bastion",
+      "character": "八幡海铃",
+      "cue": "ko",
+      "sourceCue": "CN_029",
+      "label": "完成高难行动",
+      "file": "assets/audio/bastion/ko.wav",
+      "sourcePage": "https://prts.wiki/w/八幡海铃/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4186_tmoris/cn_029.wav",
+      "translationZh": "任务完成，多亏了大家。",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        2.812607709750567
+      ],
+      "cropped": false,
+      "sourceSha256": "63c298a27fea484414d96cf644e71270b6aa07e37105979fac130b92a4ea0197",
+      "inputSha256": "63c298a27fea484414d96cf644e71270b6aa07e37105979fac130b92a4ea0197",
+      "outputSha256": "f17cdad50cd97a62f22e213441c59d90e91f69c68e9ae15ff710d7fe0a2b7da7",
+      "durationSeconds": 2.812607709750567,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 23735,
+      "rmsPcm16": 3667.44
+    },
+    {
+      "id": "iron",
+      "character": "祐天寺若麦",
+      "cue": "select",
+      "sourceCue": "CN_021",
+      "label": "选中干员1",
+      "file": "assets/audio/iron/select.wav",
+      "sourcePage": "https://prts.wiki/w/祐天寺若麦/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4185_amoris/cn_021.wav",
+      "translationZh": "我在这里哟~",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        1.671360544217687
+      ],
+      "cropped": false,
+      "sourceSha256": "c8c315c0e603aafbd73c5a156ad444e541fc2d737ef6aa66af5fc6861ce8dc25",
+      "inputSha256": "c8c315c0e603aafbd73c5a156ad444e541fc2d737ef6aa66af5fc6861ce8dc25",
+      "outputSha256": "ff847ce06ffa02addd1106eecce78a68ffd0d133100607bda21af84f7dfcf09f",
+      "durationSeconds": 1.671360544217687,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 15175,
+      "rmsPcm16": 3559.23
+    },
+    {
+      "id": "iron",
+      "character": "祐天寺若麦",
+      "cue": "ult",
+      "sourceCue": "CN_028",
+      "label": "作战中4",
+      "file": "assets/audio/iron/ult.wav",
+      "sourcePage": "https://prts.wiki/w/祐天寺若麦/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4185_amoris/cn_028.wav",
+      "translationZh": null,
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0.0,
+        0.9262131519274377
+      ],
+      "cropped": false,
+      "sourceSha256": "779411f8ba1ebae674053f38fe14d345e1cf411399ceaa51cf826355e49bebf7",
+      "inputSha256": "fdf50cb72f4fdac7116e27c677b357ada0bbbd5005c187cfd0afe9262d43da57",
+      "outputSha256": "9fb8d580000b1a5698faf8ea6a12e3f29d2a3c70f6943cf3a92c820fd21f3e45",
+      "durationSeconds": 0.9262131519274377,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 17966,
+      "rmsPcm16": 4069.76
+    },
+    {
+      "id": "iron",
+      "character": "祐天寺若麦",
+      "cue": "ko",
+      "sourceCue": "CN_030",
+      "label": "3星结束行动",
+      "file": "assets/audio/iron/ko.wav",
+      "sourcePage": "https://prts.wiki/w/祐天寺若麦/语音记录",
+      "sourceUrl": "https://torappu.prts.wiki/assets/audio/voice/char_4185_amoris/cn_030.wav",
+      "translationZh": "完美的胜利！接下来应该是庆功宴了吧！",
+      "verifiedSourceTranscriptJa": null,
+      "sourceIntervalSeconds": [
+        0,
+        5.725328798185941
+      ],
+      "cropped": false,
+      "sourceSha256": "2ffe388eeb2d155071f173abe1a3f0fc859e6f610ed47b2da2566b6d0feb91af",
+      "inputSha256": "2ffe388eeb2d155071f173abe1a3f0fc859e6f610ed47b2da2566b6d0feb91af",
+      "outputSha256": "5e11e400e46a3b60fc5859cf7775d133f621c03439e78d9a62bad3c099e4352e",
+      "durationSeconds": 5.725328798185941,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 20831,
+      "rmsPcm16": 3946.04
+    }
+  ],
+  "systemClips": {
+    "round1": [
+      "assets/audio/system/round1-voicebosch.wav"
+    ],
+    "fight": [
+      "assets/audio/system/fight-voicebosch.wav"
+    ]
+  },
+  "systemMetadata": [
+    {
+      "cue": "round1",
+      "text": "Round one!",
+      "sourceFilename": "09. Round 1.wav",
+      "sourceFile": ".scratch/audio-refresh/voicebosch/round1-source.wav",
+      "sourceSha256": "b25ea1179199d33e49404b0276dd254aa70efc7350b839aff65eca33ee4a684c",
+      "sourceIntervalSeconds": [
+        0.295,
+        1.585
+      ],
+      "outputFile": "assets/audio/system/round1-voicebosch.wav",
+      "file": "assets/audio/system/round1-voicebosch.wav",
+      "source": {
+        "author": "VoiceBosch",
+        "title": "MR. HAPPY - Announcer Audio Pack",
+        "sourcePage": "https://voicebosch.itch.io/mr-happy-announcer-audio-pack",
+        "license": "CC BY-SA 4.0 International",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "recordedVoice": true,
+        "downloadInstructions": "On the official asset page choose Download Now, then No thanks, just take me to the downloads. Save 09. Round 1.wav and 24. Fight.wav to the sourceFile paths; the original SHA256 values are checked before processing."
+      },
+      "inputSha256": "b25ea1179199d33e49404b0276dd254aa70efc7350b839aff65eca33ee4a684c",
+      "outputSha256": "6b330b68afa7df4e8cbf2afb2b8dbab19b65e40dc75cc041bb3cfadd5765615a",
+      "processing": "Trim leading silence and long tails; mono, presence EQ, light compression, -16 LUFS / -2 dBTP, short fades; no added echo",
+      "durationSeconds": 1.29,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 20860,
+      "rmsPcm16": 4947.19
+    },
+    {
+      "cue": "fight",
+      "text": "Fight!",
+      "sourceFilename": "24. Fight.wav",
+      "sourceFile": ".scratch/audio-refresh/voicebosch/fight-source.wav",
+      "sourceSha256": "b2e3393338a0082c21857e9ca74100a4ea19399aca52b0fea223d12aa3fe1981",
+      "sourceIntervalSeconds": [
+        0.525,
+        1.185
+      ],
+      "outputFile": "assets/audio/system/fight-voicebosch.wav",
+      "file": "assets/audio/system/fight-voicebosch.wav",
+      "source": {
+        "author": "VoiceBosch",
+        "title": "MR. HAPPY - Announcer Audio Pack",
+        "sourcePage": "https://voicebosch.itch.io/mr-happy-announcer-audio-pack",
+        "license": "CC BY-SA 4.0 International",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "recordedVoice": true,
+        "downloadInstructions": "On the official asset page choose Download Now, then No thanks, just take me to the downloads. Save 09. Round 1.wav and 24. Fight.wav to the sourceFile paths; the original SHA256 values are checked before processing."
+      },
+      "inputSha256": "b2e3393338a0082c21857e9ca74100a4ea19399aca52b0fea223d12aa3fe1981",
+      "outputSha256": "640b0e1e05caf4869ffa4e78d23288d72a3d1a444fe5dc63c98965363ac2cf74",
+      "processing": "Trim leading silence and long tails; mono, presence EQ, light compression, -16 LUFS / -2 dBTP, short fades; no added echo",
+      "durationSeconds": 0.66,
+      "sampleRate": 44100,
+      "channels": 1,
+      "peakPcm16": 26029,
+      "rmsPcm16": 3990.19
+    }
+  ]
+}

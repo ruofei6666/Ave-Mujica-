@@ -1,0 +1,20 @@
+MR. HAPPY - Announcer Audio Pack
+Recorded and produced by VoiceBosch, SoundBiter SFX Library.
+Source: https://voicebosch.itch.io/mr-happy-announcer-audio-pack
+
+The source recordings and the adapted round1-voicebosch.wav and
+fight-voicebosch.wav files are licensed under Creative Commons
+Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
+License: https://creativecommons.org/licenses/by-sa/4.0/
+Legal code: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+Credit: VoiceBosch
+https://www.voicebosch.com/
+
+Changes made for this game:
+- Excerpted 09. Round 1.wav at 0.295-1.585 seconds.
+- Excerpted 24. Fight.wav at 0.525-1.185 seconds.
+- Converted to mono 44.1 kHz PCM, applied presence EQ and light compression,
+  normalized loudness and added short fades. No extra echo or voice synthesis.
+
+The attribution and this license notice accompany these two recordings.

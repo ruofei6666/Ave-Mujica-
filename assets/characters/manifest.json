@@ -1,0 +1,1682 @@
+{
+  "version": 9,
+  "generatedAt": "2026-10-02",
+  "generator": "built-in image_gen",
+  "characters": {
+    "pyro": {
+      "id": "pyro",
+      "name": "丰川祥子",
+      "weapon": "keyboard",
+      "url": "assets/characters/pyro/atlas.webp",
+      "portrait": "assets/characters/pyro/portrait.png",
+      "avatar": "assets/characters/pyro/avatar.png",
+      "cutin": "assets/characters/pyro/cutin.png",
+      "height": 400,
+      "frames": {
+        "idle-0": {
+          "rect": [
+            0,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "idle-1": {
+          "rect": [
+            512,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "walk-0": {
+          "rect": [
+            1024,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "walk-1": {
+          "rect": [
+            1536,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "walk-2": {
+          "rect": [
+            0,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "walk-3": {
+          "rect": [
+            512,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "walk-4": {
+          "rect": [
+            1024,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "walk-5": {
+          "rect": [
+            1536,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "jump-0": {
+          "rect": [
+            0,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "jump-1": {
+          "rect": [
+            512,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "attack-0": {
+          "rect": [
+            1024,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "attack-1": {
+          "rect": [
+            1536,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "attack-2": {
+          "rect": [
+            0,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "attack-3": {
+          "rect": [
+            512,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "hurt-0": {
+          "rect": [
+            1024,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "hurt-1": {
+          "rect": [
+            1536,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "skill-0": {
+          "rect": [
+            0,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "skill-1": {
+          "rect": [
+            512,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "skill-2": {
+          "rect": [
+            1024,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "skill-3": {
+          "rect": [
+            1536,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "win-0": {
+          "rect": [
+            0,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "win-1": {
+          "rect": [
+            512,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "idle-2": {
+          "rect": [
+            1024,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        },
+        "idle-3": {
+          "rect": [
+            1536,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "keyboard"
+        }
+      },
+      "portraitSize": [
+        888,
+        1610
+      ],
+      "animationFrameCount": 24,
+      "instrument": {
+        "description": "ROLAND FA-08-style BLACK workstation keyboard, faithful flat rectangular casing, 88-key piano keybed with natural repeating groups of TWO and THREE black keys, central display/control panel, left pitch/modulation lever and knobs, SIXTEEN small pink/red sampler pads in a 4 by4 group on the right TOP panel. Match the instrument reference closely; do not make a guitar-shaped keytar, accordion or a toy keyboard. Scale the whole instrument uniformly to fit an action-game carried prop without cropping its keys or changing its casing proportions; add only a plain black carrying strap so she can fight while holding it. Both gloved hands visibly contact and support the keyboard.",
+        "strings": null,
+        "reference": "https://www.roland.com/global/products/fa-08/"
+      },
+      "faceCropSource": ".scratch/character-restored-portraits/pyro.png"
+    },
+    "shadow": {
+      "id": "shadow",
+      "name": "三角初华",
+      "weapon": "guitar",
+      "url": "assets/characters/shadow/atlas.webp",
+      "portrait": "assets/characters/shadow/portrait.png",
+      "avatar": "assets/characters/shadow/avatar.png",
+      "cutin": "assets/characters/shadow/cutin.png",
+      "height": 400,
+      "frames": {
+        "idle-0": {
+          "rect": [
+            0,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "idle-1": {
+          "rect": [
+            512,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-0": {
+          "rect": [
+            1024,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-1": {
+          "rect": [
+            1536,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-2": {
+          "rect": [
+            0,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-3": {
+          "rect": [
+            512,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-4": {
+          "rect": [
+            1024,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-5": {
+          "rect": [
+            1536,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "jump-0": {
+          "rect": [
+            0,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "jump-1": {
+          "rect": [
+            512,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-0": {
+          "rect": [
+            1024,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-1": {
+          "rect": [
+            1536,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-2": {
+          "rect": [
+            0,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-3": {
+          "rect": [
+            512,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "hurt-0": {
+          "rect": [
+            1024,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "hurt-1": {
+          "rect": [
+            1536,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-0": {
+          "rect": [
+            0,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-1": {
+          "rect": [
+            512,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-2": {
+          "rect": [
+            1024,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-3": {
+          "rect": [
+            1536,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "win-0": {
+          "rect": [
+            0,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "win-1": {
+          "rect": [
+            512,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "idle-2": {
+          "rect": [
+            1024,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "idle-3": {
+          "rect": [
+            1536,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        }
+      },
+      "portraitSize": [
+        861,
+        1495
+      ],
+      "animationFrameCount": 24,
+      "instrument": {
+        "description": "SCHECTER AC-AR-07-AveMujica/Doloris/SIG SEVEN-STRING electric guitar. Match the product photograph closely: black asymmetric offset double-cutaway body with broad rounded lower bout, gold hardware and gold metal control plates, one black neck single-coil and one black bridge humbucker, gold two-piece fixed bridge and tailpiece, pale maple fretboard with small flower and crescent inlays. Black headstock, EXACTLY SEVEN gold tuning keys in ONE straight row along the upper edge, EXACTLY SEVEN parallel strings and seven bridge saddles. No tuning keys on the opposite edge. Black shoulder strap, left hand on fretboard, right hand on strings.",
+        "strings": 7,
+        "reference": "https://schecter.co.jp/collaboration/4432/?products=ac-ar-07-avemujica%2Fdoloris%2Fsig"
+      },
+      "faceCropSource": ".scratch/character-restored-portraits/shadow.png"
+    },
+    "gale": {
+      "id": "gale",
+      "name": "若叶睦",
+      "weapon": "guitar",
+      "url": "assets/characters/gale/atlas.webp",
+      "portrait": "assets/characters/gale/portrait.png",
+      "avatar": "assets/characters/gale/avatar.png",
+      "cutin": "assets/characters/gale/cutin.png",
+      "height": 400,
+      "frames": {
+        "idle-0": {
+          "rect": [
+            0,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "idle-1": {
+          "rect": [
+            512,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-0": {
+          "rect": [
+            1024,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-1": {
+          "rect": [
+            1536,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-2": {
+          "rect": [
+            0,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-3": {
+          "rect": [
+            512,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-4": {
+          "rect": [
+            1024,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "walk-5": {
+          "rect": [
+            1536,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "jump-0": {
+          "rect": [
+            0,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "jump-1": {
+          "rect": [
+            512,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-0": {
+          "rect": [
+            1024,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-1": {
+          "rect": [
+            1536,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-2": {
+          "rect": [
+            0,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "attack-3": {
+          "rect": [
+            512,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "hurt-0": {
+          "rect": [
+            1024,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "hurt-1": {
+          "rect": [
+            1536,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-0": {
+          "rect": [
+            0,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-1": {
+          "rect": [
+            512,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-2": {
+          "rect": [
+            1024,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "skill-3": {
+          "rect": [
+            1536,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "win-0": {
+          "rect": [
+            0,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "win-1": {
+          "rect": [
+            512,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "idle-2": {
+          "rect": [
+            1024,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        },
+        "idle-3": {
+          "rect": [
+            1536,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "guitar"
+        }
+      },
+      "portraitSize": [
+        926,
+        1620
+      ],
+      "animationFrameCount": 24,
+      "instrument": {
+        "description": "SCHECTER AC-EX-7-AveMujica/Mortis/SIG SEVEN-STRING electric guitar. Pink glitter finish, rounded Strat-style double-cutaway body, pearlescent WHITE pickguard, TWO black humbuckers, black fixed bridge and black knobs, pale maple neck/fretboard and natural maple headstock with black flower and crescent inlays. EXACTLY SEVEN black tuning keys in ONE row along the upper edge; EXACTLY SEVEN parallel strings and seven bridge saddles. No pegs on the opposite edge, no dark red pointed fantasy guitar. Black shoulder strap; both hands support and play the instrument.",
+        "strings": 7,
+        "reference": "https://schecter.co.jp/collaboration/4432/?products=ac-ex-7-avemujica%2Fmortis%2Fsig"
+      },
+      "faceCropSource": ".scratch/character-restored-portraits/gale.png"
+    },
+    "bastion": {
+      "id": "bastion",
+      "name": "八幡海铃",
+      "weapon": "bass",
+      "url": "assets/characters/bastion/atlas.webp",
+      "portrait": "assets/characters/bastion/portrait.png",
+      "avatar": "assets/characters/bastion/avatar.png",
+      "cutin": "assets/characters/bastion/cutin.png",
+      "height": 400,
+      "frames": {
+        "idle-0": {
+          "rect": [
+            0,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "idle-1": {
+          "rect": [
+            512,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "walk-0": {
+          "rect": [
+            1024,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "walk-1": {
+          "rect": [
+            1536,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "walk-2": {
+          "rect": [
+            0,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "walk-3": {
+          "rect": [
+            512,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "walk-4": {
+          "rect": [
+            1024,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "walk-5": {
+          "rect": [
+            1536,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "jump-0": {
+          "rect": [
+            0,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "jump-1": {
+          "rect": [
+            512,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "attack-0": {
+          "rect": [
+            1024,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "attack-1": {
+          "rect": [
+            1536,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "attack-2": {
+          "rect": [
+            0,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "attack-3": {
+          "rect": [
+            512,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "hurt-0": {
+          "rect": [
+            1024,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "hurt-1": {
+          "rect": [
+            1536,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "skill-0": {
+          "rect": [
+            0,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "skill-1": {
+          "rect": [
+            512,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "skill-2": {
+          "rect": [
+            1024,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "skill-3": {
+          "rect": [
+            1536,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "win-0": {
+          "rect": [
+            0,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "win-1": {
+          "rect": [
+            512,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "idle-2": {
+          "rect": [
+            1024,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        },
+        "idle-3": {
+          "rect": [
+            1536,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "bass"
+        }
+      },
+      "portraitSize": [
+        891,
+        1629
+      ],
+      "animationFrameCount": 24,
+      "instrument": {
+        "description": "SCHECTER AC-EXB-5-AveMujica/Timoris/SIG FIVE-STRING BASS. Official muted LILAC / lavender body and matching lilac headstock, black large pickguard, two black rectangular soapbar pickups, silver five-saddle bridge, dark rosewood fretboard with pale flower and crescent inlays, black knobs. Exactly FIVE thicker bass strings and FIVE tuning machines in a 4+1 arrangement: FOUR silver keys on the upper/long edge and ONE on the opposite lower edge. Five bridge saddles. NOT navy or black, not a six-string guitar. Black strap; left hand grips neck, right hand naturally rests over strings.",
+        "strings": 5,
+        "reference": "https://schecter.co.jp/collaboration/4432/?products=ac-exb-5-avemujica%2Ftimoris%2Fsig"
+      },
+      "faceCropSource": ".scratch/character-restored-portraits/bastion.png"
+    },
+    "iron": {
+      "id": "iron",
+      "name": "祐天寺若麦",
+      "weapon": "drumsticks",
+      "url": "assets/characters/iron/atlas.webp",
+      "portrait": "assets/characters/iron/portrait.png",
+      "avatar": "assets/characters/iron/avatar.png",
+      "cutin": "assets/characters/iron/cutin.png",
+      "height": 400,
+      "frames": {
+        "idle-0": {
+          "rect": [
+            0,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "idle-1": {
+          "rect": [
+            512,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "walk-0": {
+          "rect": [
+            1024,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "walk-1": {
+          "rect": [
+            1536,
+            0,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "walk-2": {
+          "rect": [
+            0,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "walk-3": {
+          "rect": [
+            512,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "walk-4": {
+          "rect": [
+            1024,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "walk-5": {
+          "rect": [
+            1536,
+            512,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "jump-0": {
+          "rect": [
+            0,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "jump-1": {
+          "rect": [
+            512,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "attack-0": {
+          "rect": [
+            1024,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "attack-1": {
+          "rect": [
+            1536,
+            1024,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "attack-2": {
+          "rect": [
+            0,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "attack-3": {
+          "rect": [
+            512,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "hurt-0": {
+          "rect": [
+            1024,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "hurt-1": {
+          "rect": [
+            1536,
+            1536,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "skill-0": {
+          "rect": [
+            0,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "skill-1": {
+          "rect": [
+            512,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "skill-2": {
+          "rect": [
+            1024,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "skill-3": {
+          "rect": [
+            1536,
+            2048,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "win-0": {
+          "rect": [
+            0,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "win-1": {
+          "rect": [
+            512,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "idle-2": {
+          "rect": [
+            1024,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        },
+        "idle-3": {
+          "rect": [
+            1536,
+            2560,
+            512,
+            512
+          ],
+          "pivot": [
+            256,
+            488
+          ],
+          "weapon": "drumsticks"
+        }
+      },
+      "portraitSize": [
+        580,
+        1582
+      ],
+      "animationFrameCount": 24,
+      "instrument": {
+        "description": "Exactly TWO LERNI H-140AM-style signature drumsticks, one naturally held in each hand. Natural pale honey/beige hickory WOOD, narrow cylindrical shafts, slim taper and small rounded oval wood tips. Real 406mm by14mm proportions: long slender sticks rather than thick dark-red batons or mallets. Black small grip-area printing can be understated; do not reproduce advertising text or background. No floating sticks and no extra drumstick.",
+        "strings": null,
+        "reference": "https://store.shimamura.co.jp/ec/pro/disp/1/tp031-0752199"
+      },
+      "faceCropSource": ".scratch/character-restored-portraits/iron.png"
+    }
+  }
+}
