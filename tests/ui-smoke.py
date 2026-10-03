@@ -136,13 +136,47 @@ async function controlBounds(page, name) {
   assert.equal(boxes.length, 5);
   assert.deepEqual(boxes.map(box => box.action).sort(), ['punch','skill1','skill2','special','ult']);
   for (const box of boxes) assert.ok(box.inside && box.exposed && box.width >= 40 && box.height >= 40, JSON.stringify(box));
+  // The buttons are regular octagons, so two of them are apart as soon as any of the four flat directions
+  // (horizontal, vertical, both diagonals) separates their centres by more than their half widths.
   for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
     const a = boxes[i], b = boxes[j];
-    const overlapX = Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x);
-    const overlapY = Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y);
-    assert.ok(overlapX <= 1 || overlapY <= 1, 'attack buttons overlap: '+a.action+'/'+b.action);
+    const dx = (a.x + a.width / 2) - (b.x + b.width / 2), dy = (a.y + a.height / 2) - (b.y + b.height / 2);
+    const gap = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dx + dy) / Math.SQRT2, Math.abs(dx - dy) / Math.SQRT2) - (a.width + b.width) / 2;
+    assert.ok(gap >= 2, `attack buttons overlap: ${a.action}/${b.action} (${gap.toFixed(1)}px)`);
   }
-  record(name + ' five usable attack targets stay exposed inside viewport', {boxes});
+  // Honor of Kings thumb layout: the attack button owns the corner, and 技能一 → 技能二 → 技能三 → 大招 sit on ONE arc
+  // around it, from its left (9 o'clock) up to straight above it (12 o'clock).
+  const centre = action => { const box = boxes.find(item => item.action === action); return { x: box.x + box.width / 2, y: box.y + box.height / 2 }; };
+  const punch = centre('punch');
+  const expectedAngle = { special: 180, skill1: 150, skill2: 120, ult: 90 };
+  const fan = Object.keys(expectedAngle).map(action => {
+    const c = centre(action), dx = c.x - punch.x, dy = punch.y - c.y;
+    return { action, angle: +(((Math.atan2(dy, dx) * 180 / Math.PI) + 360) % 360).toFixed(1), radius: +Math.hypot(dx, dy).toFixed(1) };
+  });
+  for (const item of fan) assert.ok(Math.abs(item.angle - expectedAngle[item.action]) <= 6, `${item.action} is off its Honor of Kings position: ${JSON.stringify(fan)}`);
+  const radii = fan.map(item => item.radius);
+  assert.ok(Math.max(...radii) / Math.min(...radii) <= 1.05, 'skills are not on one arc around the attack button: ' + JSON.stringify(fan));
+  const clearance = await page.evaluate(() => {
+    const stick = document.getElementById('joystick');
+    return stick.offsetParent ? document.querySelector('.attack-controls').getBoundingClientRect().left - stick.getBoundingClientRect().right : null;
+  });
+  if (clearance !== null) assert.ok(clearance >= 8, 'joystick and skill fan overlap: ' + clearance);
+  // The "opponent is off-screen" hints ride just above the fan; neither side may end up under a skill, the stick or the pause button.
+  const hints = await page.evaluate(() => {
+    const battle = document.getElementById('battle'), stick = document.getElementById('joystick');
+    const rect = element => { const r = element.getBoundingClientRect(); return { x: r.left, y: r.top, right: r.right, bottom: r.bottom }; };
+    const meet = (a, b) => Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 && Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1;
+    const obstacles = [...document.querySelectorAll('[data-action]')].map(button => ({ name: button.dataset.action, box: rect(button) }))
+      .concat([{ name: 'pause', box: rect(document.getElementById('pause-btn')) }])
+      .concat(stick.offsetParent ? [{ name: 'joystick', box: rect(stick) }] : []);
+    return ['left', 'right'].map(side => {
+      const hint = document.createElement('div'); hint.className = 'opponent-direction ' + side; hint.textContent = side === 'left' ? '← 对手' : '对手 →';
+      battle.prepend(hint); const box = rect(hint); hint.remove();
+      return { side, covered: obstacles.filter(item => meet(box, item.box)).map(item => item.name) };
+    });
+  });
+  for (const hint of hints) assert.deepEqual(hint.covered, [], `the ${hint.side} off-screen hint sits under ${hint.covered}`);
+  record(name + ' five usable attack targets stay exposed inside viewport, skills on one Honor of Kings arc', {fan, clearance, hints, boxes});
 }
 async function cdpTouch(page, selector, dx = 0, dy = 0, advance = 0, clock = false) {
   const session = sessions.get(page);
@@ -259,7 +293,7 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
       if (s.snapshot.fighters[0].cd0 > 0) break;
     }
     await clockAdvance(page, 120);
-    s = await state(page); assert.ok(s.snapshot.fighters[0].cd0 > 0); assert.equal(s.snapshot.fighters[0].mp, 200);
+    s = await state(page); assert.ok(s.snapshot.fighters[0].cd0 > 0, 'special did not fire: ' + JSON.stringify({ me: s.snapshot.fighters[0], other: s.snapshot.fighters[1], events: s.snapshot.events })); assert.equal(s.snapshot.fighters[0].mp, 200);
     assert.match(await page.locator('[data-action="special"] .cooldown').textContent(), /\d/);
     record('special cooldown and original shadow energy skill work', { cooldown: s.snapshot.fighters[0].cd0, mp: s.snapshot.fighters[0].mp });
     await clockAdvance(page, 400); await clickClock(page, '[data-action="ult"]'); await clockAdvance(page, 150);
@@ -411,6 +445,9 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
   });
   await group('joystick release recovery and larger touch targets', async () => {
     const page = await newPage('joystick', {width:844,height:390}, true);
+    // Shadow teleports and causes knockback during this input-only check. Use a melee
+    // opponent through the normal UI, keeping hits out of the short movement gesture.
+    await page.locator('#opponent-roster [data-character="bastion"]').tap();
     await page.locator('#start-btn').tap(); await pauseClock(page); await clockAdvance(page,2700);
     await controlBounds(page,'larger landscape controls');
     const dimensions = await page.evaluate(() => ({stick:document.getElementById('joystick').getBoundingClientRect().width,
@@ -457,7 +494,8 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     assert.equal(await page.locator('#stick-knob').evaluate(el=>el.style.transform),'');
     await clockAdvance(page,20);const stopped=(await state(page)).snapshot.fighters[0];
     await clockAdvance(page,100);const later=(await state(page)).snapshot.fighters[0];
-    assert.equal(later.x,stopped.x,'fighter drifted after the thumb left the pad');
+    assert.equal(later.hp,later.maxHp,'enemy damage interrupted the joystick movement check');
+    assert.equal(later.x,stopped.x,'fighter drifted after the thumb left the pad: '+JSON.stringify({stopped,later,events:(await state(page)).snapshot.events}));
     await cdpTouch(page,'#joystick',-35,0,160,true);
     assert.ok((await state(page)).snapshot.fighters[0].x<later.x-20,'next gesture stayed locked to the previous right direction');
     record('native drag outside the pad releases movement and the next left gesture works');
@@ -475,12 +513,15 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     await page.context().close();
   });
   await group('portrait layout and controls', async () => {
-    const page = await newPage('portrait', { width:390, height:844 });
+    const page = await newPage('portrait', { width:390, height:844 }, true);
     await selectAllCharacters(page,'portrait');
     await overflow(page, 'portrait menu no horizontal overflow'); await capture(page, 'menu-portrait', true);
+    // Keep movement independent of the teleporting default opponent and screenshot timing.
+    await page.locator('#opponent-roster [data-character="bastion"]').tap();
     await page.locator('#start-btn').tap(); assert.equal(await page.locator('#rotate-hint').isVisible(), true);
     await page.locator('#portrait-play').tap(); assert.equal(await page.locator('#rotate-hint').isVisible(), false);
-    await page.waitForFunction(() => window.AveGame.getState().snapshot.intro === 0);
+    await pauseClock(page); await clockAdvance(page,2700);
+    assert.equal((await state(page)).snapshot.intro,0);
     await overflow(page, 'portrait battle no horizontal overflow');
     // Reset the browser's touch emulation before capture: Edge can revert its
     // pointer media after the full-page screenshot temporarily resizes viewport.
@@ -488,12 +529,13 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     await portraitSession.send('Emulation.setTouchEmulationEnabled', {enabled:true,maxTouchPoints:1});
     await overflow(page, 'portrait explicit touch emulation'); await controlBounds(page,'portrait battle'); await hudBars(page,'portrait HP bars are one stable, equal length',90); await capture(page, 'battle-portrait');
     const x = (await state(page)).snapshot.fighters[0].x;
-    await cdpTouch(page, '#joystick', -30, 0, 250);
-    assert.ok((await state(page)).snapshot.fighters[0].x < x - 20);
+    await cdpTouch(page, '#joystick', -30, 0, 250, true);
+    assert.equal((await state(page)).snapshot.fighters[0].hp,(await state(page)).snapshot.fighters[0].maxHp,'enemy damage interrupted the portrait movement check');
+    assert.ok((await state(page)).snapshot.fighters[0].x < x - 20, 'portrait movement did not finish: '+JSON.stringify({before:x,snapshot:(await state(page)).snapshot}));
     for (const action of ['special','skill1','skill2','ult','punch']) await cdpTouch(page, `[data-action="${action}"]`);
     record('portrait joystick and all five attack buttons are inside viewport and receive touch');
     await page.locator('#pause-btn').tap(); const portraitFrame=(await state(page)).snapshot.frame;
-    await sleep(200); assert.equal((await state(page)).snapshot.frame,portraitFrame); assert.equal((await state(page)).paused,true);
+    await clockAdvance(page,200); assert.equal((await state(page)).snapshot.frame,portraitFrame); assert.equal((await state(page)).paused,true);
     await capture(page,'pause-portrait');
     await page.locator('#quit-btn').tap(); assert.equal((await state(page)).screen,'menu'); await page.context().close();
   });

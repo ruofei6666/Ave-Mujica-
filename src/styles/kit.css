@@ -223,11 +223,11 @@
 
   /* clip-path would cut a normal outline off, so focus is drawn inside the shape */
   .frame:focus-visible, .btn:focus-visible, .icon-btn:focus-visible, .segmented button:focus-visible,
-  .character-card:focus-visible, .opponent-card:focus-visible, .mode-tab:focus-visible, .voice-preview:focus-visible, .action-btn:focus-visible {
+  .character-card:focus-visible, .opponent-card:focus-visible, .mode-tab:focus-visible, .voice-preview:focus-visible {
     outline: 2px solid var(--volt);
     outline-offset: -.4rem;
   }
-  .btn-primary:focus-visible, .punch-btn:focus-visible { outline-color: var(--ink); }
+  .btn-primary:focus-visible { outline-color: var(--ink); }
 }
 
 @keyframes chev-run {
