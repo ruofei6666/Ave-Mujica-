@@ -21,15 +21,26 @@ function fight(left: Character, right: Character, seed: number) {
 
 const stats = new Map(game.characters.map(c => [c.id, { name: c.name, wins: 0, losses: 0, draws: 0, matches: 0 }]));
 const matrix = [];
-let matchSeed = baseSeed;
+// Keep each pairing's seeds stable when increasing the sample count. Both seat
+// arrangements use the same seed, matching the offline cooldown search.
+function matchSeed(pairId: number, round: number) {
+  let x = (baseSeed >>> 0) ^ Math.imul(pairId + 1, 0x9e3779b9) ^ Math.imul(round + 1, 0x85ebca6b);
+  x ^= x >>> 16;
+  x = Math.imul(x, 0x7feb352d);
+  x ^= x >>> 15;
+  x = Math.imul(x, 0x846ca68b);
+  return (x ^ (x >>> 16)) >>> 0;
+}
+let pairId = 0;
 for (let i = 0; i < game.characters.length; i++) {
-  for (let j = i + 1; j < game.characters.length; j++) {
+  for (let j = i + 1; j < game.characters.length; j++, pairId++) {
     const a = game.characters[i], b = game.characters[j];
     let aWins = 0, bWins = 0, draws = 0;
     for (let round = 0; round < roundsPerSide; round++) {
-      let result = fight(a, b, matchSeed++);
+      const seed = matchSeed(pairId, round);
+      let result = fight(a, b, seed);
       if (result > 0) aWins++; else if (result < 0) bWins++; else draws++;
-      result = fight(b, a, matchSeed++);
+      result = fight(b, a, seed);
       if (result > 0) bWins++; else if (result < 0) aWins++; else draws++;
     }
     const sa = stats.get(a.id)!, sb = stats.get(b.id)!;
