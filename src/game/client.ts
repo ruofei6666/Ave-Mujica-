@@ -435,7 +435,7 @@ export function createGameClient(ui: TheatreState) {
   listen($('rematch-btn'), 'click', () => { if (mode === 'pve') startPve(); else if (send({ type: 'rematch' })) { $('rematch-btn').disabled = true; $('rematch-btn').textContent = '已请求重赛'; $('rematch-status').textContent = '等待对方同意。'; } });
   listen($('portrait-play'), 'click', () => $('battle').classList.add('portrait-allowed'));
   listen($('skill-info-btn'), 'click', showSkills);
-  for (const name of ['settings', 'help', 'credits'] as const) listen($(`${name}-btn`), 'click', () => { sound('unlock'); $(`${name}-dialog`).showModal(); });
+  for (const name of ['settings', 'help', 'credits', 'balance'] as const) listen($(`${name}-btn`), 'click', () => { sound('unlock'); $(`${name}-dialog`).showModal(); });
   listen($('help-done'), 'click', () => { $('help-dialog').close(); write('ave-theatre-help-seen-v2', true); });
   for (const channel of ['music', 'sfx', 'voice'] as const) {
     $(`${channel}-volume`).value = String(Math.round(settings[channel] * 100)); $(`${channel}-value`).value = `${Math.round(settings[channel] * 100)}%`;

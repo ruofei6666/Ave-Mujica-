@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTheatreState } from '../game/theatre-state';
 import ModalFrame from './ModalFrame.vue';
+import BalanceDialog from './BalanceDialog.vue';
 const ui = useTheatreState();
 </script>
 
@@ -56,6 +57,8 @@ const ui = useTheatreState();
     <p>角色立绘、头像和对战动作参照官方舞台形象重新制作；每位出演者以自己的乐器作战。日语语音来自联动游戏的真实配音，具体短句与来源已记录。</p>
     <a class="text-btn" href="CREDITS.md" target="_blank" rel="noopener">查看素材来源记录<svg class="ui-ic" aria-hidden="true"><use href="#ui-arrow" /></svg></a>
   </ModalFrame>
+
+  <BalanceDialog />
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </template>

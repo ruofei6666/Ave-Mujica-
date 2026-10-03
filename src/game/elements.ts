@@ -39,6 +39,8 @@ interface GameElements {
   'room-code': HTMLInputElement;
   'online-status': HTMLElement;
   'skill-info-btn': HTMLButtonElement;
+  'balance-btn': HTMLButtonElement;
+  'balance-dialog': HTMLDialogElement;
   'menu-status': HTMLElement;
   'record-line': HTMLElement;
   'install-btn': HTMLButtonElement;

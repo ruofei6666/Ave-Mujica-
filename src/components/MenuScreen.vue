@@ -86,7 +86,10 @@ const picked = computed(() => {
         </div>
 
         <div class="deploy-foot">
-          <button id="skill-info-btn" class="text-btn">查看角色招式<svg class="ui-ic" aria-hidden="true"><use href="#ui-arrow" /></svg></button>
+          <div class="deploy-links">
+            <button id="skill-info-btn" class="text-btn">查看角色招式<svg class="ui-ic" aria-hidden="true"><use href="#ui-arrow" /></svg></button>
+            <button id="balance-btn" class="text-btn" aria-haspopup="dialog" aria-controls="balance-dialog">对战胜率<svg class="ui-ic" aria-hidden="true"><use href="#ui-arrow" /></svg></button>
+          </div>
           <p id="menu-status" class="status" role="status" aria-live="polite"></p>
         </div>
       </section>
@@ -104,3 +107,9 @@ const picked = computed(() => {
     </footer>
   </section>
 </template>
+
+<style scoped>
+.deploy-foot { flex-wrap: wrap; }
+.deploy-links { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem 1.2rem; }
+.deploy-links .text-btn { min-height: 2.75rem; }
+</style>
