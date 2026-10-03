@@ -20,7 +20,7 @@ const ui = useTheatreState();
         <button type="button" class="voice-preview" data-voice-cue="ko">K.O.</button>
       </div>
     </div>
-    <label class="check-row"><input id="low-motion" type="checkbox"><span class="check-box" aria-hidden="true"></span>减少闪光与镜头晃动</label>
+    <label class="check-row"><input id="low-motion" type="checkbox"><span class="check-box" aria-hidden="true"></span>减少动态效果</label>
     <p class="subtle">设置与战绩保存在这台设备的浏览器中。</p>
   </ModalFrame>
 

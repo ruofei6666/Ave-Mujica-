@@ -215,7 +215,6 @@ export function createGameClient(ui: TheatreState) {
       $(`${id}-name`).textContent = def.name;
       $(`${id}-seat`).textContent = index === seat ? '你' : mode === 'pve' ? engine.difficulties[settings.difficulty].label : '对手';
       const hp = Math.max(0, f.hp / f.maxHp * 100);
-      if (state.hp !== null && state.hp !== undefined && hp < state.hp - 0.8) { const face = hud.querySelector<HTMLElement>('.fh-face')!; face.classList.remove('hurt'); void face.offsetWidth; face.classList.add('hurt'); }
       state.hp = hp;
       $(`${id}-hp`).style.width = `${hp}%`; $(`${id}-lag`).style.width = `${hp}%`;
       $(`${id}-mp`).style.width = `${Math.max(0, Math.min(100, f.mp / 200 * 100))}%`;

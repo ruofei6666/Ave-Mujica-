@@ -41,7 +41,6 @@ export class ArenaRenderer {
   declare current: TrackedFighter[];
   declare tracks: (Track | null)[];
   declare combo: { n: number; last: number }[];
-  declare tint: { color: string | null; at: number; len: number };
   declare frameEma: number;
   declare lastFrameTs: number;
   declare slowCount: number;
@@ -76,7 +75,6 @@ export class ArenaRenderer {
     this.lastSeq = -1; this.lastFrame = -1; this.lastSnapshotAt = 0; this.interval = 50; this.lastDraw = 0;
     this.previous = []; this.current = []; this.tracks = [null, null];
     this.combo = [{ n: 0, last: -999 }, { n: 0, last: -999 }];
-    this.tint = { color: null, at: 0, len: 1 };
     this.frameEma = 16.7; this.lastFrameTs = 0; this.slowCount = 0; this.fastCount = 0; this.lowQuality = false;
     this.matchMedia = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     this._reduced = !!(this.matchMedia && this.matchMedia.matches);
@@ -142,7 +140,7 @@ export class ArenaRenderer {
   }
 
   /* ---------- 事件与关键帧 -> 特效 ---------- */
-  process(snapshot: Snapshot, view: RenderedFighter[], ts: number) {
+  process(snapshot: Snapshot, view: RenderedFighter[]) {
     const fx = this.fx;
     for (const e of snapshot.events || []) {
       if (!Number.isFinite(e.seq) || e.seq <= this.lastSeq) continue;
@@ -158,7 +156,6 @@ export class ArenaRenderer {
         }
       } else if (e.kind === 'skill' && actor && e.slot && e.slot !== 'punch' && e.actor !== null) {
         fx.cast(actor, e.slot);
-        if (e.slot === 'ult') { this.tint = { color: FX.tone(actor.id).main, at: ts, len: 1500 }; }
         const detail = { seat: e.actor, id: actor.id, slot: e.slot, name: this.characters.get(actor.id)?.[e.slot]?.name || '' };
         window.dispatchEvent(new CustomEvent('mujica:skill', { detail }));
       } else if (e.kind === 'ko' && actor) {
@@ -213,29 +210,17 @@ export class ArenaRenderer {
       this.camera.update(view, localSeat, dt * 16.667);
       const winner = snapshot.result ? snapshot.result.winner : null;
       if (winner === 0 || winner === 1) { if (view[winner]) { view[winner].win = true; this.celebrate(view[winner], ts); } }
-      this.process(snapshot, view, ts);
+      this.process(snapshot, view);
       this.fx.update(dt, ts, view);
       for (let i = 0; i < view.length; i++) this.fx.sustain(view[i], view[1 - i], dt, ts);
       this.fx.sustainWorld(snapshot, ts);
       for (let i = 0; i < view.length; i++) this.dustTrail(view[i], ts);
     } else this.fx.update(dt, ts, view);
 
-    // 舞台色调随大招变化
-    const tintK = this.tint.color ? clamp(1 - (ts - this.tint.at) / this.tint.len, 0, 1) : 0;
-    this.stage.setTint(this.tint.color, tintK * 0.8);
-
-    const cam = this.fx.camera();
     const viewport = this.camera.view;
     c.setTransform(this.scale, 0, 0, this.scale, this.offsetX, this.offsetY);
     c.save(); c.beginPath(); c.rect(0, 0, viewport.width, viewport.height); c.clip();
     c.translate(-viewport.left, -viewport.top);
-    c.translate(cam.sx, cam.sy);
-    if (cam.z > 1.0005) {
-      // A distant offscreen impact must not pull the local player out of the frame.
-      const zx = clamp(cam.zx, viewport.left, viewport.left + viewport.width);
-      const zy = clamp(cam.zy, viewport.top, viewport.top + viewport.height);
-      c.translate(zx, zy); c.scale(cam.z, cam.z); c.translate(-zx, -zy);
-    }
     this.stage.draw(c, ts, reduced, this.lowQuality, viewport.left, viewport.width);
 
     if (snapshot) {
@@ -294,9 +279,8 @@ export class ArenaRenderer {
     if (S.walkAmount < 0.003) S.walkAmount = 0;
     const px = CS * this.scale;
     const w = Math.max(8, Math.ceil(SP.w * px)), h = Math.max(8, Math.ceil(SP.h * px));
-    const flash = f.hitFlash > 0 ? Math.round(clamp(f.hitFlash / 8, 0, 1) * 0.7 * 8) / 8 : 0;
     const pose = A.animationPose(f, frame);
-    const sig = `${f.id}|${pose.name}|${Math.round(pose.blend * 64)}|${S.walkAmount ? Math.round(f.walkPhase * 512) : 0}|${Math.round(S.walkAmount * 256)}|${f.state}|${f.skillMove || ''}|${f.dead ? 1 : 0}|${f.win ? 1 : 0}|${flash}|${w}|${A.assetReady(f.id) ? 1 : 0}`;
+    const sig = `${f.id}|${pose.name}|${Math.round(pose.blend * 64)}|${S.walkAmount ? Math.round(f.walkPhase * 512) : 0}|${Math.round(S.walkAmount * 256)}|${f.state}|${f.skillMove || ''}|${f.dead ? 1 : 0}|${f.win ? 1 : 0}|${w}|${A.assetReady(f.id) ? 1 : 0}`;
     const slow = f.state === 'idle' || f.state === 'jump';
     const interval = this._reduced ? 120 : this.lowQuality ? (slow ? 100 : 50) : slow ? 50 : 33;
     if (S.canvas.width !== w || S.canvas.height !== h) { S.canvas.width = w; S.canvas.height = h; S.sig = ''; S.ctx = null; }
@@ -304,12 +288,7 @@ export class ArenaRenderer {
       const c = S.ctx || (S.ctx = context2d(S.canvas));
       c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, w, h);
       c.setTransform(px, 0, 0, px, SP.ox * px, SP.oy * px);
-      A.drawCharacter(c, f, frame, { reduced: this._reduced, flash, lw: 1.3, noFlicker: true, walkAmount: S.walkAmount });
-      if (flash > 0) {
-        // 受击闪白：人物与手持乐器一起提亮
-        c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-atop'; c.globalAlpha = Math.min(0.85, flash * 1.15);
-        c.fillStyle = '#ffffff'; c.fillRect(0, 0, w, h); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
-      }
+      A.drawCharacter(c, f, frame, { reduced: this._reduced, lw: 1.3, noFlicker: true, walkAmount: S.walkAmount });
       this.lightSprite(S, w, h);
       S.sig = sig; S.at = ts;
     }
@@ -331,7 +310,6 @@ export class ArenaRenderer {
     const S = this.updateSprite(f, frame, ts);
     c.save();
     c.translate(f.x, f.y); c.scale(f.facing === -1 ? -1 : 1, 1);
-    if (f.invuln > 0 && !this._reduced) c.globalAlpha = 0.78 + 0.18 * Math.cos(frame * 0.5);
     c.drawImage(S.canvas, -SP.ox * CS, -SP.oy * CS, SP.w * CS, SP.h * CS);
     c.restore();
   }
@@ -382,7 +360,7 @@ export class ArenaRenderer {
     }
     if (f.invuln > 0 && !this._reduced) {
       c.save(); c.globalCompositeOperation = 'lighter';
-      FX.glow(c, f.x, f.y - 84 * CS, 92, '#ffffff', 0.16 + 0.08 * Math.sin(ts / 70));
+      FX.glow(c, f.x, f.y - 84 * CS, 92, T.main, 0.16);
       c.restore();
     }
   }

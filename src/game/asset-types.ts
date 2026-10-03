@@ -27,5 +27,5 @@ export interface CharacterLook {
   accent: string; accent2: string; glow: string; dark: string;
   flowerCN: string; meaning: string; flowerA: string; flowerB: string; flowerC: string;
 }
-export interface DrawCharacterOptions { reduced?: boolean; flash?: number; lw?: number; noFlicker?: boolean; walkAmount?: number }
+export interface DrawCharacterOptions { reduced?: boolean; lw?: number; noFlicker?: boolean; walkAmount?: number }
 export interface ShowcaseOptions { mode?: 'bust' | 'full'; reduced?: boolean; fill?: number }

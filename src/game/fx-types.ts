@@ -35,12 +35,11 @@ type ItemShape =
   | { t: 'crack'; pts: Point[]; forks: [Point, Point][] }
   | { t: 'brackets' | 'spike'; x: number; y: number; w: number; h: number }
   | { t: 'string'; x: number; y0: number; y1: number; sway: number }
-  // flare: white-hot core with an anamorphic streak; rays: tapered radial impact lines (lens = per-ray length factor)
-  | { t: 'flare'; x: number; y: number; r: number; rot: number; hi: string }
+  // Tapered radial impact lines (lens = per-ray length factor).
   | { t: 'rays'; x: number; y: number; r0: number; r1: number; w: number; hi: string; angles: number[]; lens: number[] };
 export type ItemSpec = ItemBase & ItemShape;
 export type Item = ItemSpec & { max: number; age: number };
-export interface Flash { color: string; a: number; life: number; max: number }
+export interface Vignette { color: string; a: number; life: number; max: number }
 export interface SpeedLines { color: string; life: number; max: number; x: number; y: number; seed: number }
 export interface Ghost { canvas: HTMLCanvasElement; x: number; y: number; facing: number; life: number; max: number; a: number }
 export interface FloatingText { x: number; y: number; str: string; color: string; size: number; life: number; max: number; vy: number; vx: number; edge: string; pop: number }

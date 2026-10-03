@@ -1,10 +1,10 @@
 import type { CharacterId, CombatEvent, FighterSnapshot, Hazard, Projectile, SkillActionSlot, SkillMove, Snapshot } from '../../shared/types';
-import type { EmitterOptions, Flash, FloatingText, Ghost, Item, ItemSpec, Particle, ParticleSpec, Point, PrimitiveOptions, SpeedLines, TextOptions } from './fx-types';
+import type { EmitterOptions, FloatingText, Ghost, Item, ItemSpec, Particle, ParticleSpec, Point, PrimitiveOptions, SpeedLines, TextOptions, Vignette } from './fx-types';
 import { context2d } from './canvas';
 import { ARENA } from '../../shared/arena';
 import A from './art';
 const TAU = Math.PI * 2;
-const W = ARENA.width, H = ARENA.height, GROUND = ARENA.ground;
+const GROUND = ARENA.ground;
 const CS = 0.9; // 角色在场上的绘制缩放
 // 角色精灵缓冲：以脚底为原点，单位为角色坐标（含乐器挥舞与倒地姿势）
 const SPRITE = { ox: 220, oy: 245, w: 440, h: 290 };
@@ -90,19 +90,8 @@ class Fx {
   declare texts: FloatingText[];
   declare ghosts: Ghost[];
   declare reduced: boolean;
-  declare shakeAmp: number;
-  declare shakeT: number;
-  declare zoomAmt: number;
-  declare zoomLife: number;
-  declare zoomMax: number;
-  declare zoomX: number;
-  declare zoomY: number;
-  declare zoomLen: number;
-  declare flashes: Flash[];
   declare lines: SpeedLines | null;
-  declare vig: Flash | null;
-  /** One-to-four-frame color inversion: the "impact frame" anime uses for ultimates and finishers. */
-  declare inv: { life: number; max: number } | null;
+  declare vig: Vignette | null;
   declare now: number;
   declare acc: Record<string, number>;
   declare density: number | undefined;
@@ -114,44 +103,17 @@ class Fx {
     this.texts = [];
     this.ghosts = [];
     this.reduced = false;
-    this.shakeAmp = 0; this.shakeT = 0;
-    this.zoomAmt = 0; this.zoomLife = 0; this.zoomMax = 1; this.zoomX = W / 2; this.zoomY = H / 2;
-    this.flashes = [];
     this.lines = null;
     this.vig = null;
-    this.inv = null;
     this.now = 0;
     this.acc = {};
   }
-  reset() { this.parts.length = 0; this.items.length = 0; this.texts.length = 0; this.ghosts.length = 0; this.flashes.length = 0; this.lines = null; this.vig = null; this.inv = null; this.shakeAmp = 0; this.zoomAmt = 0; this.acc = {}; }
+  reset() { this.parts.length = 0; this.items.length = 0; this.texts.length = 0; this.ghosts.length = 0; this.lines = null; this.vig = null; this.acc = {}; }
   get count() { return (this.reduced ? 0.35 : 1) * (this.density || 1); }
 
   /* ---- 屏幕级 ---- */
-  shake(a: number) { if (this.reduced) return; this.shakeAmp = Math.min(18, Math.max(this.shakeAmp, a)); this.shakeT = 1; }
-  flash(color: string, a: number, life: number) { if (this.reduced) return; this.flashes.push({ color, a, life, max: life }); if (this.flashes.length > 6) this.flashes.shift(); }
-  zoom(amount: number, life: number, x: number, y: number) {
-    if (this.reduced) return;
-    // a small punch-in must not cut a bigger, longer zoom short
-    const running = this.zoomLife > 0 ? this.zoomAmt * Math.min(1, this.zoomLife / this.zoomLen) : 0;
-    if (amount < running) return;
-    this.zoomAmt = amount; this.zoomMax = amount; this.zoomLife = life; this.zoomLen = life; this.zoomX = x; this.zoomY = y; }
   speedLines(color: string, life: number, x: number, y: number) { if (this.reduced) return; this.lines = { color, life, max: life, x, y, seed: Math.random() * 100 }; }
   vignette(color: string, a: number, life: number) { if (this.reduced) return; this.vig = { color, a, life, max: life }; }
-  invert(life: number) {
-    if (this.reduced) return;
-    if (this.now - (this.acc.inv ?? -9999) < 1200) return; // never twice inside 1.2 s
-    this.acc.inv = this.now; this.inv = { life, max: life };
-  }
-  camera() {
-    // 返回 { sx, sy, z, zx, zy } 供渲染器应用
-    let sx = 0, sy = 0;
-    if (this.shakeAmp > 0.2 && !this.reduced) {
-      const k = this.shakeAmp;
-      sx = (Math.random() * 2 - 1) * k; sy = (Math.random() * 2 - 1) * k * 0.8;
-    }
-    const z = 1 + (this.zoomLife > 0 ? this.zoomAmt * Math.sin(Math.min(1, this.zoomLife / this.zoomLen) * Math.PI * 0.5) : 0);
-    return { sx, sy, z, zx: this.zoomX, zy: this.zoomY };
-  }
 
   /* ---- 基础发射器 ---- */
   add(p: ParticleSpec) {
@@ -271,13 +233,6 @@ class Fx {
     return this.item({ t: 'crack', pts, forks, life, color });
   }
   brackets(x: number, y: number, w: number, h: number, life: number, color: string) { return this.item({ t: 'brackets', x, y, w, h, life, color, front: true }); }
-  // 炽白闪光核心 + 横向拉丝，命中与大招的第一帧
-  flare(x: number, y: number, r: number, life: number, color: string, o?: PrimitiveOptions) {
-    if (this.reduced) return null;
-    o = o || {};
-    // front: false puts the glow behind the fighters, so big moments frame them instead of washing them out
-    return this.item({ t: 'flare', x, y, r, life, color, hi: o.hi || '#ffffff', rot: o.rot === undefined ? 0 : o.rot, front: o.front === undefined ? true : o.front });
-  }
   // 放射状冲击线；给定 dir 时朝命中方向的线更长
   rays(x: number, y: number, r0: number, r1: number, life: number, color: string, o?: PrimitiveOptions) {
     if (this.reduced) return null;
@@ -325,8 +280,7 @@ class Fx {
       this.sparks(x, y, 10, 3, 9, '#cfeaff', { dir: dir > 0 ? 0 : Math.PI, spread: 1.2 });
     } else if (dmg > 0) {
       const r = 24 + Math.min(54, dmg * 1.1), face = dir > 0 ? 0 : Math.PI;
-      // layered impact: a white-hot flare and radial lines land first, then the star burst, ring and sparks
-      this.flare(x, y, r * 1.25, 7 + big * 2, T.main, { hi: '#ffffff', rot: rnd(-0.35, 0.35) });
+      // Layered hit feedback: radial lines, a star burst, rings and sparks.
       this.rays(x, y, r * 0.45, r * (1.9 + big * 0.35), 9 + big * 2, T.hi, { n: 9 + big * 3, dir: face, w: 2.6 + big * 0.9 });
       this.burst(x, y, r, 12 + big * 2, T.main, { n: 7 + big, hi: '#ffffff' });
       this.ring(x, y, 6, r * 1.5, 14, T.hi, { ry: 1, w: 3 + big, front: true });
@@ -334,12 +288,9 @@ class Fx {
       this.sparks(x, y, 6 + big * 3, 3, 8, T.main, {});
       this.slash(x, y, dir, 52 + big * 14, -1.0, 1.0, 9, '#ffffff', { k: 0.82, hi: T.main });
       if (big >= 2) {
-        this.flash('#ffffff', 0.16 + big * 0.04, 6); this.ring(x, GROUND - 2, 10, 90 + big * 18, 22, T.main, {});
+        this.ring(x, GROUND - 2, 10, 90 + big * 18, 22, T.main, {});
         this.shards(x, y, 3 + big * 3, T.main, T.hi, { dir: face, spread: 1.7 });
-        this.zoom(0.014 + big * 0.006, 9, x, y); // a short punch-in on heavy hits
       }
-      this.shake(Math.min(14, 2 + dmg * 0.24 + (e.ultimate ? 3 : 0)));
-      if (e.ultimate) { this.zoom(0.035, 16, x, y); }
     }
     if (e.stolen) {
       // 抽蓝：蓝色光点从受击者飞向施术者
@@ -371,20 +322,13 @@ class Fx {
     if (ult) {
       this.circle(f.x, GROUND - 2, 150, 54, T.main, { glyphs: 12 });
       this.pillar(f.x, GROUND, 120, 560, 34, T.main, { hi: T.hi });
-      // the call-out strip is only a banner now, so the canvas carries the drama: flare, rays, a wide shockwave and an impact frame.
-      // The flare and rays sit behind the fighters and the rays start outside the body, so the caster stays readable.
-      this.flare(f.x, f.y - 90 * CS, 190, 20, T.main, { hi: T.hi, front: false });
+      // Rays and a wide shockwave sit behind the fighter to keep the caster readable.
       this.rays(f.x, f.y - 90 * CS, 120, 540, 22, T.hi, { n: 24, w: 6, front: false });
       this.ring(f.x, f.y - 90 * CS, 20, 640, 26, T.hi, { ry: 0.5, w: 4 });
-      this.invert(3);
-      this.flash(T.hi, 0.5, 14);
       this.vignette(T.dark, 0.7, 54);
       this.speedLines(T.hi, 26, f.x, f.y - 90);
-      this.zoom(0.06, 30, f.x, f.y - 90);
-      this.shake(5);
       this.petals(f.x, f.y - 70, 22, f.id, { v0: 2, v1: 7, spread: Math.PI, g: 0.03 });
     } else {
-      this.flare(f.x, f.y - 90 * CS, 50, 8, T.main, { hi: T.hi });
       this.petals(f.x, f.y - 60, 6, f.id, { v0: 1, v1: 3.5, spread: Math.PI, g: 0.02 });
     }
   }
@@ -402,7 +346,6 @@ class Fx {
             this.notes(sx, o ? o.y - 80 : 400, 3, col, {});
             this.twinkles(sx, 400, 8, 40, '#ffffff', { sy: 90 });
           }
-          this.shake(4);
         }
         break;
       case 'pyro_s1':
@@ -421,12 +364,10 @@ class Fx {
           this.ring(x, GROUND - 3, 10, 110, 20, T.hi, {});
           this.dust(x, GROUND - 2, 8, '#cdd8ff', { dir: fa });
           this.sparks(x, y, 12, 3, 10, T.hi, { dir: -Math.PI / 2 + (fa > 0 ? 0.5 : -0.5), spread: 0.9, g: 0.25 });
-          this.shake(5);
         }
         break;
       case 'pyro_ult':
         if (m === 6) {
-          this.flash(T.hi, 0.22, 8);
           this.sparks(fx, fy - 140 * CS, 14, 3, 10, T.hi, { dir: -Math.PI / 2, spread: 1.1 });
         }
         break;
@@ -438,7 +379,6 @@ class Fx {
             this.petals(fx + s * 46, fy - 80, 10, 'shadow', { v0: 1.5, v1: 5, spread: Math.PI });
           }
           this.ring(fx, fy - 70, 10, 120, 24, T.hi, { ry: 1, w: 4, front: true });
-          this.flash('#fff1c4', 0.34, 10);
           this.sparks(fx, fy - 90, 18, 3, 11, T.hi, {});
         }
         break;
@@ -451,7 +391,6 @@ class Fx {
         } else if (m === 10) {
           this.slash(fx + fa * 20, fy - 96, fa, 112, -1.2, 1.1, 14, '#fff4cf', { k: 0.6, hi: T.main });
           this.slash(fx + fa * 26, fy - 86, fa, 96, -0.9, 1.25, 12, T.alt, { k: 0.74, hi: '#ffffff' });
-          this.shake(5);
         }
         break;
       case 'shadow_s2':
@@ -470,7 +409,6 @@ class Fx {
           this.slash(fx + fa * 10, fy - 90, fa, 100, -1.15 + 0.5, 1.15 - 0.4, 12, T.alt, { k: 0.7, hi: '#ffffff', tilt: 0.5 });
           this.sparks(fx, fy - 90, 14, 3, 12, T.hi, {});
           this.petals(fx, fy - 90, 6, 'shadow', { v0: 1, v1: 4, spread: Math.PI });
-          this.shake(4);
         }
         break;
       /* ---- 睦 ---- */
@@ -495,7 +433,7 @@ class Fx {
       case 'gale_s2':
         if (m === 6) this.slash(fx + fa * 18, fy - 100, fa, 96, -1.35, 0.9, 12, '#effff0', { k: 0.62, hi: T.main });
         if (m === 14) this.slash(fx + fa * 24, fy - 84, fa, 96, 1.0, -1.25, 12, '#effff0', { k: 0.62, hi: T.main });
-        if (m === 22) { this.slash(fx + fa * 30, fy - 94, fa, 124, -1.3, 1.25, 16, '#ffffff', { k: 0.56, hi: T.main }); this.shake(4); this.petals(fx + fa * 50, fy - 90, 8, 'gale', { v0: 1.5, v1: 5, spread: Math.PI }); }
+        if (m === 22) { this.slash(fx + fa * 30, fy - 94, fa, 124, -1.3, 1.25, 16, '#ffffff', { k: 0.56, hi: T.main }); this.petals(fx + fa * 50, fy - 90, 8, 'gale', { v0: 1.5, v1: 5, spread: Math.PI }); }
         if (!this.reduced) this.sparks(fx + fa * 50, fy - 90, 8, 3, 9, T.hi, { dir: fa > 0 ? 0 : Math.PI, spread: 1 });
         break;
       case 'gale_ult':
@@ -507,8 +445,6 @@ class Fx {
           this.bolt(tx + rnd(-16, 16), -20, tx, GROUND - 6, 16, T.main, { w: 9, jitter: 46, seg: 11, branches: 3 });
           this.ring(tx, GROUND - 3, 10, 150, 22, T.hi, {});
           this.burst(tx, GROUND - 40, 90, 12, T.main, { n: 9 });
-          this.flash(T.hi, 0.32, 8);
-          this.shake(m === 28 ? 14 : 10);
           this.dust(tx, GROUND - 2, 10, '#d8f5e2', {});
           this.petals(tx, GROUND - 60, 12, 'gale', { v0: 2, v1: 7, spread: Math.PI, up: -2 });
           this.sparks(tx, GROUND - 30, 20, 4, 13, T.hi, { dir: -Math.PI / 2, spread: 1.4 });
@@ -520,7 +456,6 @@ class Fx {
         if (m === 0) { this.speedLines(T.hi, 10, fx, fy - 90); this.sparks(fx, fy - 70, 10, 2, 8, T.main, { dir: fa > 0 ? Math.PI : 0, spread: 0.6 }); }
         if (m === 10) {
           const tx = o ? o.x : fx + fa * 60, ty = o ? o.y - 90 * CS : fy - 80;
-          this.flash('#ffffff', 0.5, 9);
           this.brackets(tx, ty, 120, 150, 22, '#ffffff');
           this.burst(tx, ty, 60, 12, T.main, { n: 10 });
           this.twinkles(tx, ty, 10, 40, '#ffffff', {});
@@ -531,13 +466,12 @@ class Fx {
           this.burst(fx, fy - 100, 78, 16, T.main, { n: 10 });
           this.ring(fx, fy - 90, 10, 110, 24, T.hi, { ry: 1, w: 4, front: true });
           this.petals(fx, fy - 90, 16, 'iron', { v0: 2, v1: 6, spread: Math.PI });
-          this.flash('#ffe4f2', 0.28, 8);
           this.sparks(fx, fy - 90, 16, 3, 10, T.hi, {});
         }
         break;
       case 'iron_s2':
         if (m === 0) { this.speedLines(T.hi, 12, fx, fy - 90); this.burst(fx, fy - 80, 56, 10, T.main, { n: 8 }); }
-        if (m === 6) { this.slash(fx + fa * 30, fy - 90, fa, 100, -0.9, 1.0, 12, '#ffffff', { k: 0.5, hi: T.main }); this.shake(4); }
+        if (m === 6) { this.slash(fx + fa * 30, fy - 90, fa, 100, -0.9, 1.0, 12, '#ffffff', { k: 0.5, hi: T.main }); }
         break;
       case 'iron_ult':
         if (m === 12 || m === 24 || m === 38) {
@@ -549,8 +483,6 @@ class Fx {
           this.dust(x, GROUND - 2, 12, '#ffd7ec', {});
           this.sparks(x, GROUND - 6, 22, 4, 14, T.hi, { dir: -Math.PI / 2, spread: 1.4 });
           this.petals(x, GROUND - 30, 10, 'iron', { v0: 2, v1: 7, spread: Math.PI, up: -2 });
-          this.shake(m === 38 ? 15 : 11);
-          this.flash(T.hi, 0.22, 6);
           if (m === 38) this.pillar(x, GROUND, 140, 400, 22, T.main, { hi: T.hi });
         }
         break;
@@ -564,7 +496,6 @@ class Fx {
           this.coins(x, GROUND - 14, 8);
           this.sparks(x, GROUND - 6, 18, 4, 13, T.hi, { dir: -Math.PI / 2, spread: 1.3 });
           for (let i = 0; i < 3; i++) this.spike(x + fa * (30 + i * 36), GROUND, 30 + (2 - i) * 12, 18 + i * 3, T.main);
-          this.shake(10);
         }
         break;
       case 'bastion_s1':
@@ -572,16 +503,13 @@ class Fx {
           this.ring(fx, fy - 70, 14, 230, 26, T.main, { ry: 1, w: 7, front: true });
           this.ring(fx, GROUND - 3, 14, 250, 26, T.hi, { w: 5 });
           this.burst(fx, fy - 80, 120, 16, T.main, { n: 12 });
-          this.flash(T.hi, 0.42, 10);
-          this.shake(13);
           this.petals(fx, fy - 80, 22, 'bastion', { v0: 3, v1: 9, spread: Math.PI });
           this.sparks(fx, fy - 80, 30, 5, 16, T.hi, {});
-          this.zoom(0.04, 16, fx, fy - 80);
         }
         break;
       case 'bastion_s2':
         if (m === 5) { this.slash(fx + fa * 22, fy - 90, fa, 100, -1.2, 1.0, 11, '#dff8ff', { k: 0.58, hi: T.main }); this.speedLines(T.hi, 10, fx, fy - 90); }
-        if (m === 12) { this.slash(fx + fa * 30, fy - 88, fa, 118, 1.15, -1.25, 13, '#ffffff', { k: 0.54, hi: T.main }); this.shake(5); this.petals(fx + fa * 60, fy - 90, 5, 'bastion', { v0: 1, v1: 4, spread: Math.PI }); }
+        if (m === 12) { this.slash(fx + fa * 30, fy - 88, fa, 118, 1.15, -1.25, 13, '#ffffff', { k: 0.54, hi: T.main }); this.petals(fx + fa * 60, fy - 90, 5, 'bastion', { v0: 1, v1: 4, spread: Math.PI }); }
         break;
       case 'bastion_ult':
         if (m === 8 || m === 16 || m === 24 || m === 34) {
@@ -590,8 +518,7 @@ class Fx {
           this.ring(x, GROUND - 3, 10, 100, 20, T.hi, { w: 4 });
           this.sparks(x, GROUND - 8, 18, 4, 14, T.hi, { dir: -Math.PI / 2, spread: 0.9 });
           this.dust(x, GROUND - 2, 6, '#bfe8ef', {});
-          this.shake(10);
-          if (m === 34) { this.flash(T.hi, 0.25, 8); this.petals(x, GROUND - 50, 16, 'bastion', { v0: 2, v1: 8, spread: Math.PI, up: -2 }); }
+          if (m === 34) { this.petals(x, GROUND - 50, 16, 'bastion', { v0: 2, v1: 8, spread: Math.PI, up: -2 }); }
         }
         break;
       default: break;
@@ -609,7 +536,6 @@ class Fx {
     this.dust(f.x, GROUND - 2, 10, '#d8f2e2', {});
     this.sparks(f.x, GROUND - 8, 18, 4, 13, T.hi, { dir: -Math.PI / 2, spread: 1.3 });
     this.petals(f.x, GROUND - 40, 8, f.id, { v0: 2, v1: 6, spread: Math.PI, up: -2 });
-    this.shake(11);
   }
   strings(x: number, n: number) {
     // 天上垂下的细线（人偶线）
@@ -701,12 +627,7 @@ class Fx {
     this.ring(x, GROUND - 3, 8, 170, 22, T.hi, { w: 4 });
     this.ring(x, GROUND - 40, 10, 170, 24, '#ffffff', { ry: 1, w: 3, front: true });
     this.pillar(x, GROUND, 150, 620, 30, T.main, { hi: T.hi, front: true });
-    this.flare(x, GROUND - 40, 260, 20, T.main, { hi: '#ffffff', front: false });
     this.rays(x, GROUND - 40, 90, 520, 22, T.hi, { n: 24, w: 7, dir: -Math.PI / 2, front: false });
-    this.invert(3);
-    this.flash('#ffffff', 0.62, 16);
-    this.shake(18);
-    this.zoom(0.05, 24, x, GROUND - 80);
     this.speedLines(T.hi, 18, x, GROUND - 60);
     this.dust(x, GROUND - 2, 16, '#dbe4ff', {});
     this.sparks(x, GROUND - 20, 40, 5, 18, T.hi, { dir: -Math.PI / 2, spread: 1.5, g: 0.25, l1: 40 });
@@ -717,9 +638,7 @@ class Fx {
 
   ko(f: FighterSnapshot) {
     const T = tone(f.id);
-    // finisher: impact frame, a huge flare, radial lines and a spray of glass
-    this.invert(4);
-    this.flare(f.x, f.y - 90, 230, 22, T.main, { hi: '#ffffff', front: false });
+    // Finisher: radial lines and a spray of glass.
     this.rays(f.x, f.y - 90, 110, 640, 24, T.hi, { n: 30, w: 8, front: false });
     this.shards(f.x, f.y - 90, 26, T.main, T.hi, { v0: 4, v1: 14, spread: Math.PI });
     this.ring(f.x, f.y - 90, 20, 520, 28, T.hi, { ry: 0.55, w: 4 });
@@ -728,9 +647,6 @@ class Fx {
     this.ring(f.x, f.y - 90, 10, 160, 24, '#ffffff', { ry: 1, w: 4, front: true });
     this.petals(f.x, f.y - 90, 36, f.id, { v0: 2, v1: 10, spread: Math.PI, g: 0.05, l1: 120 });
     this.sparks(f.x, f.y - 90, 40, 4, 18, T.hi, {});
-    this.flash('#ffffff', 0.62, 16);
-    this.shake(16);
-    this.zoom(0.07, 40, f.x, f.y - 90);
     this.vignette('#000000', 0.5, 60);
   }
 
@@ -761,12 +677,8 @@ class Fx {
       if (t.life <= 0) this.texts.splice(i, 1);
     }
     for (let i = this.ghosts.length - 1; i >= 0; i--) { this.ghosts[i].life -= dtf; if (this.ghosts[i].life <= 0) this.ghosts.splice(i, 1); }
-    for (let i = this.flashes.length - 1; i >= 0; i--) { this.flashes[i].life -= dtf; if (this.flashes[i].life <= 0) this.flashes.splice(i, 1); }
     if (this.lines) { this.lines.life -= dtf; if (this.lines.life <= 0) this.lines = null; }
     if (this.vig) { this.vig.life -= dtf; if (this.vig.life <= 0) this.vig = null; }
-    if (this.inv) { this.inv.life -= dtf; if (this.inv.life <= 0) this.inv = null; }
-    if (this.shakeAmp > 0) { this.shakeAmp *= Math.pow(0.86, dtf); if (this.shakeAmp < 0.2) this.shakeAmp = 0; }
-    if (this.zoomLife > 0) { this.zoomLife -= dtf; if (this.zoomLife <= 0) { this.zoomLife = 0; this.zoomAmt = 0; } }
   }
 
   /* ---------------- 绘制：角色后方 ---------------- */
@@ -825,7 +737,7 @@ class Fx {
       c.restore();
     }
   }
-  // 屏幕空间叠层（闪白 / 暗角 / 速度线），ctx 已重置为屏幕坐标
+  // 屏幕空间叠层（暗角 / 速度线），ctx 已重置为屏幕坐标
   drawScreen(c: CanvasRenderingContext2D, w: number, h: number, ts: number) {
     void ts;
     if (this.reduced) return;
@@ -846,15 +758,6 @@ class Fx {
         c.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0 * 0.7); c.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1 * 0.7);
       }
       c.stroke(); c.restore();
-    }
-    if (this.inv) {
-      // impact frame: invert the picture for a few frames (difference against white)
-      c.save(); c.globalCompositeOperation = 'difference'; c.globalAlpha = this.inv.life / this.inv.max > 0.5 ? 0.9 : 0.5;
-      c.fillStyle = '#ffffff'; c.fillRect(0, 0, w, h); c.restore();
-    }
-    for (const f of this.flashes) {
-      const k = f.life / f.max;
-      c.globalAlpha = f.a * k * k; c.fillStyle = f.color; c.fillRect(0, 0, w, h);
     }
     c.globalAlpha = 1;
   }
@@ -961,7 +864,6 @@ class Fx {
         break;
       }
       case 'bolt': {
-        if (it.age % 3 === 2 && k < 0.8) break; // 闪烁
         const a = k < 0.6 ? 1 : 1 - (k - 0.6) / 0.4;
         c.globalCompositeOperation = 'lighter'; c.lineJoin = 'round'; c.lineCap = 'round';
         const draw = (pts: readonly Point[], wMul: number) => {
@@ -1033,21 +935,6 @@ class Fx {
         const y1 = lerp(it.y0, it.y1, grow);
         c.quadraticCurveTo(it.x + Math.sin(it.sway + it.age * 0.2) * 7, (it.y0 + y1) / 2, it.x, y1); c.stroke();
         glow(c, it.x, y1, 7, it.color, a);
-        break;
-      }
-      case 'flare': {
-        const e = ease(Math.min(1, k / 0.25)), a = 1 - Math.pow(k, 1.4), r = it.r * (0.55 + 0.45 * e);
-        c.globalCompositeOperation = 'lighter';
-        glow(c, it.x, it.y, r * 1.1, it.color, a * 0.75);
-        glow(c, it.x, it.y, r * 0.45, it.hi, a * 0.85);
-        // anamorphic streak and a shorter cross spike, plus a half-length pair at 45 degrees
-        c.fillStyle = it.hi;
-        c.translate(it.x, it.y); c.rotate(it.rot);
-        for (const [deg, long, thin, fade] of [[0, 1.5, 0.07, 0.95], [Math.PI / 2, 0.9, 0.05, 0.7], [Math.PI / 4, 0.7, 0.04, 0.5], [-Math.PI / 4, 0.7, 0.04, 0.5]] as const) {
-          c.save(); c.rotate(deg); c.globalAlpha = a * fade;
-          c.beginPath(); c.moveTo(-r * long, 0); c.quadraticCurveTo(0, -r * thin, r * long, 0); c.quadraticCurveTo(0, r * thin, -r * long, 0); c.fill();
-          c.restore();
-        }
         break;
       }
       case 'rays': {
