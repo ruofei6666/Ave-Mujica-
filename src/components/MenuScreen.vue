@@ -17,7 +17,7 @@ const picked = computed(() => {
 
 <template>
   <section id="menu" class="screen menu">
-    <Backdrop />
+    <Backdrop :with-scene="false" />
 
     <header class="menu-top">
       <a class="brand" href="#" aria-label="Ave Mujica 乱斗剧场" @click.prevent>

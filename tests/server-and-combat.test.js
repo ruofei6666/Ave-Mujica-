@@ -389,8 +389,9 @@ test('the shared ES combat module bundles for browsers without DOM dependencies'
   vm.runInNewContext(source, browser, { filename: 'combat.ts', timeout: 1000 });
   assert.equal(typeof browser.AveCombat.createWorld, 'function');
   const world = browser.AveCombat.createWorld({ mode: 'pvp', introFrames: 0 });
+  const startX = world.snapshot().fighters[0].x;
   world.step([{ right: true }, {}]);
-  assert.ok(world.snapshot().fighters[0].x > 280);
+  assert.ok(world.snapshot().fighters[0].x > startX);
   assert.equal(browser.document, undefined);
 });
 

@@ -321,6 +321,10 @@ test('sound is placed left or right of center by where the action is', () => {
   at(12); audio.handle([hitEvent({ x: 640 })]); const center = heard();
   const pan = layers => layers.tones.map(t => t[7]?.pan ?? 0);
   assert.ok(pan(left).length > 0 && pan(left).every(p => p < -0.3), 'left of center'); assert.ok(pan(right).every(p => p > 0.3), 'right of center'); assert.ok(pan(center).every(p => Math.abs(p) < 0.05), 'centered');
+  audio.setListenerView(1400, 800);
+  at(13); audio.handle([hitEvent({ x: 1450 })]); assert.ok(pan(heard()).every(p => p < -0.3), 'left of the scrolled camera');
+  at(14); audio.handle([hitEvent({ x: 1800 })]); assert.ok(pan(heard()).every(p => Math.abs(p) < 0.05), 'center of the scrolled camera');
+  at(15); audio.handle([hitEvent({ x: 2150 })]); assert.ok(pan(heard()).every(p => p > 0.3), 'right of the scrolled camera');
 });
 
 test('consecutive hits by one fighter climb a scale; a long gap or a different fighter starts over', () => {

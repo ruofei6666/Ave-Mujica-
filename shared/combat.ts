@@ -1,9 +1,10 @@
 import type { Action, AttackBox, Character, CharacterId, CombatEvent, CombatEventDetail, CombatEventKind, Difficulty, DifficultyConfig, FighterSnapshot, FighterState, Hazard, Hit, HitSpec, Input, MatchResult, Projectile, Rect, Seat, SkillActionSlot, SkillMove, SkillSlot, Snapshot, WorldOptions } from './types';
 import { crossedFootPlant, cyclePhase, WALK_CYCLE_DISTANCE } from './locomotion';
+import { ARENA } from './arena';
 type AiInput = Omit<Input, 'down'> & { wait: number };
 interface ImpactRing { x: number; y: number; life: number; max: number; radius: number; speed: number; color: string }
-  const CANVAS_W = 1280, CANVAS_H = 720, GROUND = 602, SIZE = 1.5;
-  const GRAVITY = 0.82, LEFT_WALL = 70, RIGHT_WALL = 1210, MAX_MP = 200;
+  const CANVAS_W = ARENA.width, CANVAS_H = ARENA.height, GROUND = ARENA.ground, SIZE = 1.5;
+  const GRAVITY = 0.82, LEFT_WALL = ARENA.leftWall, RIGHT_WALL = ARENA.rightWall, MAX_MP = 200;
   const SKILL_DAMAGE_SCALE = 2.1, ULT_DAMAGE_SCALE = 2;
   const ACTIONS: readonly Action[] = ["up", "punch", "special", "skill1", "skill2", "ult"];
   const SLOT_ACTION: Record<SkillSlot | Action, Action> = { up: 'up', special: 'special', skill1: 'skill1', skill2: 'skill2', punch: "punch", s0: "special", s1: "skill1", s2: "skill2", ult: "ult" };
@@ -1150,8 +1151,8 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       const middle = Math.max(LEFT_WALL + half, Math.min(RIGHT_WALL - half, (player.x + cpu.x) / 2));
       first.x = middle - half; second.x = middle + half;
     }
-    player = new Fighter(left, 280, 1, false); player.seat = 0;
-    cpu = new Fighter(right, 1000, -1, mode === "pve"); cpu.seat = 1;
+    player = new Fighter(left, CANVAS_W / 2 - 240, 1, false); player.seat = 0;
+    cpu = new Fighter(right, CANVAS_W / 2 + 240, -1, mode === "pve"); cpu.seat = 1;
     const fighters = [player, cpu];
     function bufferedInput(seat: Seat, raw: unknown) {
       const input = sanitizeInput(raw);

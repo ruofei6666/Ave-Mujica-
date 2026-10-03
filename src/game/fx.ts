@@ -1,9 +1,10 @@
 import type { CharacterId, CombatEvent, FighterSnapshot, Hazard, Projectile, SkillActionSlot, SkillMove, Snapshot } from '../../shared/types';
 import type { EmitterOptions, Flash, FloatingText, Ghost, Item, ItemSpec, Particle, ParticleSpec, Point, PrimitiveOptions, SpeedLines, TextOptions } from './fx-types';
 import { context2d } from './canvas';
+import { ARENA } from '../../shared/arena';
 import A from './art';
 const TAU = Math.PI * 2;
-const W = 1280, H = 720, GROUND = 602;
+const W = ARENA.width, H = ARENA.height, GROUND = ARENA.ground;
 const CS = 0.9; // 角色在场上的绘制缩放
 // 角色精灵缓冲：以脚底为原点，单位为角色坐标（含乐器挥舞与倒地姿势）
 const SPRITE = { ox: 220, oy: 245, w: 440, h: 290 };

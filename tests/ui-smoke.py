@@ -321,6 +321,10 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     await session.send('Emulation.setPageScaleFactor', {pageScaleFactor:1});
     await page.locator('#start-btn').tap();
     await page.waitForFunction(() => window.AveGame.getState().snapshot.intro === 0);
+    const camera = (await state(page)).camera;
+    assert.ok(camera && camera.width < await page.evaluate(() => AveCombat.constants.CANVAS_W), 'scrolling camera is missing from the deployed game');
+    record('deployed battle uses the enlarged view inside the wider arena', {camera});
+    await capture(page, 'camera-landscape');
     const bounds = await page.locator('#arena').boundingBox();
     await pinch();
     assert.ok(Math.abs(await scale() - 1) < .01, 'pinch zoomed the battle page');
@@ -395,6 +399,71 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     const prevented = await page.evaluate(() => { const e = new Event('gesturestart',{bubbles:true,cancelable:true}); document.dispatchEvent(e); return e.defaultPrevented; });
     assert.equal(prevented, false);
     record('unmount restores the viewport and removes gesture handlers');
+    await page.context().close();
+  });
+  await group('joystick release recovery and larger touch targets', async () => {
+    const page = await newPage('joystick', {width:844,height:390}, true);
+    await page.locator('#start-btn').tap(); await pauseClock(page); await clockAdvance(page,2700);
+    await controlBounds(page,'larger landscape controls');
+    const dimensions = await page.evaluate(() => ({stick:document.getElementById('joystick').getBoundingClientRect().width,
+      skill:document.querySelector('[data-action="skill1"]').getBoundingClientRect().width}));
+    assert.ok(dimensions.stick>=150 && dimensions.skill>=60, JSON.stringify(dimensions));
+    record('mobile joystick and skill targets are larger',dimensions);
+    const releases = await page.evaluate(() => {
+      const pad=document.getElementById('joystick'),knob=document.getElementById('stick-knob');
+      const box=pad.getBoundingClientRect(),x=box.x+box.width*.8,y=box.y+box.height/2;
+      let id=700;
+      const down=(type='touch')=>{id++;pad.dispatchEvent(new PointerEvent('pointerdown',{pointerId:id,pointerType:type,button:0,buttons:1,clientX:x,clientY:y,bubbles:true,cancelable:true}));if(!knob.style.transform)throw new Error('stick did not move right');};
+      const centered=name=>{if(knob.style.transform)throw new Error(name+' left the knob stuck: '+knob.style.transform);};
+      const report=[];
+      // Fault injection: capture can be unavailable, and terminal events can arrive on another element.
+      const original=pad.setPointerCapture;
+      pad.setPointerCapture=()=>{throw new DOMException('Pointer is no longer active','NotFoundError');};
+      try {
+        for(const type of ['pointerup','pointercancel','lostpointercapture']) {
+          down(); document.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',bubbles:true})); centered(type); report.push(type);
+        }
+        down('mouse'); document.dispatchEvent(new PointerEvent('pointermove',{pointerId:id,pointerType:'mouse',buttons:0,bubbles:true}));centered('mouse release');report.push('mouse buttons=0');
+        for(const terminal of ['touchend','touchcancel']) {
+          down();
+          const thumb=new Touch({identifier:7,target:pad,clientX:x,clientY:y});
+          const attack=new Touch({identifier:42,target:document.querySelector('[data-action="punch"]'),clientX:790,clientY:330});
+          pad.dispatchEvent(new TouchEvent('touchstart',{touches:[thumb],changedTouches:[thumb],bubbles:true}));
+          document.dispatchEvent(new TouchEvent('touchend',{touches:[thumb],changedTouches:[attack],bubbles:true}));
+          if(!knob.style.transform)throw new Error('attack finger stole the joystick');
+          document.dispatchEvent(new TouchEvent(terminal,{touches:[attack],changedTouches:[thumb],bubbles:true}));centered(terminal);report.push(terminal+' with attack held');
+        }
+        down();window.dispatchEvent(new Event('resize'));centered('resize');report.push('resize');
+        down();window.dispatchEvent(new Event('orientationchange'));centered('rotation');report.push('orientation');
+      } finally {pad.setPointerCapture=original;}
+      return report;
+    });
+    record('joystick releases even when pointer capture fails or the attack finger remains held',{releases});
+    const session=sessions.get(page),pad=await page.locator('#joystick').boundingBox();
+    const thumb={x:pad.x+pad.width*.7,y:pad.y+pad.height/2,id:1};
+    await session.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+    await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[thumb]});
+    await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{...thumb,x:pad.x+pad.width+80}]});
+    await clockAdvance(page,180);
+    await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    assert.equal(await page.locator('#stick-knob').evaluate(el=>el.style.transform),'');
+    await clockAdvance(page,20);const stopped=(await state(page)).snapshot.fighters[0];
+    await clockAdvance(page,100);const later=(await state(page)).snapshot.fighters[0];
+    assert.equal(later.x,stopped.x,'fighter drifted after the thumb left the pad');
+    await cdpTouch(page,'#joystick',-35,0,160,true);
+    assert.ok((await state(page)).snapshot.fighters[0].x<later.x-20,'next gesture stayed locked to the previous right direction');
+    record('native drag outside the pad releases movement and the next left gesture works');
+    await capture(page,'controls-large-landscape');
+    for(const viewport of [{width:390,height:844},{width:320,height:568},{width:568,height:320}]) {
+      await page.setViewportSize(viewport);
+      await session.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+      if(await page.locator('#rotate-hint').isVisible())await page.locator('#portrait-play').tap();
+      await clockAdvance(page,20);
+      await controlBounds(page,`${viewport.width}x${viewport.height} enlarged controls`);
+      const gap=await page.evaluate(()=>{const a=document.getElementById('joystick').getBoundingClientRect(),b=document.querySelector('.attack-controls').getBoundingClientRect();return b.left-a.right;});
+      assert.ok(gap>=8,'joystick and attack cluster overlap: '+gap);
+      await capture(page,`controls-large-${viewport.width}`);
+    }
     await page.context().close();
   });
   await group('portrait layout and controls', async () => {
@@ -508,7 +577,7 @@ def main():
     parser.add_argument('--edge', default='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
     parser.add_argument('--port', type=int, default=18080)
     parser.add_argument('--only', default='', help='optional group prefix, e.g. desktop, PVE, portrait or PVP')
-    parser.add_argument('--url', default='', help='test a deployed URL instead of the local server; use with --only zoom')
+    parser.add_argument('--url', default='', help='test a deployed URL instead of the local server; use with --only zoom or --only joystick')
     args = parser.parse_args()
     if not args.node or not Path(args.playwright).is_dir() or not Path(args.edge).is_file():
         parser.error('installed Node, Playwright module and Edge executable are required; override their paths above')

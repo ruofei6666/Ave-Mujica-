@@ -69,6 +69,10 @@ export class GameAudio {
   declare gates: Map<string, number>;
   declare drives: Map<number, Float32Array<ArrayBuffer>>;
   declare chain: { actor: number | null; n: number; at: number };
+  private listenerLeft = 0;
+  private listenerWidth = 1280;
+
+  setListenerView(left: number, width: number) { this.listenerLeft = left; this.listenerWidth = Math.max(1, width); }
 
   constructor(volumes: Partial<Volumes> = {}, options: { random?: () => number } = {}) {
     this.volumes = { music: clamp(volumes.music, DEFAULT_VOLUMES.music), sfx: clamp(volumes.sfx, DEFAULT_VOLUMES.sfx), voice: clamp(volumes.voice, DEFAULT_VOLUMES.voice) };
@@ -341,8 +345,8 @@ export class GameAudio {
       if (!event || typeof event !== 'object') continue;
       const now = this.context.currentTime, at = now + .004;
       const id = String(event.id || ''), side = String(event.actor), character = characterOf(id);
-      // the arena is 1280 wide: sounds sit left or right of center like the fighters do
-      const pan = Number.isFinite(event.x) ? Math.max(-.6, Math.min(.6, (event.x / 640 - 1) * .55)) : 0;
+      // Stereo follows the visible stage as the camera pans through the wider arena.
+      const pan = Number.isFinite(event.x) ? Math.max(-.6, Math.min(.6, ((event.x - this.listenerLeft) / (this.listenerWidth / 2) - 1) * .55)) : 0;
       switch (event.kind) {
         case 'hit':
         case 'impact': {

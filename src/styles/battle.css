@@ -15,6 +15,14 @@ html.battle-touch-locked, html.battle-touch-locked body {
 }
 .battle button, .battle canvas { touch-action: none; }
 #arena { position: absolute; inset: 0; width: 100%; height: 100%; }
+.opponent-direction {
+  position: absolute; top: 43%; z-index: 4; padding: .4rem .6rem;
+  border: 1px solid rgb(222 198 157 / .35); border-radius: .3rem;
+  background: rgb(14 11 22 / .78); color: #e8d7ba; font-size: .75rem;
+  pointer-events: none;
+}
+.opponent-direction.left { left: max(.5rem, env(safe-area-inset-left)); }
+.opponent-direction.right { right: max(.5rem, env(safe-area-inset-right)); }
 /* darkens the top/bottom edges so HUD and thumbs stay readable on any stage */
 .battle-shade {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -311,6 +319,31 @@ html[data-art~='fx-speed'] .vs-speed { background: var(--art-fx-speed) center / 
   .cutin-strip { --h: 3.8rem; top: 4.4rem; min-width: 74vw; }
   .cutin-face { width: 5.6rem; }
   .combo { top: 9rem; }
+}
+
+/* Use physical CSS pixels for touch targets: the page's compact rem size made them too small. */
+@media (pointer: coarse), (hover: none) {
+  .touch-controls {
+    --control-unit: clamp(15px, 4.2vmin, 19px);
+    --stick-size: clamp(124px, 40vmin, 176px);
+    left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .joystick { flex: 0 0 var(--stick-size); width: var(--stick-size); height: var(--stick-size); }
+  .stick-knob { width: 40%; height: 40%; margin: -20% 0 0 -20%; }
+  .stick-guide { font-size: 11px; top: -22px; letter-spacing: .08em; }
+  .attack-controls { width: calc(var(--control-unit) * 10.2); height: calc(var(--control-unit) * 13.6); }
+  .skill-btn { width: calc(var(--control-unit) * 3.9); height: calc(var(--control-unit) * 3.9); }
+  .skill-btn[data-action='special'] { right: calc(var(--control-unit) * 5.6); bottom: calc(var(--control-unit) * .1); }
+  .skill-btn[data-action='skill1'] { right: calc(var(--control-unit) * 5.3); bottom: calc(var(--control-unit) * 4.6); }
+  .skill-btn[data-action='skill2'] { right: var(--control-unit); bottom: calc(var(--control-unit) * 5.7); }
+  .ult-btn { right: calc(var(--control-unit) * 5.2); bottom: calc(var(--control-unit) * 9.1); width: calc(var(--control-unit) * 4.5); height: calc(var(--control-unit) * 4.5); }
+  .punch-btn { width: calc(var(--control-unit) * 5.1); height: calc(var(--control-unit) * 5.1); }
+  .action-btn .ic { width: calc(var(--control-unit) * 1.55); height: calc(var(--control-unit) * 1.55); }
+  .punch-btn .ic { width: calc(var(--control-unit) * 2); height: calc(var(--control-unit) * 2); }
+  .action-name { font-size: calc(var(--control-unit) * .65); }
+  .action-key { font-size: 9px; }
+  .cooldown { font-size: calc(var(--control-unit) * 1.05); }
 }
 
 /* ---------- motion ---------- */

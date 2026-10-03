@@ -1,4 +1,5 @@
 import type { CharacterId, Difficulty, Input, Mode, Seat, SkillSlot, Snapshot } from '../../shared/types';
+import type { CameraView } from './camera';
 export type { Action, AttackAction, Character, CharacterId, CombatEvent, CombatWorld, Difficulty, FighterSnapshot, Input, MatchResult, Mode, Move, Seat, SkillSlot, Snapshot, WorldOptions } from '../../shared/types';
 export type Screen = 'menu' | 'room' | 'battle';
 export type VolumeChannel = 'music' | 'sfx' | 'voice';
@@ -35,4 +36,5 @@ export interface SkillDetail { id: CharacterId; seat: Seat; name?: string; slot?
 export interface GameDiagnostics {
   mode: Mode; screen: Screen; seat: Seat; room: string | null; snapshot: Snapshot | null;
   paused: boolean; finished: boolean; records: Records;
+  camera: CameraView;
 }

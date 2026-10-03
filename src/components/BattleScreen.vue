@@ -8,6 +8,9 @@ const ui = useTheatreState();
   <section id="battle" class="screen battle" hidden>
     <canvas id="arena" width="1280" height="720" aria-label="对战舞台"></canvas>
     <div class="battle-shade" aria-hidden="true"></div>
+    <div v-if="ui.offscreenOpponent" class="opponent-direction" :class="ui.offscreenOpponent" aria-hidden="true">
+      {{ ui.offscreenOpponent === 'left' ? '← 对手' : '对手 →' }}
+    </div>
 
     <div class="battle-hud">
       <div class="fighter-hud left-hud">

@@ -11,6 +11,7 @@ export function createTheatreState() {
     roomPlayers: [] as ({ id: CharacterId; name: string; ready: boolean } | null)[],
     resultStats: [] as { label: string; value: string }[],
     skills: [] as { slot: SkillSlot; key: string; move: Move }[],
+    offscreenOpponent: null as 'left' | 'right' | null,
     previewUltimate: () => {},
     pwaStatus: '',
     pwaUpdateAvailable: false,

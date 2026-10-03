@@ -1,5 +1,7 @@
 import type { Character, CharacterId, FighterSnapshot, Seat, SkillMove, Snapshot } from '../../shared/types';
 import { context2d } from './canvas';
+import { ARENA } from '../../shared/arena';
+import { BattleCamera } from './camera';
 type TrackedFighter = Pick<FighterSnapshot, 'x' | 'y' | 'walkPhase' | 'state' | 'facing'>;
 type RenderedFighter = FighterSnapshot & { frame: number };
 interface SpriteBuffer { canvas: HTMLCanvasElement; sig: string; at: number; ctx?: CanvasRenderingContext2D | null; walkAmount: number; walkAt: number; id?: CharacterId }
@@ -7,7 +9,7 @@ interface Track { move: SkillMove | 'punch' | null; t: number; y: number; pos: P
 import A from './art';
 import FX from './fx';
 import ST from './stage';
-const W = 1280, H = 720, GROUND = 602, CS = FX.CS, SP = FX.SPRITE;
+const W = ARENA.width, H = ARENA.height, GROUND = ARENA.ground, CS = FX.CS, SP = FX.SPRITE;
 const clamp = A.clamp, mix = A.lerp;
 
 // 技能 / 普攻中需要触发演出的关键帧（与 shared/combat.ts 的时间轴一致）
@@ -27,6 +29,7 @@ export class ArenaRenderer {
   declare ctx: CanvasRenderingContext2D;
   declare characters: Map<CharacterId, Character>;
   declare stage: InstanceType<typeof ST.Stage>;
+  readonly camera = new BattleCamera();
   declare fx: InstanceType<typeof FX.Fx>;
   declare sprites: [SpriteBuffer | null, SpriteBuffer | null];
   declare lastSeq: number;
@@ -88,15 +91,16 @@ export class ArenaRenderer {
 
   resize() {
     const bounds = this.canvas.getBoundingClientRect();
-    const width = Math.max(1, bounds.width || this.canvas.clientWidth || W);
+    const width = Math.max(1, bounds.width || this.canvas.clientWidth || 1280);
     const height = Math.max(1, bounds.height || this.canvas.clientHeight || H);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const bw = Math.round(width * dpr), bh = Math.round(height * dpr);
     if (this.canvas.width !== bw) this.canvas.width = bw;
     if (this.canvas.height !== bh) this.canvas.height = bh;
-    this.scale = Math.min(bw / W, bh / H);
-    this.offsetX = (bw - W * this.scale) / 2;
-    this.offsetY = (bh - H * this.scale) / 2;
+    this.camera.resize(bw, bh);
+    this.scale = bh / this.camera.view.height;
+    this.offsetX = (bw - this.camera.view.width * this.scale) / 2;
+    this.offsetY = 0;
     this.boundsWidth = width; this.boundsHeight = height; this.dpr = dpr;
   }
 
@@ -107,6 +111,7 @@ export class ArenaRenderer {
   /* ---------- 快照跟踪与插值 ---------- */
   track(snapshot: Snapshot, ts: number) {
     if (snapshot.frame < this.lastFrame) {
+      this.camera.reset();
       this.lastSeq = -1; this.fx.reset(); this.previous = []; this.current = []; this.tracks = [null, null];
       this.sprites = [null, null];
       this.combo = [{ n: 0, last: -999 }, { n: 0, last: -999 }];
@@ -205,6 +210,7 @@ export class ArenaRenderer {
     if (snapshot) {
       this.track(snapshot, ts);
       view = this.interpolate(snapshot, ts);
+      this.camera.update(view, localSeat, dt * 16.667);
       const winner = snapshot.result ? snapshot.result.winner : null;
       if (winner === 0 || winner === 1) { if (view[winner]) { view[winner].win = true; this.celebrate(view[winner], ts); } }
       this.process(snapshot, view, ts);
@@ -219,11 +225,18 @@ export class ArenaRenderer {
     this.stage.setTint(this.tint.color, tintK * 0.8);
 
     const cam = this.fx.camera();
+    const viewport = this.camera.view;
     c.setTransform(this.scale, 0, 0, this.scale, this.offsetX, this.offsetY);
-    c.save(); c.beginPath(); c.rect(0, 0, W, H); c.clip();
+    c.save(); c.beginPath(); c.rect(0, 0, viewport.width, viewport.height); c.clip();
+    c.translate(-viewport.left, -viewport.top);
     c.translate(cam.sx, cam.sy);
-    if (cam.z > 1.0005) { c.translate(cam.zx, cam.zy); c.scale(cam.z, cam.z); c.translate(-cam.zx, -cam.zy); }
-    this.stage.draw(c, ts, reduced, this.lowQuality);
+    if (cam.z > 1.0005) {
+      // A distant offscreen impact must not pull the local player out of the frame.
+      const zx = clamp(cam.zx, viewport.left, viewport.left + viewport.width);
+      const zy = clamp(cam.zy, viewport.top, viewport.top + viewport.height);
+      c.translate(zx, zy); c.scale(cam.z, cam.z); c.translate(-zx, -zy);
+    }
+    this.stage.draw(c, ts, reduced, this.lowQuality, viewport.left, viewport.width);
 
     if (snapshot) {
       const frame = snapshot.result ? Math.floor(ts / 16.667) : snapshot.frame || 0;
@@ -249,8 +262,8 @@ export class ArenaRenderer {
 
     // 屏幕空间叠层
     c.setTransform(this.scale, 0, 0, this.scale, this.offsetX, this.offsetY);
-    c.save(); c.beginPath(); c.rect(0, 0, W, H); c.clip();
-    this.fx.drawScreen(c, W, H, ts);
+    c.save(); c.beginPath(); c.rect(0, 0, viewport.width, viewport.height); c.clip();
+    this.fx.drawScreen(c, viewport.width, viewport.height, ts);
     c.restore();
 
     // 画质自适应：以实际帧间隔判断（光栅化多在 GPU / 合成线程，脚本耗时看不出来）。
@@ -391,8 +404,8 @@ export class ArenaRenderer {
     const a = this.fx.acc, key = 'win';
     if (ts - (a[key] || 0) < 90) return;
     a[key] = ts;
-    const x = 80 + Math.random() * 1120, T = FX.tone(f.id);
-    this.fx.petals(x, -12, 1, f.id, { dir: Math.PI / 2, spread: 0.5, v0: 0.8, v1: 2.2, g: 0.012, l0: 170, l1: 260, jx: 4, jy: 2 });
+    const viewport = this.camera.view, x = viewport.left + Math.random() * viewport.width, T = FX.tone(f.id);
+    this.fx.petals(x, viewport.top - 12, 1, f.id, { dir: Math.PI / 2, spread: 0.5, v0: 0.8, v1: 2.2, g: 0.012, l0: 170, l1: 260, jx: 4, jy: 2 });
     if (Math.random() < 0.5) this.fx.twinkles(f.x + (Math.random() - 0.5) * 120, f.y - 40 - Math.random() * 130, 1, 4, T.hi, { vy: -0.6, l0: 30, l1: 56 });
   }
 

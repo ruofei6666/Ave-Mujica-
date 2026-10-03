@@ -159,6 +159,47 @@ window.checkMovementInterpolation = () => {
   }
   return {samples:samples.length,pixelsPerSample:3,phasePerSample:.02,startStopPhaseContinuous:true};
 };
+window.checkCamera = async () => {
+  await loadUiArt();
+  const canvas = document.getElementById('arena'), probe = new ArenaRenderer(canvas, AveCombat.characters);
+  probe.reducedMotion = true;
+  const report = [];
+  for (const [width,height] of [[844,390],[390,844],[1440,900]]) {
+    canvas.style.width = width+'px'; canvas.style.height = height+'px'; probe.resize();
+    for (const id of ['pyro','shadow','gale','bastion','iron']) {
+      const fight = AveCombat.createWorld({left:id,right:'gale',mode:'pvp',introFrames:0});
+      probe.camera.reset(); probe.stage.setArena(report.length%3);
+      const snap = fight.snapshot(); snap.fighters[0].x=1000; snap.fighters[1].x=1200;
+      probe.draw({...snap,frame:100},0,1000); probe.draw(snap,0,1100); probe.draw(snap,0,1200);
+      const sprite = probe.sprites[0].canvas, pixels = sprite.getContext('2d').getImageData(0,0,sprite.width,sprite.height).data;
+      let top=sprite.height,bottom=-1;
+      for(let y=0;y<sprite.height;y++) for(let x=0;x<sprite.width;x++) if(pixels[(y*sprite.width+x)*4+3]>=128) {top=Math.min(top,y);bottom=Math.max(bottom,y);}
+      const ratio=(bottom-top+1)/canvas.height;
+      if(ratio<.30||ratio>.37) throw new Error(id+' size is not a third of '+width+'x'+height+': '+ratio);
+      const view=probe.camera.view, local=(snap.fighters[0].x-view.left)*probe.scale;
+      if(local<0||local>canvas.width) throw new Error('local player offscreen');
+      report.push({id,width,height,bodyRatio:ratio,view});
+    }
+  }
+  canvas.style.width='844px'; canvas.style.height='390px'; probe.resize();
+  const fight=AveCombat.createWorld({left:'shadow',right:'gale',mode:'pvp',introFrames:0}), snap=fight.snapshot();
+  window.cameraScene=(position)=>{
+    const pairs={left:[90,260],middle:[1000,1200],right:[1970,2150],seam:[480,670]};
+    snap.fighters.forEach((f,i)=>f.x=pairs[position][i]);
+    probe.draw({...snap,frame:100},0,2000); probe.draw(snap,0,2100); probe.draw(snap,0,2200);
+    const view=probe.camera.view;
+    // Solid background must fill both edges and the join through the arena floor.
+    const pixels=probe.ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    for(const x of [1,Math.floor(canvas.width/2),canvas.width-2]) {
+      let painted=0;
+      for(let y=0;y<canvas.height;y++) {const i=(y*canvas.width+x)*4;if(pixels[i]!==6||pixels[i+1]!==4||pixels[i+2]!==13) painted++;}
+      if(painted<canvas.height*.95) throw new Error('unpainted background edge at '+position+' x='+x);
+    }
+    return view;
+  };
+  window.finishCamera=()=>{probe.destroy();canvas.style.width='1280px';canvas.style.height='720px';};
+  return report;
+};
 MujicaArt.ready.then(ok => { window.__assets = ok; window.__ready = true; });
 </script>
 '''
@@ -172,7 +213,7 @@ const { chromium } = require(process.env.RF_PLAYWRIGHT);
 const root = path.resolve(__dirname, '..');
 const { createGameServer } = require(path.join(root, 'server.js'));
 const { buildSync } = require('esbuild');
-const runtime = buildSync({ stdin: { contents: `import Combat from './shared/combat.ts'; import Art from './src/game/art.ts'; import FX from './src/game/fx.ts'; import { ArenaRenderer } from './src/game/renderer.ts'; Object.assign(window, { AveCombat: Combat, MujicaArt: Art, MujicaFx: FX, ArenaRenderer });`, resolveDir: root }, bundle: true, write: false, format: 'iife' }).outputFiles[0].text;
+const runtime = buildSync({ stdin: { contents: `import Combat from './shared/combat.ts'; import Art from './src/game/art.ts'; import FX from './src/game/fx.ts'; import { ArenaRenderer } from './src/game/renderer.ts'; import { loadUiArt } from './src/game/ui-art.ts'; Object.assign(window, { AveCombat: Combat, MujicaArt: Art, MujicaFx: FX, ArenaRenderer, loadUiArt });`, resolveDir: root }, bundle: true, write: false, format: 'iife' }).outputFiles[0].text;
 const lab = fs.readFileSync(path.join(root, '.scratch', 'render-lab.html'), 'utf8');
 const ids = ['pyro', 'shadow', 'gale', 'bastion', 'iron'];
 const frames = Number(process.env.RF_FRAMES || 600);
@@ -200,6 +241,14 @@ const report = {started:new Date().toISOString(),checks:[]};
         report.animationFrames = await page.evaluate(() => window.checkAnimationFrames());
         report.movementInterpolation = await page.evaluate(() => window.checkMovementInterpolation());
         console.log('PASS 120 distinct uncropped frames; fixed idle pixels, blended walking, constant packet interpolation, and unchanged alpha');
+        report.camera = await page.evaluate(() => window.checkCamera());
+        report.cameraEdges = {};
+        for (const position of ['left','middle','right','seam']) {
+          report.cameraEdges[position] = await page.evaluate(p => window.cameraScene(p), position);
+          await page.locator('#arena').screenshot({path:path.join(root,'.scratch',`camera-${position}.png`)});
+        }
+        await page.evaluate(() => window.finishCamera());
+        console.log('PASS five characters near one-third screen height on mobile landscape, portrait and desktop; scrolling stage and walls');
       }
       const counts = await page.evaluate(f => window.runFrames(f), frames);
       assert.equal(errors.length, 0, errors.slice(0, 3).join(' | '));

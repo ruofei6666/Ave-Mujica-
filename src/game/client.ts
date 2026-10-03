@@ -8,10 +8,11 @@ import { GameAudio } from './audio';
 import { element as $ } from './elements';
 import { setupPwa } from './pwa';
 import { createBattleTouchGuard } from './touch-guard';
+import { createJoystick } from './joystick';
 import type { TheatreState } from './theatre-state';
 import type { Action, AttackAction, CharacterId, ClientMessage, CombatWorld, Difficulty, Input, Mode, Records, RoomState, Screen, Seat, ServerMessage, Settings, SkillDetail, SkillSlot, Snapshot, VoiceCue } from './types';
 
-type AudioMethod = 'unlock' | 'setScene' | 'setVolumes' | 'handle' | 'handleCombatVoices' | 'playVoice' | 'playAnnouncer' | 'playResult' | 'playUI';
+type AudioMethod = 'unlock' | 'setScene' | 'setVolumes' | 'setListenerView' | 'handle' | 'handleCombatVoices' | 'playVoice' | 'playAnnouncer' | 'playResult' | 'playUI';
 export function createGameClient(ui: TheatreState) {
   const subscriptions = new AbortController();
   const intervals: number[] = [], timeouts = new Set<number>();
@@ -85,9 +86,12 @@ export function createGameClient(ui: TheatreState) {
   let lastHudAt = 0, lastPortraitAt = 0, lastSendAt = 0, lastMessageAt = 0;
   let latency: number | null = null, pendingEntry: ClientMessage | null = null, actionCharacter: CharacterId | null = null;
   let connectionTimeout: number | undefined, toastTimer: number | undefined;
-  let joystickPointer: number | null = null, stickUp = false, matchDuration = 90;
+  let matchDuration = 90;
   let fightSpoken = false;
   const held = { left: false, right: false };
+  const joystickControl = createJoystick($('joystick'), $('stick-knob'),
+    () => screen === 'battle' && !paused && !finished && !!latest && $('pause-overlay').hidden,
+    state => { held.left = state.left; held.right = state.right; if (state.jump) press('up'); });
   const keys = new Set();
   const pulses: Partial<Record<Action, number>> = {};
   const actionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-action]'));
@@ -116,9 +120,7 @@ export function createGameClient(ui: TheatreState) {
   function clearInputs() {
     keys.clear(); held.left = held.right = false;
     for (const action of Object.keys(pulses) as Action[]) delete pulses[action];
-    if (joystickPointer !== null) { try { $('joystick').releasePointerCapture(joystickPointer); } catch { /* already released */ } }
-    joystickPointer = null; stickUp = false;
-    $('stick-knob').style.transform = '';
+    joystickControl.reset();
     actionButtons.forEach((button) => button.classList.remove('pressed'));
   }
   function press(action: Action, buttonPress = false) { if (screen !== 'battle' || paused || finished || !latest || latest.intro > 0 || !$('pause-overlay').hidden) return; pulses[action] = performance.now() + 160; if (buttonPress) sound('playUI', action); }
@@ -168,7 +170,7 @@ export function createGameClient(ui: TheatreState) {
     const own = latest?.fighters?.[seat]?.id || settings.player;
     fightSpoken = false;
     syncActions(own); sound('unlock'); sound('playAnnouncer', 'round1');
-    renderer.resize();
+    renderer.camera.reset(); renderer.resize();
     // Delivered arena plates rotate per match. PVP derives the pick from the room code so both phones show one stage.
     renderer.stage.setArena(room ? [...room.code].reduce((sum, ch) => (sum * 31 + ch.charCodeAt(0)) >>> 0, 7) : Math.floor(Math.random() * 1e6));
   }
@@ -192,11 +194,14 @@ export function createGameClient(ui: TheatreState) {
   function consumeEvents(snapshot: Snapshot) {
     const fresh = (snapshot.events || []).filter((event) => event.seq > eventSeq);
     if (fresh.length) eventSeq = Math.max(eventSeq, ...fresh.map((event) => event.seq));
+    sound('setListenerView', renderer.camera.view.left, renderer.camera.view.width);
     sound('handle', fresh);
     sound('handleCombatVoices', fresh, snapshot.fighters);
   }
   function updateHud(snapshot: Snapshot) {
     if (!snapshot?.fighters) return;
+    const view = renderer.camera.view, other = snapshot.fighters[1 - seat];
+    ui.offscreenOpponent = other && !snapshot.result ? other.x < view.left + 24 ? 'left' : other.x > view.left + view.width - 24 ? 'right' : null : null;
     const labels = ['left', 'right'] as const;
     snapshot.fighters.forEach((f, index) => {
       const id = labels[index]; const def = character(f.id), hud = document.querySelector<HTMLElement>(`.${id}-hud`)!, state = hudState[index];
@@ -460,18 +465,6 @@ export function createGameClient(ui: TheatreState) {
     if (['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight', ...Object.keys(actionKeys)].includes(event.code)) { event.preventDefault(); if (!event.repeat && actionKeys[event.code]) press(actionKeys[event.code]); keys.add(event.code); }
   });
   listen(window, 'keyup', (event) => keys.delete(event.code));
-  const joystick = $('joystick');
-  function moveStick(event: PointerEvent) {
-    const rect = joystick.getBoundingClientRect(); const radius = rect.width * .33;
-    let dx = event.clientX - rect.left - rect.width / 2, dy = event.clientY - rect.top - rect.height / 2;
-    const distance = Math.hypot(dx, dy); if (distance > radius) { dx *= radius / distance; dy *= radius / distance; }
-    $('stick-knob').style.transform = `translate(${dx}px,${dy}px)`;
-    held.left = dx / radius < -.22; held.right = dx / radius > .22;
-    const up = dy / radius < -.55; if (up && !stickUp) press('up'); stickUp = up;
-  }
-  listen(joystick, 'pointerdown', (event) => { if (joystickPointer !== null) return; event.preventDefault(); joystickPointer = event.pointerId; joystick.setPointerCapture(event.pointerId); moveStick(event); });
-  listen(joystick, 'pointermove', (event) => { if (event.pointerId === joystickPointer) { event.preventDefault(); moveStick(event); } });
-  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'] as const) listen(joystick, type, (event) => { if (event.pointerId === joystickPointer) { joystickPointer = null; held.left = held.right = false; stickUp = false; $('stick-knob').style.transform = ''; } });
   for (const button of actionButtons) {
     listen(button, 'pointerdown', (event) => { event.preventDefault(); button.setPointerCapture(event.pointerId); press((button.dataset.action as AttackAction), true); button.classList.add('pressed'); });
     for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'] as const) listen(button, type, () => button.classList.remove('pressed'));
@@ -507,7 +500,7 @@ export function createGameClient(ui: TheatreState) {
   const invited = new URLSearchParams(location.search).get('room'); if (invited && /^\d{6}$/.test(invited)) { changeMode('pvp'); $('room-code').value = invited; status(/(^|\.)github\.io$/i.test(location.hostname) ? '邀请链接需要游戏服务器。GitHub Pages 只能进行人机对战。' : '已填入邀请房间码，选择角色后点击加入。'); }
   if (!read('ave-theatre-help-seen-v2', false)) { $('help-dialog').showModal(); write('ave-theatre-help-seen-v2', true); }
   // Read-only diagnostics used by the bundled smoke checks.
-  window.AveGame = { getState: () => ({ mode, screen, seat, room: room?.code || null, snapshot: latest, paused, finished, records: { ...records } }) };
+  window.AveGame = { getState: () => ({ mode, screen, seat, room: room?.code || null, snapshot: latest, camera: renderer.camera.view, paused, finished, records: { ...records } }) };
 
   // Compatibility diagnostics only; gameplay uses module imports.
   Object.assign(window, { AveCombat: engine, MujicaArt: Art, MujicaFx: effects, ArenaRenderer, GameAudio, MujicaCharacterAssets: characterAssets });
@@ -519,6 +512,7 @@ export function createGameClient(ui: TheatreState) {
       disposed = true;
       disposePwa();
       touchGuard.dispose();
+      joystickControl.dispose();
       disconnect(true); clearInputs(); subscriptions.abort();
       window.cancelAnimationFrame(animation);
       intervals.forEach(id => window.clearInterval(id));

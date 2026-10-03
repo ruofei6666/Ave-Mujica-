@@ -1,4 +1,5 @@
 import { context2d } from './canvas';
+import { ARENA } from '../../shared/arena';
 interface Mote { x: number; y: number; s: number; v: number; ph: number; a: number }
 interface StagePetal { x: number; y: number; s: number; v: number; ph: number; c: string; rot: number }
 import A from './art';
@@ -241,8 +242,30 @@ class Stage {
     c.restore();
   }
 
-  // 绘制到世界坐标（原点为舞台左上角，1280×720）
-  draw(c: CanvasRenderingContext2D, ts: number, reduced?: boolean, low?: boolean) {
+  // Extend the painted stage with mirrored side sections, preserving its original proportions.
+  draw(c: CanvasRenderingContext2D, ts: number, reduced = false, low = false, left = 0, width: number = ARENA.width) {
+    const origin = (ARENA.width - W) / 2;
+    const first = Math.floor((left - origin - M) / W), last = Math.floor((left + width - origin + M) / W);
+    for (let tile = first; tile <= last; tile++) {
+      c.save(); c.translate(origin + tile * W, 0);
+      c.beginPath(); c.rect(0, -M, W, H + M * 2); c.clip();
+      if (Math.abs(tile) % 2) { c.translate(W, 0); c.scale(-1, 1); }
+      this.drawSection(c, ts, reduced, low);
+      c.restore();
+    }
+    // Physical end pillars mark the walls where the camera and fighters stop.
+    for (const x of [32, ARENA.width - 32]) {
+      if (x < left - 72 || x > left + width + 72) continue;
+      const stone = c.createLinearGradient(x - 22, 0, x + 22, 0);
+      stone.addColorStop(0, '#100d1b'); stone.addColorStop(0.5, '#393042'); stone.addColorStop(1, '#100d1b');
+      c.fillStyle = stone; c.fillRect(x - 22, GROUND - 270, 44, 282);
+      c.fillStyle = '#a58a5c'; c.fillRect(x - 28, GROUND - 272, 56, 6);
+      c.fillStyle = '#332d38'; c.fillRect(x - 34, GROUND + 2, 68, 14);
+      c.fillStyle = 'rgba(223,195,133,.3)'; c.fillRect(x - 12, GROUND - 258, 2, 250);
+    }
+  }
+
+  private drawSection(c: CanvasRenderingContext2D, ts: number, reduced: boolean, low: boolean) {
     // art arrives asynchronously after the first frames; one integer compare per frame is all it costs
     if (this.artSeen !== artRevision()) { this.artSeen = artRevision(); this.pick(); }
     c.drawImage(this.canvas, -M, -M);
