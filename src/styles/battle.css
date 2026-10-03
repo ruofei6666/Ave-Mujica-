@@ -5,10 +5,15 @@
  * Plain CSS (not a Tailwind layer) so state-only selectors are never purged.
  */
 
+/* Two-thumb gestures must not pan/zoom the document behind the fixed arena. */
+html.battle-touch-locked, html.battle-touch-locked body {
+  overflow: hidden; overscroll-behavior: none; touch-action: none;
+}
 .battle {
   position: fixed; inset: 0; z-index: 10; min-height: 0; overflow: hidden; background: #06040d;
   touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
 }
+.battle button, .battle canvas { touch-action: none; }
 #arena { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* darkens the top/bottom edges so HUD and thumbs stay readable on any stage */
 .battle-shade {

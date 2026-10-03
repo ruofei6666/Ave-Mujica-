@@ -90,7 +90,7 @@ async function newPage(name, viewport = { width: 844, height: 390 }, clock = fal
     ws.on('framereceived', event => { try { const m = JSON.parse(String(event.payload)); if (m.type === 'snapshot') { snaps.set(m.snapshot.frame, JSON.stringify(m.snapshot)); if (snaps.size > 500) snaps.delete(snaps.keys().next().value); } } catch {} });
     ws.on('framesent', event => { try { const m = JSON.parse(String(event.payload)); if (m.type === 'input') inputs.push({ seq: m.seq, input: m.input }); } catch {} });
   });
-  await page.goto(`http://127.0.0.1:${process.env.UI_PORT}/`, { waitUntil: 'networkidle' });
+  await page.goto(process.env.UI_BASE_URL || `http://127.0.0.1:${process.env.UI_PORT}/`, { waitUntil: 'networkidle', timeout: process.env.UI_BASE_URL ? 120000 : 30000 });
   await page.waitForFunction(() => !!window.AveGame && !!window.GameAudio);
   const compiledStyles = await page.evaluate(() => ({
     tailwindHeight: getComputedStyle(document.querySelector('.min-h-screen')).minHeight,
@@ -300,6 +300,103 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ave-theatre-records-v2'))); assert.equal(saved.played, 1); record('PVE record persisted without counting early quit');
     await page.context().close();
   });
+  await group('zoom: mobile battle gestures keep the page at its original scale', async () => {
+    const page = await newPage('zoom', { width:844, height:390 });
+    const session = sessions.get(page);
+    const viewport = await page.locator('meta[name="viewport"]').getAttribute('content');
+    const scale = () => page.evaluate(() => visualViewport.scale);
+    const pinch = async () => {
+      await session.send('Emulation.setTouchEmulationEnabled', {enabled:true,maxTouchPoints:5});
+      await session.send('Input.dispatchTouchEvent', {type:'touchStart',touchPoints:[{x:322,y:170,id:1},{x:522,y:170,id:2}]});
+      for (let i = 1; i <= 8; i++) {
+        await session.send('Input.dispatchTouchEvent', {type:'touchMove',touchPoints:[{x:322-i*10,y:170,id:1},{x:522+i*10,y:170,id:2}]});
+        await sleep(40);
+      }
+      await session.send('Input.dispatchTouchEvent', {type:'touchEnd',touchPoints:[]});
+      await sleep(150);
+    };
+    // Positive control: this browser can really zoom, not just dispatch JS events.
+    await pinch();
+    assert.ok(await scale() > 1.2, 'native pinch did not zoom the menu');
+    await session.send('Emulation.setPageScaleFactor', {pageScaleFactor:1});
+    await page.locator('#start-btn').tap();
+    await page.waitForFunction(() => window.AveGame.getState().snapshot.intro === 0);
+    const bounds = await page.locator('#arena').boundingBox();
+    await pinch();
+    assert.ok(Math.abs(await scale() - 1) < .01, 'pinch zoomed the battle page');
+    for (const selector of ['#arena', '[data-action="punch"]', '[data-action="skill1"]']) {
+      const box = await page.locator(selector).boundingBox();
+      const x = selector === '#arena' ? 422 : box.x + box.width / 2;
+      const y = selector === '#arena' ? 170 : box.y + box.height / 2;
+      for (let i = 0; i < 4; i++) await session.send('Input.synthesizeTapGesture', {x,y,tapCount:2,duration:40,gestureSourceType:'touch'});
+    }
+    assert.ok(Math.abs(await scale() - 1) < .01, 'rapid double taps zoomed the battle page');
+    assert.deepEqual(await page.locator('#arena').boundingBox(), bounds);
+    record('native pinches and rapid double taps leave the battle viewport at 1x');
+
+    // Safari's gesture events are separate from Pointer Events / CSS touch-action.
+    const fallback = await page.evaluate(() => {
+      const target = document.getElementById('arena');
+      return ['gesturestart','gesturechange','gestureend','dblclick'].map(type => {
+        const event = new Event(type, {bubbles:true,cancelable:true});
+        target.dispatchEvent(event); return {type,prevented:event.defaultPrevented};
+      });
+    });
+    assert.ok(fallback.every(event => event.prevented), JSON.stringify(fallback));
+    record('Safari gesture and double-click zoom fallbacks are canceled during battle');
+
+    // Exercise the event fallback even if a browser ignores CSS/viewport limits.
+    const lockedViewport = await page.locator('meta[name="viewport"]').getAttribute('content');
+    const ignoreCss = await page.addStyleTag({content:'html, body, #battle, #battle * { touch-action: auto !important; }'});
+    await page.locator('meta[name="viewport"]').evaluate((el, content) => { el.content = content; }, viewport);
+    await pinch();
+    assert.ok(Math.abs(await scale() - 1) < .01, 'touch-event fallback allowed pinch zoom');
+    await ignoreCss.evaluate(el => el.remove());
+    await page.locator('meta[name="viewport"]').evaluate((el, content) => { el.content = content; }, lockedViewport);
+    record('touch-event fallback prevents native pinch when CSS/viewport zoom limits are unavailable');
+
+    // Start a fresh round so earlier rapid skill presses cannot leave recovery/stun.
+    await page.locator('#pause-btn').tap(); await page.locator('#quit-btn').tap();
+    await page.locator('#start-btn').tap();
+    await page.waitForFunction(() => window.AveGame.getState().snapshot.intro === 0);
+    const joystick = await page.locator('#joystick').boundingBox();
+    const attack = await page.locator('[data-action="punch"]').boundingBox();
+    const thumb = {x:joystick.x + joystick.width/2 - 30,y:joystick.y + joystick.height/2,id:1};
+    const finger = {x:attack.x + attack.width/2,y:attack.y + attack.height/2,id:2};
+    const before = (await state(page)).snapshot.fighters[0].x;
+    await session.send('Input.dispatchTouchEvent', {type:'touchStart',touchPoints:[thumb]});
+    await session.send('Input.dispatchTouchEvent', {type:'touchStart',touchPoints:[thumb,finger]});
+    assert.equal(await page.locator('[data-action="punch"]').evaluate(el => el.classList.contains('pressed')), true);
+    await sleep(220);
+    // A punch intentionally stops walking until recovery ends; the held thumb
+    // must still move the player afterwards, without another pointerdown.
+    await waitState(page, value => value.snapshot.fighters[0].x < before - 10, 2000);
+    await session.send('Input.dispatchTouchEvent', {type:'touchEnd',touchPoints:[]});
+    assert.equal(await page.locator('[data-action="punch"]').evaluate(el => el.classList.contains('pressed')), false);
+    assert.ok(Math.abs(await scale() - 1) < .01);
+    record('two fingers can hold the joystick and attack together without page zoom');
+
+    await page.locator('#pause-btn').tap();
+    assert.equal((await state(page)).paused, true);
+    await page.locator('#resume-btn').tap();
+    assert.equal((await state(page)).paused, false);
+    await page.locator('#pause-btn').tap(); await page.locator('#quit-btn').tap();
+    assert.equal((await state(page)).screen, 'menu');
+    assert.equal(await page.locator('meta[name="viewport"]').getAttribute('content'), viewport);
+    await pinch();
+    assert.ok(await scale() > 1.2, 'menu zoom remained locked after leaving battle');
+    await session.send('Emulation.setPageScaleFactor', {pageScaleFactor:1});
+    record('pause, resume and quit still accept taps; leaving battle restores menu zoom');
+
+    await page.locator('#start-btn').tap();
+    await page.evaluate(() => document.getElementById('app').__vue_app__.unmount());
+    assert.equal(await page.locator('meta[name="viewport"]').getAttribute('content'), viewport);
+    assert.equal(await page.evaluate(() => document.documentElement.classList.contains('battle-touch-locked')), false);
+    const prevented = await page.evaluate(() => { const e = new Event('gesturestart',{bubbles:true,cancelable:true}); document.dispatchEvent(e); return e.defaultPrevented; });
+    assert.equal(prevented, false);
+    record('unmount restores the viewport and removes gesture handlers');
+    await page.context().close();
+  });
   await group('portrait layout and controls', async () => {
     const page = await newPage('portrait', { width:390, height:844 });
     await selectAllCharacters(page,'portrait');
@@ -411,6 +508,7 @@ def main():
     parser.add_argument('--edge', default='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')
     parser.add_argument('--port', type=int, default=18080)
     parser.add_argument('--only', default='', help='optional group prefix, e.g. desktop, PVE, portrait or PVP')
+    parser.add_argument('--url', default='', help='test a deployed URL instead of the local server; use with --only zoom')
     args = parser.parse_args()
     if not args.node or not Path(args.playwright).is_dir() or not Path(args.edge).is_file():
         parser.error('installed Node, Playwright module and Edge executable are required; override their paths above')
@@ -419,7 +517,7 @@ def main():
     scratch.mkdir(exist_ok=True)
     script = scratch / 'ui-smoke.cjs'
     script.write_text(SCRIPT, encoding='utf-8')
-    env = dict(os.environ, UI_PLAYWRIGHT=args.playwright, UI_EDGE=args.edge, UI_PORT=str(args.port), UI_ONLY=args.only)
+    env = dict(os.environ, UI_PLAYWRIGHT=args.playwright, UI_EDGE=args.edge, UI_PORT=str(args.port), UI_ONLY=args.only, UI_BASE_URL=args.url)
     return subprocess.call([args.node, str(script)], cwd=root, env=env)
 
 

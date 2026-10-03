@@ -7,6 +7,7 @@ import { ArenaRenderer } from './renderer';
 import { GameAudio } from './audio';
 import { element as $ } from './elements';
 import { setupPwa } from './pwa';
+import { createBattleTouchGuard } from './touch-guard';
 import type { TheatreState } from './theatre-state';
 import type { Action, AttackAction, CharacterId, ClientMessage, CombatWorld, Difficulty, Input, Mode, Records, RoomState, Screen, Seat, ServerMessage, Settings, SkillDetail, SkillSlot, Snapshot, VoiceCue } from './types';
 
@@ -50,6 +51,7 @@ export function createGameClient(ui: TheatreState) {
   const records: Records = { played: 0, won: 0, drawn: 0, bestStreak: 0, streak: 0, ...read<Partial<Records>>('ave-theatre-records-v2', {}) };
   const audio = new GameAudio(settings);
   const renderer = new ArenaRenderer($('arena'), characters);
+  const touchGuard = createBattleTouchGuard();
 
   // 每个角色每个按键对应的技能图标（图标定义见 index.html 顶部的 SVG 精灵）
   const ICONS: Record<CharacterId, Record<AttackAction, string>> = {
@@ -105,6 +107,7 @@ export function createGameClient(ui: TheatreState) {
   function show(name: Screen) {
     for (const id of ['menu', 'room', 'battle'] as const) $(id).hidden = id !== name;
     screen = name;
+    touchGuard.setActive(name === 'battle');
     clearInputs();
     if (name !== 'battle') { world = null; paused = false; $('pause-overlay').hidden = true; }
     sound('setScene', name === 'battle' ? 'battle' : 'menu');
@@ -515,6 +518,7 @@ export function createGameClient(ui: TheatreState) {
       if (disposed) return;
       disposed = true;
       disposePwa();
+      touchGuard.dispose();
       disconnect(true); clearInputs(); subscriptions.abort();
       window.cancelAnimationFrame(animation);
       intervals.forEach(id => window.clearInterval(id));
