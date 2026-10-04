@@ -124,7 +124,7 @@ async function main() {
       description: 'Fixed-cooldown AI round robin using the unmodified production engine. Overall score rates weight all four opponents equally; draws count as half a win. This does not establish human-player or individual-matchup balance.',
       aiLabel: `${game.difficulties[difficulty].label} AI`, currentDifficulty: difficulty,
       reproduce: `pnpm balance ${rounds} ${difficulty} ${seed} --json ${output}${maxGap === undefined ? '' : ` --max-gap ${maxGap}`}`,
-      rules: { framesPerSecond: 60, cooldownFrameRange: [180, 420], autoplay: true, introFrames: 0,
+      rules: { framesPerSecond: 60, cooldownFrameRange: [120, 300], autoplay: true, introFrames: 0,
         equalOpponents: true, swappedSeats: true, sameSeedForBothSeats: true, drawScore: .5 },
       sourceSha256: Object.fromEntries(sourcePaths.map(path => [path,
         createHash('sha256').update(readFileSync(path, 'utf8').replace(/\r\n/g, '\n')).digest('hex')])),

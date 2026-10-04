@@ -96,6 +96,7 @@ test('published balance evidence matches production code and the one-point relea
   assert.equal(result.difficulty, 'hard');
   assert.equal(report.rules.swappedSeats, true);
   assert.equal(report.rules.sameSeedForBothSeats, true);
+  assert.deepEqual(report.rules.cooldownFrameRange, [120, 300]);
   assert.deepEqual(Object.keys(report.sourceSha256).sort(), [
     'shared/combat.ts', 'shared/ai.ts', 'shared/ai-tactics.ts', 'shared/arena.ts',
     'shared/locomotion.ts', 'shared/ladder.ts', 'simulate-balance.ts',
@@ -107,7 +108,7 @@ test('published balance evidence matches production code and the one-point relea
   const { characters } = require('../shared/combat.ts');
   assert.deepEqual(result.cds, characters.flatMap(c => [c.s0.cd, c.s1.cd, c.s2.cd]));
   for (const c of characters) for (const move of [c.s0, c.s1, c.s2]) {
-    assert.ok(move.cd >= 180 && move.cd <= 420);
+    assert.ok(Number.isInteger(move.cd) && move.cd >= 120 && move.cd <= 300, `${c.id}: cooldown must be 2–5 seconds`);
     assert.ok(move.detail.includes(`冷却 ${(move.cd / 60).toFixed(2)} 秒`), `${c.id}: stale cooldown description`);
   }
   assert.equal(result.matrix.length, 10);

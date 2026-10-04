@@ -2,7 +2,7 @@
   "description": "Fixed-cooldown AI round robin using the unmodified production engine. Overall score rates weight all four opponents equally; draws count as half a win. This does not establish human-player or individual-matchup balance.",
   "aiLabel": "挑战 AI",
   "currentDifficulty": "hard",
-  "reproduce": "pnpm balance 20000 hard 3141592655 --json tests/balance-report.json --max-gap 1",
+  "reproduce": "pnpm balance 20000 hard 3141592654 --json tests/balance-report.json --max-gap 1",
   "rules": {
     "framesPerSecond": 60,
     "cooldownFrameRange": [
@@ -17,7 +17,7 @@
     "drawScore": 0.5
   },
   "sourceSha256": {
-    "shared/combat.ts": "a18a6ae8e8eabde459124aee7b26d1175d28916f3e36b714b85067be34705eb8",
+    "shared/combat.ts": "28f2f76a06ec646c91f0e82346611639495bd4f80d2ebcc920d74a8ce7227f5b",
     "shared/ai.ts": "7ddd98b04c941c69a53db466515e5c3a2c425f06a60d13cfc1570f5ec98c2269",
     "shared/ai-tactics.ts": "7f750444569db482d5a3b77bab200db97ae545d4cab18fe53631e740deb74d80",
     "shared/arena.ts": "0d4e7b9b71c0c35a4aac756b87870c4cadaaf595e40c75a3c1f4482fef904fce",
@@ -30,10 +30,10 @@
     "cds": [
       263,
       241,
-      148,
+      150,
       264,
       245,
-      253,
+      257,
       295,
       155,
       189,
@@ -42,10 +42,10 @@
       300,
       155,
       176,
-      173
+      175
     ],
     "rounds": 20000,
-    "seed": 3141592655,
+    "seed": 3141592654,
     "difficulty": "hard",
     "mode": "pve",
     "duration": 90,
@@ -53,94 +53,94 @@
       {
         "id": "gale",
         "name": "睦",
-        "wins": 80070,
-        "losses": 79441,
-        "draws": 489,
+        "wins": 79405,
+        "losses": 80063,
+        "draws": 532,
         "matches": 160000,
-        "rate": 50.1965625
+        "rate": 49.794375
       },
       {
         "id": "iron",
         "name": "喵梦",
-        "wins": 79192,
-        "losses": 80306,
-        "draws": 502,
+        "wins": 78810,
+        "losses": 80699,
+        "draws": 491,
         "matches": 160000,
-        "rate": 49.651875000000004
+        "rate": 49.4096875
       },
       {
         "id": "shadow",
         "name": "初华",
-        "wins": 80034,
-        "losses": 79757,
-        "draws": 209,
+        "wins": 80137,
+        "losses": 79633,
+        "draws": 230,
         "matches": 160000,
-        "rate": 50.0865625
+        "rate": 50.1575
       },
       {
         "id": "pyro",
         "name": "祥子",
-        "wins": 79955,
-        "losses": 79764,
-        "draws": 281,
+        "wins": 80895,
+        "losses": 78808,
+        "draws": 297,
         "matches": 160000,
-        "rate": 50.0596875
+        "rate": 50.652187500000004
       },
       {
         "id": "bastion",
         "name": "海铃",
-        "wins": 79813,
-        "losses": 79796,
-        "draws": 391,
+        "wins": 79756,
+        "losses": 79800,
+        "draws": 444,
         "matches": 160000,
-        "rate": 50.0053125
+        "rate": 49.98625
       }
     ],
     "byId": {
       "gale": {
         "id": "gale",
         "name": "睦",
-        "wins": 80070,
-        "losses": 79441,
-        "draws": 489,
+        "wins": 79405,
+        "losses": 80063,
+        "draws": 532,
         "matches": 160000,
-        "rate": 50.1965625
+        "rate": 49.794375
       },
       "iron": {
         "id": "iron",
         "name": "喵梦",
-        "wins": 79192,
-        "losses": 80306,
-        "draws": 502,
+        "wins": 78810,
+        "losses": 80699,
+        "draws": 491,
         "matches": 160000,
-        "rate": 49.651875000000004
+        "rate": 49.4096875
       },
       "shadow": {
         "id": "shadow",
         "name": "初华",
-        "wins": 80034,
-        "losses": 79757,
-        "draws": 209,
+        "wins": 80137,
+        "losses": 79633,
+        "draws": 230,
         "matches": 160000,
-        "rate": 50.0865625
+        "rate": 50.1575
       },
       "pyro": {
         "id": "pyro",
         "name": "祥子",
-        "wins": 79955,
-        "losses": 79764,
-        "draws": 281,
+        "wins": 80895,
+        "losses": 78808,
+        "draws": 297,
         "matches": 160000,
-        "rate": 50.0596875
+        "rate": 50.652187500000004
       },
       "bastion": {
         "id": "bastion",
         "name": "海铃",
-        "wins": 79813,
-        "losses": 79796,
-        "draws": 391,
+        "wins": 79756,
+        "losses": 79800,
+        "draws": 444,
         "matches": 160000,
-        "rate": 50.0053125
+        "rate": 49.98625
       }
     },
     "matrix": [
@@ -150,14 +150,14 @@
         "b": "iron",
         "aName": "睦",
         "bName": "喵梦",
-        "aWins": 13010,
-        "bWins": 26824,
-        "draws": 166,
+        "aWins": 12383,
+        "bWins": 27455,
+        "draws": 162,
         "matches": 40000,
-        "frames": 51776347,
+        "frames": 51873054,
         "timeouts": 0,
-        "aRate": 32.732499999999995,
-        "bRate": 67.2675
+        "aRate": 31.16,
+        "bRate": 68.84
       },
       {
         "pairId": 1,
@@ -165,14 +165,14 @@
         "b": "shadow",
         "aName": "睦",
         "bName": "初华",
-        "aWins": 32996,
-        "bWins": 6949,
-        "draws": 55,
+        "aWins": 32983,
+        "bWins": 6956,
+        "draws": 61,
         "matches": 40000,
-        "frames": 52583674,
+        "frames": 52647079,
         "timeouts": 0,
-        "aRate": 82.55875,
-        "bRate": 17.44125
+        "aRate": 82.53375,
+        "bRate": 17.46625
       },
       {
         "pairId": 2,
@@ -180,14 +180,14 @@
         "b": "pyro",
         "aName": "睦",
         "bName": "祥子",
-        "aWins": 25158,
-        "bWins": 14674,
-        "draws": 168,
+        "aWins": 25056,
+        "bWins": 14763,
+        "draws": 181,
         "matches": 40000,
-        "frames": 53790289,
+        "frames": 53867999,
         "timeouts": 0,
-        "aRate": 63.105,
-        "bRate": 36.895
+        "aRate": 62.86625,
+        "bRate": 37.13375
       },
       {
         "pairId": 3,
@@ -195,14 +195,14 @@
         "b": "bastion",
         "aName": "睦",
         "bName": "海铃",
-        "aWins": 8906,
-        "bWins": 30994,
-        "draws": 100,
+        "aWins": 8983,
+        "bWins": 30889,
+        "draws": 128,
         "matches": 40000,
-        "frames": 50686868,
+        "frames": 50813812,
         "timeouts": 0,
-        "aRate": 22.39,
-        "bRate": 77.61
+        "aRate": 22.6175,
+        "bRate": 77.3825
       },
       {
         "pairId": 4,
@@ -210,14 +210,14 @@
         "b": "shadow",
         "aName": "喵梦",
         "bName": "初华",
-        "aWins": 23963,
-        "bWins": 15962,
-        "draws": 75,
+        "aWins": 24125,
+        "bWins": 15804,
+        "draws": 71,
         "matches": 40000,
-        "frames": 59127477,
+        "frames": 59117251,
         "timeouts": 0,
-        "aRate": 60.00124999999999,
-        "bRate": 39.99875
+        "aRate": 60.40125,
+        "bRate": 39.59875
       },
       {
         "pairId": 5,
@@ -225,14 +225,14 @@
         "b": "pyro",
         "aName": "喵梦",
         "bName": "祥子",
-        "aWins": 12514,
-        "bWins": 27435,
-        "draws": 51,
+        "aWins": 12209,
+        "bWins": 27750,
+        "draws": 41,
         "matches": 40000,
-        "frames": 57430997,
+        "frames": 57366405,
         "timeouts": 0,
-        "aRate": 31.34875,
-        "bRate": 68.65124999999999
+        "aRate": 30.57375,
+        "bRate": 69.42625
       },
       {
         "pairId": 6,
@@ -240,14 +240,14 @@
         "b": "bastion",
         "aName": "喵梦",
         "bName": "海铃",
-        "aWins": 15891,
-        "bWins": 23899,
-        "draws": 210,
+        "aWins": 15021,
+        "bWins": 24762,
+        "draws": 217,
         "matches": 40000,
-        "frames": 54851299,
+        "frames": 55046921,
         "timeouts": 0,
-        "aRate": 39.989999999999995,
-        "bRate": 60.01
+        "aRate": 37.823750000000004,
+        "bRate": 62.176249999999996
       },
       {
         "pairId": 7,
@@ -255,14 +255,14 @@
         "b": "pyro",
         "aName": "初华",
         "bName": "祥子",
-        "aWins": 35839,
-        "bWins": 4131,
-        "draws": 30,
+        "aWins": 35737,
+        "bWins": 4226,
+        "draws": 37,
         "matches": 40000,
-        "frames": 56596325,
+        "frames": 56595103,
         "timeouts": 0,
-        "aRate": 89.63499999999999,
-        "bRate": 10.365
+        "aRate": 89.38874999999999,
+        "bRate": 10.61125
       },
       {
         "pairId": 8,
@@ -270,14 +270,14 @@
         "b": "bastion",
         "aName": "初华",
         "bName": "海铃",
-        "aWins": 21284,
-        "bWins": 18667,
-        "draws": 49,
+        "aWins": 21640,
+        "bWins": 18299,
+        "draws": 61,
         "matches": 40000,
-        "frames": 55544290,
+        "frames": 55578317,
         "timeouts": 0,
-        "aRate": 53.27125,
-        "bRate": 46.728750000000005
+        "aRate": 54.17625,
+        "bRate": 45.823750000000004
       },
       {
         "pairId": 9,
@@ -285,26 +285,26 @@
         "b": "bastion",
         "aName": "祥子",
         "bName": "海铃",
-        "aWins": 33715,
-        "bWins": 6253,
-        "draws": 32,
+        "aWins": 34156,
+        "bWins": 5806,
+        "draws": 38,
         "matches": 40000,
-        "frames": 57164399,
+        "frames": 57152012,
         "timeouts": 0,
-        "aRate": 84.3275,
-        "bRate": 15.6725
+        "aRate": 85.4375,
+        "bRate": 14.5625
       }
     ],
-    "gap": 0.5446874999999949,
+    "gap": 1.2425000000000068,
     "matches": 400000,
-    "frames": 549551965,
+    "frames": 550057953,
     "timeouts": 0,
-    "elapsedMs": 433022
+    "elapsedMs": 511033
   },
   "acceptance": {
     "metric": "maximum overall score rate minus minimum overall score rate, in percentage points",
     "maximumGap": 1,
-    "actualGap": 0.5446874999999949,
-    "passed": true
+    "actualGap": 1.2425000000000068,
+    "passed": false
   }
 }
