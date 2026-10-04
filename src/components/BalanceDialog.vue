@@ -39,7 +39,7 @@ const number = (value: number) => value.toLocaleString('en-US');
       </dl>
       <p>每位角色与其余四位等量对战，共 {{ number(result.stats[0].matches) }} 场。</p>
     </details>
-    <p class="balance-note">这是原挑战级（现困难级）的历史模拟结果，不代表新版挑战级或玩家实战胜率。总体接近 50%，角色之间仍存在明显克制。</p>
+    <p class="balance-note">这是挑战级 AI 的模拟统计，不代表玩家实战胜率。1 个百分点目标针对总体胜率，角色之间仍存在克制。</p>
   </ModalFrame>
 </template>
 

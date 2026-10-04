@@ -202,14 +202,21 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
   await app.listen();
   browser = await chromium.launch({ headless: true, executablePath: process.env.UI_EDGE, args: ['--autoplay-policy=no-user-gesture-required'] });
   report.runtime = { edge: process.env.UI_EDGE, playwright: require(path.join(process.env.UI_PLAYWRIGHT, 'package.json')).version, testServer: { port: Number(process.env.UI_PORT), pvpDuration: 10, introFrames: 0 } };
-  await group('AI difficulty selection and historical matchup labels', async () => {
+  await group('AI difficulty selection and challenge matchup labels', async () => {
+    const balance = JSON.parse(fs.readFileSync(path.join(root, 'tests/balance-report.json'), 'utf8'));
     for (const [difficulty, label] of [['normal', '困难'], ['hard', '挑战']]) {
       const page = await newPage('ai-' + difficulty, {width:844,height:390}, true);
       assert.equal(await page.evaluate(() => AveCombat.difficulties.normal.think), 4);
       assert.equal(await page.evaluate(() => AveCombat.difficulties.hard.think), 2);
       await page.locator('#balance-btn').tap();
-      assert.match(await page.locator('#balance-method').textContent(), /困难 AI（原挑战）/);
-      assert.match(await page.locator('.balance-note').textContent(), /不代表新版挑战级/);
+      assert.match(await page.locator('#balance-method').textContent(), /挑战 AI/);
+      assert.match(await page.locator('.balance-note').textContent(), /目标针对总体胜率/);
+      const rows = await page.locator('#balance-dialog tr[data-pair]').evaluateAll(items => items.map(row => ({
+        pair: row.dataset.pair, rates: [...row.querySelectorAll('b')].map(el => el.textContent),
+      })));
+      assert.deepEqual(rows, balance.result.matrix.map(pair => ({ pair: `${pair.a}-${pair.b}`,
+        rates: [pair.aRate.toFixed(3) + '%', pair.bRate.toFixed(3) + '%'] })));
+      await capture(page, 'challenge-balance-' + difficulty);
       await page.locator('#balance-dialog .dialog-close').tap();
       await page.locator(`[data-difficulty="${difficulty}"]`).tap();
       assert.equal(await page.locator(`[data-difficulty="${difficulty}"]`).getAttribute('aria-pressed'), 'true');
@@ -227,7 +234,7 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
       await capture(page, 'ai-' + difficulty);
       await page.context().close();
     }
-    record('historical matchup table explicitly refers to the former challenge controller');
+    record('challenge matchup table displays every pair from the current simulation report');
   });
   await group('desktop layout, selection, keyboard, pause and room', async () => {
     const page = await newPage('desktop', {width:1440,height:900}, true, false);
