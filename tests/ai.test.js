@@ -54,7 +54,7 @@ test('challenge drain interrupts an armored charge before it releases', () => {
   const input = decide({ me, opp, def: characters.find(c => c.id === me.id) });
   assert.equal(input.skill2, true);
   world.step([input, {}]);
-  for (let n = 0; n < 10; n++) world.step([{}, {}]);
+  for (let n = 0; n < 14 && opp.state !== 'stun'; n++) world.step([{}, {}]);
   assert.equal(opp.skillMove, null);
   assert.equal(opp.state, 'stun');
   assert.equal(opp.mp, 110);
@@ -232,7 +232,7 @@ test('short-range grab and drain are not spent on a rising opponent outside vert
 
 test('iron does not grab a retreating opponent that will outrun the grab startup', () => {
   const scenario = situation('iron'); scenario.me.cd0 = 0;
-  Object.assign(scenario.opp, { x: 620, vx: 5.15, state: 'walk' });
+  Object.assign(scenario.opp, { x: 650, vx: 5.15, state: 'walk' });
   assert.equal(decide(scenario).special, false);
 });
 
@@ -252,7 +252,7 @@ test('an airborne armor animation is not mistaken for a falling grab target', ()
   Object.assign(scenario.opp, { x: 590, y: ARENA.ground - 102, vy: 0,
     state: 'skill', skillMove: 'iron_s1', stateT: 1, armor: 119 });
   // iron_s1 keeps its caster's y unchanged for the remaining 25 frames.
-  // The grab checks at frame 10 and requires an actual foot-height gap below 90.
+  // The grab starts at frame 5 and requires an actual foot-height gap below 100.
   assert.equal(decide(scenario).special, false);
 });
 

@@ -349,7 +349,7 @@ class Fx {
         }
         break;
       case 'pyro_s1':
-        if (m === 11) {
+        if (m === 7) {
           const x = fx + fa * 36 * CS, y = fy - 58 * CS * 1.55;
           this.burst(x, y, 44, 12, T.main, { n: 6 });
           this.ring(x, y, 6, 50, 14, T.hi, { ry: 1, w: 3, front: true });
@@ -358,7 +358,7 @@ class Fx {
         }
         break;
       case 'pyro_s2':
-        if (m === 10) {
+        if (m === 7) {
           const x = fx + fa * 40, y = GROUND - 6;
           this.burst(x, y - 10, 56, 12, T.main, { n: 7 });
           this.ring(x, GROUND - 3, 10, 110, 20, T.hi, {});
@@ -394,11 +394,12 @@ class Fx {
         }
         break;
       case 'shadow_s2':
-        if (m === 10) {
-          this.ghost({ ...f, x: fx + fa * 62, facing: fa }, 22, '#6b3fb5', 0.55);
-          this.ring(fx + fa * 62, GROUND - 3, 10, 80, 22, T.alt, {});
-          this.circle(fx + fa * 62, GROUND - 2, 70, 30, T.alt, { glyphs: 6 });
-          this.glows(fx + fa * 62, fy - 80, 8, 1, 3, T.alt, { g: -0.04 });
+        if (m === 8) {
+          this.ghost({ ...f, x: fx + fa * 110, facing: fa }, 18, '#6b3fb5', 0.55);
+          this.slash(fx + fa * 20, fy - 75, fa, 190, -0.35, 0.35, 12, T.alt, { k: 0.7, hi: T.main });
+          this.ring(fx + fa * 105, fy - 3, 10, 105, 18, T.alt, {});
+          this.circle(fx + fa * 105, fy - 2, 100, 20, T.alt, { glyphs: 6 });
+          this.glows(fx + fa * 110, fy - 80, 8, 1, 3, T.alt, { g: -0.04 });
         }
         break;
       case 'shadow_ult':
@@ -417,7 +418,7 @@ class Fx {
           this.dust(fx, GROUND - 2, 8, '#cfeedd', {});
           this.sparks(fx, GROUND - 6, 10, 2, 8, T.main, { dir: -Math.PI / 2, spread: 0.8 });
           this.strings(fx, 5);
-        } else if (m === 13) {
+        } else if (m === 8) {
           this.burst(fx, fy - 90, 56, 12, T.hi, { n: 8 });
           this.speedLines(T.main, 14, fx, fy - 70);
         }
@@ -454,8 +455,8 @@ class Fx {
       /* ---- 喵梦 ---- */
       case 'iron_s0':
         if (m === 0) { this.speedLines(T.hi, 10, fx, fy - 90); this.sparks(fx, fy - 70, 10, 2, 8, T.main, { dir: fa > 0 ? Math.PI : 0, spread: 0.6 }); }
-        if (m === 10) {
-          const tx = o ? o.x : fx + fa * 60, ty = o ? o.y - 90 * CS : fy - 80;
+        if (m === 5) {
+          const tx = fx + fa * 60, ty = fy - 80;
           this.brackets(tx, ty, 120, 150, 22, '#ffffff');
           this.burst(tx, ty, 60, 12, T.main, { n: 10 });
           this.twinkles(tx, ty, 10, 40, '#ffffff', {});
@@ -474,16 +475,16 @@ class Fx {
         if (m === 6) { this.slash(fx + fa * 30, fy - 90, fa, 100, -0.9, 1.0, 12, '#ffffff', { k: 0.5, hi: T.main }); }
         break;
       case 'iron_ult':
-        if (m === 12 || m === 24 || m === 38) {
-          const x = fx + fa * 36;
-          this.ring(x, GROUND - 3, 12, m === 38 ? 220 : 170, 22, T.main, { w: 6 });
-          this.ring(x, GROUND - 3, 6, m === 38 ? 140 : 100, 18, T.hi, { w: 3 });
-          this.crack(x, GROUND, fa, m === 38 ? 190 : 140, 30, T.main);
-          this.crack(x, GROUND, -fa, m === 38 ? 90 : 60, 26, T.main);
+        if (m === 10 || m === 22 || m === 36) {
+          const x = m === 36 ? fx : fx + fa * 36;
+          this.ring(x, GROUND - 3, 12, m === 36 ? 190 : 140, 22, T.main, { w: 6 });
+          this.ring(x, GROUND - 3, 6, m === 36 ? 140 : 100, 18, T.hi, { w: 3 });
+          this.crack(x, GROUND, fa, m === 36 ? 170 : 140, 30, T.main);
+          this.crack(x, GROUND, -fa, m === 36 ? 170 : 60, 26, T.main);
           this.dust(x, GROUND - 2, 12, '#ffd7ec', {});
           this.sparks(x, GROUND - 6, 22, 4, 14, T.hi, { dir: -Math.PI / 2, spread: 1.4 });
           this.petals(x, GROUND - 30, 10, 'iron', { v0: 2, v1: 7, spread: Math.PI, up: -2 });
-          if (m === 38) this.pillar(x, GROUND, 140, 400, 22, T.main, { hi: T.hi });
+          if (m === 36) this.pillar(x, GROUND, 140, 400, 22, T.main, { hi: T.hi });
         }
         break;
       /* ---- 海铃 ---- */
@@ -552,7 +553,7 @@ class Fx {
     const every = (n: string, ms: number) => { if (ts - (a[key(n)] || 0) >= ms) { a[key(n)] = ts; return true; } return false; };
     if (f.dead) return;
     // 冲刺残影
-    const dashing = (f.state === 'skill' && (move === 'gale_s1' || move === 'iron_s2' || move === 'bastion_s2' || (move === 'shadow_s1' && t >= 9) || (move === 'gale_s0' && t >= 13) || move === 'shadow_ult')) || (f.dashT > 0);
+    const dashing = (f.state === 'skill' && (move === 'gale_s1' || move === 'iron_s2' || move === 'bastion_s2' || (move === 'shadow_s1' && t >= 9) || (move === 'gale_s0' && t >= 8) || move === 'shadow_ult')) || (f.dashT > 0);
     if (dashing && every('ghost', 34)) this.ghost(f, 14, T.main, 0.4);
     if (f.state === 'skill' && every('trail', 40) && (move === 'gale_s1' || move === 'iron_s2' || move === 'bastion_s2')) {
       this.sparks(f.x - f.facing * 20, f.y - 90 * CS * rnd(0.5, 1.4), 2, 1, 4, T.hi, { dir: f.facing > 0 ? Math.PI : 0, spread: 0.3, g: 0 });
@@ -574,7 +575,7 @@ class Fx {
     // 初华 s0：金色花瓣环绕
     if (move === 'shadow_s0' && f.state === 'skill' && every('s0', 70)) this.petals(f.x, f.y - 70, 1, 'shadow', { v0: 0.3, v1: 1.2, spread: Math.PI, jx: 40, jy: 60, g: 0.03 });
     // 祥子 s1：右手音符萦绕
-    if (move === 'pyro_s1' && f.state === 'skill' && t < 11 && every('s1', 90)) this.notes(f.x + f.facing * 26, f.y - 96, 1, T.hi, {});
+    if (move === 'pyro_s1' && f.state === 'skill' && t < 7 && every('s1', 90)) this.notes(f.x + f.facing * 26, f.y - 96, 1, T.hi, {});
     // 祥子 s0 / ult：舞台灯环绕的光点
     if (move === 'pyro_s0' && f.state === 'skill' && t < 9 && every('p0', 60)) this.twinkles(f.x, f.y - 96, 1, 46, T.hi, { sy: 40 });
     if (f.id === 'pyro' && move === 'pyro_ult' && f.state === 'skill' && every('pu', 50)) {
@@ -1016,11 +1017,11 @@ function drawProjectile(c: CanvasRenderingContext2D, p: Projectile, ownerId: Cha
   } else if (p.type === 'note') {
     c.translate(p.x, p.y);
     const pulse = 1 + Math.sin(frame * 0.4) * 0.08;
-    glow(c, 0, 0, 40 * pulse, T.main, 0.85);
+    glow(c, 0, 0, p.r * 1.8 * pulse, T.main, 0.85);
     glow(c, 0, 0, 22, T.hi, 0.9);
     c.fillStyle = '#ffffff'; c.globalAlpha = 1;
     c.scale(dir, 1);
-    note(c, 0, 2, 32 * pulse, Math.sin(frame * 0.2) * 0.2);
+    note(c, 0, 2, p.r * 2 * pulse, Math.sin(frame * 0.2) * 0.2);
     c.globalAlpha = 0.5; c.strokeStyle = T.main; c.lineWidth = 2;
     c.beginPath(); c.moveTo(-26, -4); c.lineTo(-70, -4); c.moveTo(-24, 5); c.lineTo(-56, 5); c.stroke();
   } else if (p.type === 'wave') {
@@ -1049,14 +1050,14 @@ function drawHazardBack(c: CanvasRenderingContext2D, h: Hazard, ownerId: Charact
     const pulse = 0.75 + Math.sin(frame * 0.5) * 0.25;
     c.save();
     // 落点警示：旋转法阵
-    drawMagicCircle(c, h.x, GROUND - 2, 64 + fall * 24, 0.24, frame * 0.07, T.main, 0.35 + fall * 0.55, 8);
+    drawMagicCircle(c, h.x, GROUND - 2, (h.radius ?? 90) * (0.7 + fall * 0.3), 0.24, frame * 0.07, T.main, 0.35 + fall * 0.55, 8);
     c.globalCompositeOperation = 'lighter'; c.globalAlpha = (0.15 + fall * 0.35) * pulse;
     const g = c.createLinearGradient(h.x, 0, h.x, GROUND);
     g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, rgbaOf(T.main, 0.6));
     c.fillStyle = g; c.fillRect(h.x - 3, 0, 6, GROUND);
     c.restore();
   } else if (h.type === 'boom' || h.type === 'shock' || h.type === 'skillShock') {
-    const life = h.life || 1, k = clamp(1 - life / 14, 0, 1), rad = h.radius || 120;
+    const life = h.life || 1, k = clamp(1 - life / (h.type === 'boom' ? 18 : 14), 0, 1), rad = h.radius || 120;
     c.save(); c.globalCompositeOperation = 'lighter';
     c.globalAlpha = (1 - k) * 0.55;
     glow(c, h.x, GROUND - 30, rad * (0.9 + k * 0.7), T.main, 1);
@@ -1106,7 +1107,7 @@ function drawHazardFront(c: CanvasRenderingContext2D, h: Hazard, ownerId: Charac
     glow(c, h.x, GROUND - 6, 80, T.main, 0.9 * a);
     glow(c, h.x, GROUND - height, 50, T.hi, 0.7 * a);
   } else if (h.type === 'boom') {
-    const life = h.life || 1, k = clamp(1 - life / 14, 0, 1);
+    const life = h.life || 1, k = clamp(1 - life / 18, 0, 1);
     c.globalCompositeOperation = 'lighter';
     glow(c, h.x, GROUND - 50, 190 * (0.7 + k * 0.6), T.main, (1 - k) * 0.9);
     glow(c, h.x, GROUND - 40, 110 * (0.7 + k * 0.5), '#ffffff', (1 - k));

@@ -63,10 +63,10 @@ const assetReady = (id: CharacterId) => { const rec = loaded.get(id); return !!(
 // Anticipation, wind-up, active gesture, recovery. Active boundaries follow
 // the combat core, so the held instrument strikes when damage can occur.
 const SKILL_PHASES: Record<SkillMove, [number, number, number]> = {
-  pyro_s0: [4, 9, 17], pyro_s1: [5, 11, 17], pyro_s2: [5, 10, 17], pyro_ult: [3, 6, 26],
-  shadow_s0: [3, 7, 14], shadow_s1: [4, 8, 15], shadow_s2: [5, 10, 17], shadow_ult: [3, 6, 40],
-  gale_s0: [6, 13, 23], gale_s1: [2, 4, 12], gale_s2: [3, 6, 26], gale_ult: [4, 8, 34],
-  iron_s0: [5, 10, 17], iron_s1: [4, 8, 18], iron_s2: [3, 6, 15], iron_ult: [6, 12, 44],
+  pyro_s0: [4, 9, 17], pyro_s1: [3, 7, 17], pyro_s2: [3, 7, 17], pyro_ult: [3, 6, 26],
+  shadow_s0: [3, 7, 14], shadow_s1: [4, 8, 15], shadow_s2: [4, 8, 15], shadow_ult: [3, 6, 40],
+  gale_s0: [4, 8, 14], gale_s1: [2, 4, 12], gale_s2: [3, 6, 26], gale_ult: [4, 8, 34],
+  iron_s0: [3, 5, 15], iron_s1: [4, 8, 18], iron_s2: [3, 6, 15], iron_ult: [5, 10, 42],
   bastion_s0: [5, 10, 17], bastion_s1: [20, 40, 45], bastion_s2: [2, 5, 18], bastion_ult: [4, 8, 38],
 };
 function frameName(f: FighterSnapshot, frame: number = 0) {

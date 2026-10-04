@@ -15,10 +15,10 @@ const clamp = A.clamp, mix = A.lerp;
 // 技能 / 普攻中需要触发演出的关键帧（与 shared/combat.ts 的时间轴一致）
 const MARKS: Record<SkillMove | 'punch', readonly number[]> = {
   punch: [5],
-  pyro_s0: [9], pyro_s1: [11], pyro_s2: [10], pyro_ult: [6],
-  shadow_s0: [7], shadow_s1: [8, 10], shadow_s2: [10], shadow_ult: [6, 14, 22, 30, 38],
-  gale_s0: [0, 13], gale_s1: [0], gale_s2: [6, 14, 22], gale_ult: [0, 8, 18, 28],
-  iron_s0: [0, 10], iron_s1: [8], iron_s2: [0, 6], iron_ult: [12, 24, 38],
+  pyro_s0: [9], pyro_s1: [7], pyro_s2: [7], pyro_ult: [6],
+  shadow_s0: [7], shadow_s1: [8, 10], shadow_s2: [8], shadow_ult: [6, 14, 22, 30, 38],
+  gale_s0: [0, 8], gale_s1: [0], gale_s2: [6, 14, 22], gale_ult: [0, 8, 18, 28],
+  iron_s0: [0, 5], iron_s1: [8], iron_s2: [0, 6], iron_ult: [10, 22, 36],
   bastion_s0: [10], bastion_s1: [40], bastion_s2: [5, 12], bastion_ult: [8, 16, 24, 34],
 };
 
@@ -184,7 +184,7 @@ export class ArenaRenderer {
       if (tr) {
         // 落地
         if (tr.y < GROUND - 8 && raw.y >= GROUND - 1 && !f.dead) {
-          if (move === 'gale_s0' && t > 13) fx.landing(f);
+          if (move === 'gale_s0' && t > 8) fx.landing(f);
           else fx.dust(f.x, GROUND - 2, 4, '#d9d2ee', {});
         }
       }

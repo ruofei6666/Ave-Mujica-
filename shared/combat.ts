@@ -41,9 +41,9 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       jump: 14,
       airJumps: 0,
       punch: { name: "……", dmg: 11.2, kb: 6.5, stun: 14, reach: 55, startup: 5, active: 7, recover: 10 },
-      s0: { name: "剪掉坠线", cd: 244, hint: "跃起后折返俯冲砸击。", detail: "最长 0.57 秒，落地提前结束。前 0.20 秒上升（水平速度 5.4，垂直初速 18），随后转向对手俯冲（水平 9.5，垂直 7.5）。0.22–0.38 秒可命中：伤害 35.7，击退 13，硬直 0.33 秒。判定 117×138。冷却 4.07 秒。" },
-      s1: { name: "睦不在", cd: 180, hint: "闪现突进，途中短暂无敌，穿招、追人、换边。", detail: "持续 0.27 秒。每秒位移 780，总位移 208。前 0.08 秒完全无敌。全程可命中：伤害 22.7，击退 8，硬直 0.22 秒。判定 105×105。冷却 3.00 秒。" },
-      s2: { name: "再死一次", cd: 229, hint: "三刀连斩，最后一刀最重。", detail: "持续 0.57 秒。每秒位移 330，总位移 187。第一刀 0.10–0.15 秒伤害 16.4、击退 5；第二刀 0.23–0.28 秒伤害 16.4、击退 5；第三刀 0.37–0.43 秒伤害 25.2、击退 9。每刀硬直 0.20 秒。三刀全中合计 58.0。判定 96×75。冷却 3.82 秒。" },
+      s0: { name: "剪掉坠线", cd: 350, hint: "短跃切入，起跳短暂霸体，折返俯冲砸击。", detail: "最长 0.47 秒，落地提前结束。起跳获得 0.17 秒霸体；前 0.12 秒上升（水平速度 5.4，垂直初速 14），随后转向对手俯冲（水平、垂直初速均为 9.5）。0.13–0.40 秒内落地前可命中一次：伤害 35.7，击退 13，硬直 0.33 秒。判定 117×138。冷却 5.83 秒。" },
+      s1: { name: "睦不在", cd: 275, hint: "闪现突进，途中短暂无敌，穿招、追人、换边。", detail: "持续 0.27 秒。每秒位移 780，总位移 208。前 0.08 秒完全无敌。全程可命中：伤害 22.7，击退 8，硬直 0.22 秒。判定 105×105。冷却 4.58 秒。" },
+      s2: { name: "再死一次", cd: 209, hint: "三刀连斩，最后一刀最重。", detail: "持续 0.57 秒。每秒位移 330，总位移 187。第一刀 0.10–0.15 秒伤害 16.4、击退 5；第二刀 0.23–0.28 秒伤害 16.4、击退 5；第三刀 0.37–0.43 秒伤害 25.2、击退 9。每刀硬直 0.20 秒。三刀全中合计 58.0。判定 96×75。冷却 3.48 秒。" },
       ult: { name: "人偶剧开演", cost: 200, hint: "瞬到身侧连落三道闪电，贴身清场。", detail: "耗蓝 200。持续 0.70 秒。前 0.30 秒无敌。0.13 / 0.30 / 0.47 秒时瞬移到对手身侧 72 像素并落雷。前两波 0.13–0.20、0.30–0.37 秒各伤害 26、击退 8；第三波 0.47–0.57 秒伤害 40、击退 14。每波硬直 0.28 秒。全中合计 92。判定 168×150。" },
       tag: "Mortis",
     },
@@ -58,10 +58,10 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       jump: 14,
       airJumps: 0,
       punch: { name: "出镜", dmg: 11.2, kb: 6.5, stun: 14, reach: 55, startup: 5, active: 7, recover: 10 },
-      s0: { name: "拍了没", cd: 243, hint: "近身抓住抛飞，命中回复蓝量。", detail: "持续 0.43 秒。前 0.15 秒每秒靠近 210。0.17 秒时抓取：水平距离小于 104、垂直小于 90。只有打中才生效：把对手拉到身前 54 像素，伤害 37.4，击退 13，硬直 0.33 秒，自身回复 55 蓝并转身。冷却 4.05 秒。" },
-      s1: { name: "镜头别停", cd: 229, hint: "停手获得长时间霸体。", detail: "动作 0.43 秒，无攻击判定。获得 2.00 秒霸体：近战受伤为 72%，远程受伤为 69%，不进硬直，击退仅保留 18%。冷却 3.82 秒。" },
-      s2: { name: "我要出镜", cd: 211, hint: "带霸体肩撞贴脸。", detail: "持续 0.38 秒。前 0.50 秒霸体（近战受伤 72%，远程 69%，不硬直）。每秒位移 432，总位移 166。0.10–0.23 秒可命中：伤害 38.2，击退 10，硬直 0.27 秒。判定 108×99。冷却 3.52 秒。" },
-      ult: { name: "今晚热搜", cost: 200, hint: "三记砸地越来越重，接近全程霸体。", detail: "耗蓝 200。持续 0.93 秒。前 0.67 秒霸体。第一记 0.20–0.27 秒伤害 32、击退 9；第二记 0.40–0.47 秒伤害 32、击退 9；第三记 0.63–0.73 秒伤害 46、击退 15。每记硬直 0.30 秒。全中合计 110。判定 168×114。" },
+      s0: { name: "拍了没", cd: 398, hint: "快速跨步抓拍，抓住后过肩摔并回复蓝量。", detail: "持续 0.43 秒。前 0.13 秒向前跨步，每秒 360，最多前进 48，抓中后停步。0.08–0.23 秒持续尝试抓取身前 120 像素、垂直差小于 100 的对手；每次施放最多抓中一次。伤害 37.4，击退 13，硬直 0.33 秒，额外回复 55 蓝并把对手摔到身后 54 像素。可被打断，无敌目标不能被抓。冷却 6.63 秒。" },
+      s1: { name: "镜头别停", cd: 370, hint: "停手获得长时间霸体。", detail: "动作 0.43 秒，无攻击判定。获得 2.00 秒霸体：近战受伤为 72%，远程受伤为 69%，不进硬直，击退仅保留 18%。冷却 6.17 秒。" },
+      s2: { name: "我要出镜", cd: 359, hint: "带霸体肩撞贴脸。", detail: "持续 0.38 秒。前 0.50 秒霸体（近战受伤 72%，远程 69%，不硬直）。每秒位移 432，总位移 166。0.10–0.23 秒可命中：伤害 38.2，击退 10，硬直 0.27 秒。判定 108×99。冷却 5.98 秒。" },
+      ult: { name: "今晚热搜", cost: 200, hint: "踏步三连：前两击留人，最后环形震地击飞。", detail: "耗蓝 200。持续 0.87 秒，前 0.73 秒霸体。出手前分三次踏步追近，最多共 100 像素，不会瞬移。第一击 0.17–0.23 秒、第二击 0.37–0.43 秒各伤害 26、击退 3、硬直 0.30 秒，判定 168×135；最后一击 0.60–0.70 秒伤害 42、击退 15、硬直 0.33 秒，环形判定 336×135。全中合计 94。" },
       tag: "Amoris",
     },
     {
@@ -75,9 +75,9 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       jump: 14,
       airJumps: 0,
       punch: { name: "对不起", dmg: 11.2, kb: 6.5, stun: 14, reach: 55, startup: 5, active: 7, recover: 10 },
-      s0: { name: "弦在哭", cd: 365, hint: "自损换无敌，刷新另两技能并灌满蓝。", detail: "持续 0.37 秒。0.12 秒时自损 24 生命（至少留 1），立刻刷新另两个技能冷却，蓝量灌满 200，并获得 0.53 秒无敌。不对敌人造成伤害。冷却 6.08 秒。" },
-      s1: { name: "面具戴好", cd: 291, hint: "瞬到背后补一记重斩。", detail: "持续 0.37 秒。0.13 秒时瞬到对手背后 58 像素，并获得 0.23 秒无敌。0.17–0.23 秒可命中：伤害 35.7，击退 9，硬直 0.27 秒。判定 129×120。冷却 4.85 秒。" },
-      s2: { name: "小祥等等", cd: 291, hint: "影子现身，近身打断并抽蓝。", detail: "持续 0.40 秒。0.17 秒时近身判定：水平小于 145、垂直小于 105。命中不造成伤害，抽取最多 40 蓝（自己获得其中 60%，最多 24），使对手硬直 0.40 秒、速度清零并打断当前技能。冷却 4.85 秒。" },
+      s0: { name: "弦在哭", cd: 420, hint: "自损换无敌，刷新另两技能并灌满蓝。", detail: "持续 0.37 秒。0.12 秒时自损 24 生命（至少留 1），立刻刷新另两个技能冷却，蓝量灌满 200，并获得 0.53 秒无敌。不对敌人造成伤害。冷却 7.00 秒。" },
+      s1: { name: "面具戴好", cd: 220, hint: "瞬到背后补一记重斩。", detail: "持续 0.37 秒。0.13 秒时瞬到对手背后 58 像素，并获得 0.23 秒无敌。0.17–0.23 秒可命中：伤害 35.7，击退 9，硬直 0.27 秒。判定 129×120。冷却 3.67 秒。" },
+      s2: { name: "小祥等等", cd: 253, hint: "向前铺开影缚，牵住对手、打断并抽蓝。", detail: "持续 0.40 秒。0.13–0.23 秒影缚持续捕捉身前 210 像素、垂直差小于 120 的对手，每次施放最多生效一次。命中不造成伤害，将远处目标拉近至 110 像素，抽取最多 40 蓝（自己获得其中 60%，最多 24），使其硬直 0.40 秒、速度清零并打断当前技能。无敌目标可躲避，出手可被打断。冷却 4.22 秒。" },
       ult: { name: "我来守护你", cost: 200, hint: "五次闪现连斩，用来收残血。", detail: "耗蓝 200。持续 0.83 秒。前 0.60 秒无敌。0.10 / 0.23 / 0.37 / 0.50 / 0.63 秒时闪现到对手左右 52 像素。五段各伤害 18.4、击退 6、硬直 0.15 秒。全中合计 92.0。判定 120×117。" },
       tag: "Doloris",
     },
@@ -92,10 +92,10 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       jump: 14,
       airJumps: 0,
       punch: { name: "听我的", dmg: 11.2, kb: 6.5, stun: 14, reach: 55, startup: 5, active: 7, recover: 10 },
-      s0: { name: "改你的剧本", cd: 400, hint: "两侧幕刃同时合拢夹击。", detail: "动作 0.43 秒。0.15 秒时从场地左右两侧各出一道幕刃，速度每秒 810，持续飞行直到碰到对手或飞出场地。每道伤害 33.2，击退 8，硬直 0.27 秒，判定半径 34。两侧各能命中一次，全中 66.4。冷却 6.67 秒。" },
-      s1: { name: "忘了吧", cd: 355, hint: "直线音符，命中把人推开。", detail: "动作 0.40 秒。0.18 秒时向前射出音符，速度每秒 720，存活 0.90 秒，最远约 648。伤害 43.7，击退 8，硬直 0.25 秒，判定半径 16。冷却 5.92 秒。" },
-      s2: { name: "箱庭塌了", cd: 373, hint: "贴地乐浪推开近中距离。", detail: "动作 0.40 秒。0.17 秒时贴地推出乐浪，速度每秒 528，存活 0.73 秒，最远约 387。伤害 50.0，击退 14，硬直 0.25 秒。判定 96×92。冷却 6.22 秒。" },
-      ult: { name: "我要成为神", cost: 200, hint: "终幕砸向预判落点，高伤强击退。", detail: "耗蓝 200。动作 0.63 秒。按对手当前速度超前 0.30 秒预判落点。陨石从高度 80 以每秒 930 下落，约 0.55 秒后落地。伤害 60，击退 20，硬直 0.43 秒。下落判定 36×36；若落地则爆炸 0.23 秒，范围 180×80。" },
+      s0: { name: "改你的剧本", cd: 314, hint: "两侧幕刃同时合拢夹击。", detail: "动作 0.43 秒。0.15 秒时从场地左右两侧各出一道幕刃，速度每秒 810，持续飞行直到碰到对手或飞出场地。每道伤害 33.2，击退 8，硬直 0.27 秒，判定半径 34。两侧各能命中一次，全中 66.4。冷却 5.23 秒。" },
+      s1: { name: "忘了吧", cd: 387, hint: "瞄准对手高度，射出快速直行音符。", detail: "动作 0.40 秒。0.12 秒时瞄准对手高度和短时移动趋势射出音符，发射后沿固定方向飞行。水平速度每秒 1080，垂直速度最多每秒 360，存活 0.67 秒，水平最远 720。伤害 43.7，击退 8，硬直 0.25 秒，判定半径 28。冷却 6.45 秒。" },
+      s2: { name: "箱庭塌了", cd: 360, hint: "快速贴地乐浪，推开近中距离。", detail: "动作 0.40 秒。0.12 秒时贴地推出乐浪，速度每秒 690，存活 0.57 秒，最远约 391。伤害 50.0，击退 14，硬直 0.27 秒。判定 96×92。冷却 6.00 秒。" },
+      ult: { name: "我要成为神", cost: 200, hint: "终幕快速砸向预判落点，落地大范围震爆。", detail: "耗蓝 200。动作 0.63 秒。按对手当前速度超前 0.30 秒预判并锁定落点。0.10 秒时召唤陨石，从高度 80 以每秒 1200 下落，施放后约 0.52 秒落地。伤害 60，击退 20，硬直 0.43 秒。下落判定 36×36；落地爆炸持续 0.30 秒，范围 240×120，全程最多命中一次。" },
       tag: "Oblivionis",
     },
     {
@@ -109,9 +109,9 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       jump: 14,
       airJumps: 0,
       punch: { name: "加班", dmg: 11.2, kb: 6.5, stun: 14, reach: 55, startup: 5, active: 7, recover: 10 },
-      s0: { name: "加钱吗", cd: 308, hint: "把贝斯砸进地面，前方裂开音刃。", detail: "持续 0.47 秒。0.17–0.27 秒可命中：伤害 35.7，击退 12，硬直 0.30 秒。判定 165×108，覆盖身前。冷却 5.13 秒。" },
-      s1: { name: "我有点怕", cd: 360, hint: "原地蓄力，期间霸体，结束时震晕对手并造成伤害。", detail: "持续 0.80 秒。全程停步并获得霸体：近战受伤 72%，远程 69%，不进硬直。0.67–0.73 秒爆发：伤害 42.0，击退 6，硬直 0.60 秒。判定 330×135，覆盖自身周围。冷却 6.00 秒。" },
-      s2: { name: "职业病犯了", cd: 339, hint: "持贝斯前冲两段斩击。", detail: "持续 0.43 秒。每秒位移 480。第一段 0.08–0.15 秒伤害 18.5、击退 6；第二段 0.20–0.28 秒伤害 28.1、击退 10。每段硬直 0.22 秒。全中合计 46.6。判定 108×96。冷却 5.65 秒。" },
+      s0: { name: "加钱吗", cd: 232, hint: "把贝斯砸进地面，前方裂开音刃。", detail: "持续 0.47 秒。0.17–0.27 秒可命中：伤害 35.7，击退 12，硬直 0.30 秒。判定 165×108，覆盖身前。冷却 3.87 秒。" },
+      s1: { name: "我有点怕", cd: 242, hint: "原地蓄力，期间霸体，结束时震晕对手并造成伤害。", detail: "持续 0.80 秒。全程停步并获得霸体：近战受伤 72%，远程 69%，不进硬直。0.67–0.73 秒爆发：伤害 42.0，击退 6，硬直 0.60 秒。判定 330×135，覆盖自身周围。冷却 4.03 秒。" },
+      s2: { name: "职业病犯了", cd: 251, hint: "持贝斯前冲两段斩击。", detail: "持续 0.43 秒。每秒位移 480。第一段 0.08–0.15 秒伤害 18.5、击退 6；第二段 0.20–0.28 秒伤害 28.1、击退 10。每段硬直 0.22 秒。全中合计 46.6。判定 108×96。冷却 4.18 秒。" },
       ult: { name: "海铃要崩溃", cost: 200, hint: "身前连续砸下四根音柱，高伤收割。", detail: "耗蓝 200。持续 0.87 秒。前 0.17 秒短暂无敌。0.13 / 0.27 / 0.40 / 0.57 秒在身前越来越远的位置落下音柱。前两柱伤害 18、击退 8；第三柱伤害 22、击退 10；第四柱伤害 30、击退 14。每柱硬直 0.25 秒，各命中一次。全中合计 88。判定宽 64、高 150。" },
       tag: "Timoris",
     },
@@ -319,9 +319,10 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       const move = this.skillMove;
       if (move === "gale_s0") {
         this.vx = this.facing * 5.4;
-        this.vy = -18;
+        this.vy = -14;
+        this.armor = Math.max(this.armor, 10);
       } else if (move === "iron_s0") {
-        this.vx = this.facing * 2;
+        this.vx = this.facing * 6;
       } else if (move === "gale_s1") {
         this.dashT = 16;
         this.invuln = 5;
@@ -341,7 +342,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
         this.armor = 30;
         this.vx = this.facing * 8.2;
       } else if (move === "iron_ult") {
-        this.armor = 40;
+        this.armor = 44;
         this.vx = 0;
         burst(this.x, this.y - 40, this.def.color, 24, 6);
       } else if (move === "shadow_s1") {
@@ -536,36 +537,39 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
       this.closeHit();
 
       if (move === "gale_s0") {
-        if (t <= 12) {
+        if (t <= 7) {
           this.x += this.vx;
           this.y += this.vy;
           this.vy += GRAVITY * 0.72;
         } else {
-          if (t === 13) {
+          if (t === 8) {
             this.facing = Math.sign(opponent.x - this.x) || this.facing;
             this.vx = this.facing * 9.5;
-            this.vy = 7.5;
+            this.vy = 9.5;
           }
           this.x += this.vx;
           this.y += this.vy;
           this.vy += GRAVITY * 0.85;
         }
-        if (t === 13) {
+        if (t === 8) {
           this.attackHit = false;
           burst(this.x, this.y - 48, this.def.color, 28, 9);
         }
-        if (t >= 13 && t <= 23) this.openHit({ dmg: 17.0, kb: 13, stun: 20, w: 78, h: 92, yOff: -100, sfx: "gale_s0" });
-        if (t > 13 && this.y >= GROUND) {
+        if (t >= 8 && t <= 24) this.openHit({ dmg: 17.0, kb: 13, stun: 20, w: 78, h: 92, yOff: -100, sfx: "gale_s0" });
+        if (t > 8 && this.y >= GROUND) {
           this.y = GROUND;
           this.vy = 0;
           burst(this.x, GROUND - 4, this.def.accent, 24, 7);
           shake = Math.max(shake, 11);
           this.endSkill();
-        } else if (t >= 34) this.endSkill();
+        } else if (t >= 28) this.endSkill();
       } else if (move === "iron_s0") {
-        this.vx *= 0.55;
-        if (t <= 9) this.x += this.facing * 3.5;
-        if (t === 10 && Math.abs(opponent.x - this.x) < 104 && Math.abs(opponent.y - this.y) < 90) {
+        this.vx = 0;
+        if (t <= 8 && !this.attackHit) this.x += this.facing * 6;
+        const gap = (opponent.x - this.x) * this.facing;
+        if (t >= 5 && t <= 14 && !this.attackHit && !opponent.dead && opponent.invuln <= 0 &&
+          gap > -30 && gap < 120 && Math.abs(opponent.y - this.y) < 100) {
+          this.attackHit = true;
           const facing = this.facing;
           queuedHits.push({ from: this, target: opponent,
             hit: { dmg: 17.8 * SKILL_DAMAGE_SCALE, kb: 13, stun: 20, kind: "skill", sfx: "iron_s0", id: "iron_s0", empowered: SKILL_DAMAGE_SCALE },
@@ -697,8 +701,15 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
         if (t >= 6 && t <= 14) this.openHit({ dmg: 18.2, kb: 10, stun: 16, w: 72, h: 66, yOff: -76, sfx: "iron_s2" });
         if (t >= 23) this.endSkill();
       } else if (move === "iron_ult") {
-        this.vx *= 0.5;
-        if (t === 12 || t === 24 || t === 38) {
+        this.vx = 0;
+        // Short committed steps keep the follow-ups connected without teleporting
+        // or dragging an escaping opponent into an automatic combo.
+        if (t === 1 || t === 18 || t === 30) this.facing = Math.sign(opponent.x - this.x) || this.facing;
+        if (t <= 8 || t >= 18 && t <= 22 || t >= 30 && t <= 36) {
+          const gap = (opponent.x - this.x) * this.facing;
+          this.x += this.facing * Math.min(5, Math.max(0, gap - 78));
+        }
+        if (t === 10 || t === 22 || t === 36) {
           this.attackHit = false;
           shake = 15;
           burst(this.x + this.facing * 36, GROUND, this.def.color, 28, 8);
@@ -707,10 +718,12 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
           impactRings.push({ x: this.x + this.facing * 36, y: GROUND, life: 18, max: 18, radius: 24, speed: 14, color: "#fb7185" });
           playSfx("iron_ult_slam");
         }
-        if ((t >= 12 && t <= 16) || (t >= 24 && t <= 28) || (t >= 38 && t <= 44)) {
-          this.openHit({ dmg: t >= 38 ? 23 : 16, kb: t >= 38 ? 15 : 9, stun: 18, w: 112, h: 76, yOff: -78, xOff: -8, sfx: "iron_ult" });
+        if ((t >= 10 && t <= 14) || (t >= 22 && t <= 26) || (t >= 36 && t <= 42)) {
+          const finisher = t >= 36;
+          this.openHit({ dmg: finisher ? 21 : 13, kb: finisher ? 15 : 3, stun: finisher ? 20 : 18,
+            w: finisher ? 224 : 112, h: 90, yOff: finisher ? -80 : -100, xOff: finisher ? -112 : -8, sfx: "iron_ult" });
         }
-        if (t >= 56) this.endSkill();
+        if (t >= 52) this.endSkill();
       } else if (move === "shadow_s1") {
         if (t === 8) {
           leaveAfterimage(this, 16, 0.42);
@@ -727,10 +740,13 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
         if (t >= 9) leaveAfterimage(this, 10, 0.32);
         if (t >= 22) this.endSkill();
       } else if (move === "shadow_s2") {
-        this.vx *= 0.65;
-        if (t === 10 && !opponent.dead && opponent.invuln <= 0 && Math.abs(opponent.x - this.x) < 145 && Math.abs(opponent.y - this.y) < 105) {
+        this.vx = 0;
+        const gap = (opponent.x - this.x) * this.facing;
+        if (t >= 8 && t <= 14 && !this.attackHit && !opponent.dead && opponent.invuln <= 0 &&
+          gap > -35 && gap < 210 && Math.abs(opponent.y - this.y) < 120) {
+          this.attackHit = true;
           queuedEffects.push(() => {
-            if (opponent.dead) return;
+            if (opponent.dead || opponent.invuln > 0) return;
             const stolen = Math.min(40, opponent.mp);
             opponent.mp -= stolen;
             this.gainMp(stolen * 0.6);
@@ -738,6 +754,10 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
             opponent.stateT = 0;
             opponent.stunMax = 24;
             opponent.vx = opponent.vy = 0;
+            if (Math.abs(opponent.x - this.x) > 110) {
+              opponent.x = this.x + Math.sign(opponent.x - this.x) * 110;
+              opponent.clamp();
+            }
             opponent.skillMove = null;
             opponent.closeHit();
             emit("hit", this, "shadow_s2", { target: opponent.seat, x: opponent.x, y: opponent.y - 70, damage: 0, stolen });
@@ -762,20 +782,24 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
         }
         if (t >= 50) this.endSkill();
       } else if (move === "pyro_s1") {
-        if (t === 11) {
+        if (t === 7) {
+          const travel = Math.max(1, Math.min(40, (Math.abs(opponent.x - this.x) - 36) / 18));
+          const lead = Math.min(12, travel);
+          const targetY = opponent.state === "skill" ? opponent.y : Math.min(GROUND, opponent.y + opponent.vy * lead + GRAVITY * lead * (lead + 1) / 2);
+          const vy = Math.max(-6, Math.min(6, (targetY - 70 - (this.y - 58)) / travel));
           projectiles.push({
             type: "note",
             x: this.x + this.facing * 36,
             y: this.y - 58,
-            vx: this.facing * 12,
-            vy: 0,
-            life: 54,
+            vx: this.facing * 18,
+            vy,
+            life: 40,
             owner: this,
             color: "#fb923c",
             dmg: 20.8,
             kb: 8,
             stun: 15,
-            r: 16,
+            r: 28,
             sfx: "pyro_s1",
           });
           burst(this.x + this.facing * 30, this.y - 58, "#f59e0b", 10, 3);
@@ -784,14 +808,14 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
         this.vx *= 0.8;
         if (t >= 24) this.endSkill();
       } else if (move === "pyro_s2") {
-        if (t === 10) {
+        if (t === 7) {
           projectiles.push({
             type: "wave",
             x: this.x + this.facing * 40,
             y: GROUND - 24,
-            vx: this.facing * 8.8,
+            vx: this.facing * 11.5,
             vy: 0,
-            life: 44,
+            life: 34,
             owner: this,
             color: "#f97316",
             dmg: 23.8,
@@ -821,7 +845,8 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
             stun: 26,
             hit: false,
             color: "#fb923c",
-            vy: 15.5,
+            vy: 20,
+            radius: 120,
             sfx: "pyro_ult",
           });
           playSfx("pyro_ult_fall");
@@ -965,12 +990,12 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
         if (h.y >= GROUND - 20) {
           h.y = GROUND;
           h.type = "boom";
-          h.life = 14;
+          h.life = 18;
           shake = 18;
           burst(h.x, GROUND, h.color, 36, 8);
           currentActor = h.owner;
           playSfx("pyro_ult_boom");
-          emit("impact", h.owner, "pyro_ult", { x: h.x, y: GROUND, radius: 90 });
+          emit("impact", h.owner, "pyro_ult", { x: h.x, y: GROUND, radius: h.radius ?? 90 });
         }
       }
       h.life -= 1;
@@ -990,7 +1015,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
     }
   }
   function hazardBox(h: Hazard<Fighter>) {
-    if (h.type === "shock" || h.type === "boom") return { x: h.x - 90, y: GROUND - 80, w: 180, h: 80 };
+    if (h.type === "shock" || h.type === "boom") return { x: h.x - (h.radius ?? 90), y: GROUND - (h.radius ?? 80), w: (h.radius ?? 90) * 2, h: h.radius ?? 80 };
     if (h.type === "meteor") return { x: h.x - 18, y: h.y - 18, w: 36, h: 36 };
     if (h.type === "skillShock") return { x: h.x - h.radius, y: GROUND - h.radius * 1.45, w: h.radius * 2, h: h.radius * 1.45 };
     if (h.type === "pillar") return { x: h.x - 32, y: GROUND - 150, w: 64, h: 150 };

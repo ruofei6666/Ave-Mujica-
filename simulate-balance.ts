@@ -6,7 +6,7 @@ import { availableParallelism } from 'node:os';
 import { isMainThread, parentPort, Worker } from 'node:worker_threads';
 
 // Both seats use the actual PVE controller and production combat clock.
-// pnpm balance [rounds/side] [easy|normal|hard] [seed] [--json path] [--workers n]
+// pnpm balance [rounds/side] [easy|normal|hard] [seed] [--json path] [--workers n] [--max-gap percentage-points]
 const pairs: { a: Character; b: Character }[] = [];
 for (let a = 0; a < game.characters.length; a++) {
   for (let b = a + 1; b < game.characters.length; b++) pairs.push({ a: game.characters[a], b: game.characters[b] });
@@ -52,14 +52,16 @@ async function main() {
   const difficulty = requestedDifficulty as Difficulty;
   const seed = Number(process.argv[4] ?? 0x51f15e);
   if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) throw new Error('Seed must be an unsigned 32-bit integer');
-  let workers = Math.min(8, availableParallelism()), output: string | undefined;
+  let workers = Math.min(8, availableParallelism()), output: string | undefined, maxGap: number | undefined;
   for (let i = 5; i < process.argv.length; i += 2) {
     if (!process.argv[i + 1]) throw new Error(`Missing value for ${process.argv[i]}`);
     if (process.argv[i] === '--json') output = process.argv[i + 1];
     else if (process.argv[i] === '--workers') workers = Number(process.argv[i + 1]);
+    else if (process.argv[i] === '--max-gap') maxGap = Number(process.argv[i + 1]);
     else throw new Error(`Unknown option: ${process.argv[i]}`);
   }
   if (!Number.isInteger(workers) || workers < 1 || workers > 32) throw new Error('Workers must be an integer in [1, 32]');
+  if (maxGap !== undefined && (!Number.isFinite(maxGap) || maxGap < 0 || maxGap > 100)) throw new Error('Maximum gap must be in [0, 100] percentage points');
   const started = performance.now();
   const matrix = pairs.map(({ a, b }, pairId) => ({ pairId, a: a.id, b: b.id, aName: a.name, bName: b.name,
     aWins: 0, bWins: 0, draws: 0, matches: 0, frames: 0, timeouts: 0, aRate: 0, bRate: 0 }));
@@ -112,17 +114,21 @@ async function main() {
     frames: matrix.reduce((sum, row) => sum + row.frames, 0),
     timeouts: matrix.reduce((sum, row) => sum + row.timeouts, 0), elapsedMs: Math.round(performance.now() - started),
   };
+  const acceptance = maxGap === undefined ? undefined : {
+    metric: 'maximum overall score rate minus minimum overall score rate, in percentage points',
+    maximumGap: maxGap, actualGap: result.gap, passed: result.gap <= maxGap,
+  };
   if (output) {
-    const sourcePaths = ['shared/combat.ts', 'shared/ai.ts', 'shared/ai-tactics.ts', 'shared/arena.ts', 'shared/locomotion.ts', 'simulate-balance.ts'];
+    const sourcePaths = ['shared/combat.ts', 'shared/ai.ts', 'shared/ai-tactics.ts', 'shared/arena.ts', 'shared/locomotion.ts', 'shared/ladder.ts', 'simulate-balance.ts'];
     const report = {
       description: 'Fixed-cooldown AI round robin using the unmodified production engine. Overall score rates weight all four opponents equally; draws count as half a win. This does not establish human-player or individual-matchup balance.',
       aiLabel: `${game.difficulties[difficulty].label} AI`, currentDifficulty: difficulty,
-      reproduce: `pnpm balance ${rounds} ${difficulty} ${seed} --json ${output}`,
+      reproduce: `pnpm balance ${rounds} ${difficulty} ${seed} --json ${output}${maxGap === undefined ? '' : ` --max-gap ${maxGap}`}`,
       rules: { framesPerSecond: 60, cooldownFrameRange: [180, 420], autoplay: true, introFrames: 0,
         equalOpponents: true, swappedSeats: true, sameSeedForBothSeats: true, drawScore: .5 },
       sourceSha256: Object.fromEntries(sourcePaths.map(path => [path,
         createHash('sha256').update(readFileSync(path, 'utf8').replace(/\r\n/g, '\n')).digest('hex')])),
-      hashNormalization: 'UTF-8 with LF line endings', result,
+      hashNormalization: 'UTF-8 with LF line endings', result, acceptance,
     };
     writeFileSync(output, JSON.stringify(report, null, 2) + '\n');
   }
@@ -130,6 +136,10 @@ async function main() {
   console.table(stats.map(s => ({ 角色: s.name, 胜: s.wins, 负: s.losses, 平: s.draws, 胜率: `${s.rate.toFixed(5)}%` })));
   console.table(matrix.map(row => ({ 对局: `${row.aName} vs ${row.bName}`, 前者胜: row.aWins, 后者胜: row.bWins, 平: row.draws })));
   console.log(`Overall gap: ${result.gap.toFixed(5)} percentage points; ${result.matches} matches`);
+  if (acceptance) {
+    console.log(`Balance target ${acceptance.passed ? 'PASS' : 'FAIL'}: gap <= ${maxGap} percentage points`);
+    if (!acceptance.passed) process.exitCode = 1;
+  }
 }
 
 if (isMainThread) main().catch(error => { console.error(error); process.exitCode = 1; });

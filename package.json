@@ -15,9 +15,11 @@
     "start": "node scripts/ensure-build.cjs && node server.js",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
-    "test": "pnpm run build:server && node --import tsx --test tests/server-and-combat.test.js tests/audio-events.test.js tests/camera.test.js tests/ai.test.js tests/balance.test.js tests/ladder.test.js",
+    "test": "pnpm run build:server && node --import tsx --test tests/server-and-combat.test.js tests/audio-events.test.js tests/camera.test.js tests/ai.test.js tests/balance.test.js tests/ladder.test.js tests/skill-hits.test.js tests/skill-redesign.test.js",
     "balance": "node --import tsx simulate-balance.ts",
     "ai:benchmark": "node --import tsx simulate-ai.ts",
+    "skills:accuracy": "node --import tsx scripts/measure-skill-hits.cjs",
+    "skills:verify": "node --import tsx scripts/measure-skill-hits.cjs 400 20261004 tests/skill-hit-report.json 8 --min-hit-rate 70 --min-casts 1000",
     "check": "pnpm run lint && pnpm run typecheck && pnpm test && pnpm run build"
   },
   "engines": {

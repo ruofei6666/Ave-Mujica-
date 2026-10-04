@@ -1,5 +1,5 @@
 import { ARENA } from './arena';
-import { planChallenge } from './ai-tactics';
+import { galeDiveContact, planChallenge } from './ai-tactics';
 import type { AiProfile, Character, Difficulty, DifficultyConfig, FighterSnapshot, Hazard, Input, Projectile, Seat } from './types';
 
 // Difficulty changes decisions only. Health, damage, movement and cooldowns stay shared.
@@ -26,9 +26,9 @@ const futureY = (f: FighterSnapshot, t: number) => f.state === 'skill' && f.skil
 const futureX = (f: FighterSnapshot, t: number) => clampX(f.x + f.vx * (f.state === 'stun' ? (1 - .86 ** t) / .14 : t));
 const busy = (f: FighterSnapshot) => ['punch', 'skill', 'stun', 'dead'].includes(f.state);
 const ATTACK_WINDOWS: Readonly<Record<string, readonly [number, number]>> = {
-  iron_s0: [10, 135], iron_s2: [14, 220], iron_ult: [44, 190],
-  gale_s0: [23, 195], gale_s1: [16, 265], gale_s2: [26, 190], gale_ult: [34, 300],
-  shadow_s1: [14, 300], shadow_s2: [10, 145], shadow_ult: [41, 300],
+  iron_s0: [14, 168], iron_s2: [14, 220], iron_ult: [42, 229],
+  gale_s0: [24, 255], gale_s1: [16, 265], gale_s2: [26, 190], gale_ult: [34, 300],
+  shadow_s1: [14, 300], shadow_s2: [14, 210], shadow_ult: [41, 300],
   bastion_s0: [16, 210], bastion_s1: [44, 305], bastion_s2: [17, 240], bastion_ult: [34, 260],
 };
 
@@ -100,8 +100,8 @@ export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Characte
       const my = futureY(me, t), mx = clampX(me.x + me.vx * t);
       const hy = h.y + (h.type === 'meteor' ? (h.vy || 14) * Math.max(0, t - h.delay) : 0);
       const landed = h.type === 'meteor' && hy >= ARENA.ground - 20;
-      const radius = h.type === 'pillar' ? 32 : h.type === 'skillShock' ? h.radius : h.type === 'meteor' && !landed ? 18 : 90;
-      const top = h.type === 'meteor' && !landed ? hy - 18 : ARENA.ground - (h.type === 'pillar' ? 150 : h.type === 'skillShock' ? h.radius * 1.45 : 80);
+      const radius = h.type === 'pillar' ? 32 : h.type === 'skillShock' ? h.radius : h.type === 'meteor' && !landed ? 18 : (h.radius ?? 90);
+      const top = h.type === 'meteor' && !landed ? hy - 18 : ARENA.ground - (h.type === 'pillar' ? 150 : h.type === 'skillShock' ? h.radius * 1.45 : (h.radius ?? 80));
       const bottom = h.type === 'meteor' && !landed ? hy + 18 : ARENA.ground;
       if (Math.abs(h.x - mx) < radius + 33 && bottom > my - 138 && top < my && t < hazardAt) {
         hazardX = h.x; hazardAt = t; break;
@@ -178,21 +178,21 @@ export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Characte
   }
   if (roll(skillChance)) {
     if (me.id === 'pyro') {
-      const travel = Math.min(35, 10 + abs / 9);
-      if (vulnerable && me.cd2 <= 0 && projected(10) < 360 && futureY(opp, travel) > ARENA.ground - 80) return use('skill2');
-      const noteY = me.y - 58, targetY = futureY(opp, Math.min(45, 11 + abs / 12));
-      if (vulnerable && me.cd1 <= 0 && projected(11) < 610 && noteY + 16 > targetY - 138 && noteY - 16 < targetY) return use('skill1');
+      const travel = Math.min(35, 7 + abs / 11.5);
+      if (vulnerable && me.cd2 <= 0 && projected(7) < 360 && futureY(opp, travel) > ARENA.ground - 80) return use('skill2');
+      const targetY = futureY(opp, Math.min(40, 7 + abs / 18));
+      if (vulnerable && me.cd1 <= 0 && projected(7) < 700 && targetY > me.y - 210 && targetY < me.y + 140) return use('skill1');
       if (me.cd0 <= 0 && (abs > 160 || punish || me.cd1 > 0 && me.cd2 > 0)) return use('special');
     } else if (me.id === 'gale') {
       if (vulnerable && me.cd2 <= 0 && projected(6) < 150 && aligned(6, 80)) return use('skill2');
       if (opp.invuln <= Math.max(1, Math.ceil((abs - 138) / 13)) && me.cd1 <= 0 && abs > 115 && projected(8) < 285 && aligned(4, 90)) return use('skill1');
-      if (vulnerable && me.cd0 <= 0 && abs > 90 && abs < 240 && opp.y < ARENA.ground - 45) return use('special');
+      if (me.cd0 <= 0 && abs > 130 && Number.isFinite(galeDiveContact(me, opp))) return use('special');
     } else if (me.id === 'iron') {
-      if (vulnerable && me.cd0 <= 0 && projected(10) < 127 && aligned(10, 85)) return use('special');
+      if (vulnerable && me.cd0 <= 0 && projected(5) < 150 && aligned(5, 100)) return use('special');
       if (vulnerable && me.cd2 <= 0 && projected(6) < 215 && aligned(6, 85)) return use('skill2');
       if (rank > 0 && me.cd1 <= 0 && me.armor <= 0 && abs > 145 && abs < 290 && opp.vx * toward < 0) return use('skill1');
     } else if (me.id === 'shadow') {
-      if (vulnerable && me.cd2 <= 0 && projected(10) < 135 && aligned(10, 100) &&
+      if (vulnerable && me.cd2 <= 0 && projected(8) < 205 && aligned(8, 115) &&
         (opp.mp >= 30 || attack === 'bastion_s1' || stunLeft > 10)) return use('skill2');
       if (vulnerable && me.cd1 <= 0) return use('skill1');
       // Spend the ready attacks first. Refresh only when it buys a new attack/ultimate.
