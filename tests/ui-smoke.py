@@ -614,6 +614,86 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     record('Vue unmount disposes renderer, native audio, diagnostics and its online room');
     await page.context().close();
   });
+  await group('PVE skill lamps: ready and cooling look clearly different and flash when a cooldown ends', async () => {
+    const page = await newPage('lamps', { width:844, height:390 }, true);
+    await page.locator('#opponent-roster [data-character="bastion"]').tap();
+    await page.locator('#start-btn').tap();
+    await pauseClock(page);
+    await clockAdvance(page, 2700);
+    // The HUD redraws at most every 65 ms, so give it one pass after the simulation changes.
+    const settle = () => clockAdvance(page, 140);
+    // What a player sees: the rim colour (the button background is the rim), the icon strength, the countdown and the flash.
+    const lamp = action => page.locator(`[data-action="${action}"]`).evaluate(el => {
+      const [r, g, b, a = 1] = getComputedStyle(el).backgroundColor.match(/[\d.]+/g).map(Number);
+      return {
+        ready: el.classList.contains('ready'), cooling: el.classList.contains('cooling'), label: el.querySelector('.cooldown').textContent,
+        rim: +(a * (r + g + b) / 765).toFixed(2), icon: +getComputedStyle(el.querySelector('.ic')).opacity,
+        flashing: el.getAnimations().some(animation => animation.animationName === 'kf-skill-ready'),
+      };
+    });
+    // A real AI may hit during the click, so retry until the skill really starts its cooldown.
+    const fire = async (action, field) => {
+      let s;
+      for (let retry = 0; retry < 40; retry++) {
+        s = await state(page);
+        if (s.snapshot.fighters[0][field] > 0) break;
+        if (!['skill','punch','stun','dead'].includes(s.snapshot.fighters[0].state)) await clickClock(page, `[data-action="${action}"]`);
+        await clockAdvance(page, 80);
+      }
+      assert.ok((await state(page)).snapshot.fighters[0][field] > 0, action + ' did not start its cooldown');
+      await settle();
+    };
+    const finishCooldown = async field => {
+      for (let i = 0; i < 300 && (await state(page)).snapshot.fighters[0][field] > 0; i++) await clockAdvance(page, 40);
+      assert.equal((await state(page)).snapshot.fighters[0][field], 0, field + ' never reached zero');
+      await settle();
+    };
+    const actions = ['special', 'skill1', 'skill2'];
+    for (const action of actions) {
+      const l = await lamp(action);
+      assert.deepEqual([l.ready, l.cooling, l.flashing, l.label], [true, false, false, ''], `${action} must start lit and quiet: ${JSON.stringify(l)}`);
+    }
+    // Firing one skill darkens only that one: faint rim, ghosted icon and a countdown, while its neighbours stay lit.
+    await fire('skill1', 'cd1');
+    const dark = await lamp('skill1'), lit = await lamp('skill2');
+    assert.deepEqual([dark.ready, dark.cooling], [false, true], JSON.stringify(dark));
+    assert.match(dark.label, /^\d+\.\d$/, 'a cooling skill must show its countdown');
+    assert.deepEqual([lit.ready, lit.cooling, lit.label], [true, false, ''], JSON.stringify(lit));
+    assert.ok(lit.rim >= dark.rim * 3, `rims are too alike to tell ready from cooling: ${JSON.stringify({ lit, dark })}`);
+    assert.ok(lit.icon >= dark.icon * 3, `icons are too alike to tell ready from cooling: ${JSON.stringify({ lit, dark })}`);
+    record('a cooling skill is dark with a countdown while ready skills stay lit', { lit, dark });
+    // The cooldown ends: lit again and one flash.
+    await finishCooldown('cd1');
+    const back = await lamp('skill1');
+    assert.deepEqual([back.ready, back.cooling, back.flashing, back.label], [true, false, true, ''], JSON.stringify(back));
+    assert.equal((await lamp('skill2')).flashing, false, 'a skill that never cooled must not flash');
+    await page.waitForTimeout(700);
+    assert.equal((await lamp('skill1')).flashing, false, 'the flash must end by itself');
+    record('the skill lights up and flashes once when its cooldown ends', { back });
+    // Reduced motion keeps the state change but drops the flash.
+    await page.evaluate(() => document.body.classList.add('low-motion'));
+    await fire('skill2', 'cd2'); await finishCooldown('cd2');
+    const calm = await lamp('skill2');
+    assert.deepEqual([calm.ready, calm.flashing], [true, false], JSON.stringify(calm));
+    await page.evaluate(() => document.body.classList.remove('low-motion'));
+    record('low-motion still shows the state without the flash');
+    // A new match must not inherit the old cooldown look or flash at the start.
+    await fire('special', 'cd0');
+    assert.equal((await lamp('special')).cooling, true);
+    await clickClock(page, '#pause-btn'); await clickClock(page, '#quit-btn'); assert.equal((await state(page)).screen, 'menu');
+    await clickClock(page, '#start-btn'); await clockAdvance(page, 60);
+    for (const action of actions) {
+      const l = await lamp(action);
+      assert.deepEqual([l.cooling, l.flashing], [false, false], `${action} carried over from the last match: ${JSON.stringify(l)}`);
+    }
+    await clockAdvance(page, 2900);
+    for (const action of actions) {
+      const l = await lamp(action);
+      assert.deepEqual([l.ready, l.cooling, l.flashing, l.label], [true, false, false, ''], `${action} is not a plain lit lamp in the new match: ${JSON.stringify(l)}`);
+    }
+    record('a new match starts with all three skills lit and quiet');
+    await page.context().close();
+  });
   assert.equal(report.browserErrors.length, 0, JSON.stringify(report.browserErrors)); record('no uncaught browser errors');
   assert.equal(report.resourceErrors.length, 0, JSON.stringify(report.resourceErrors)); record('all game resources load locally without HTTP errors');
 })().catch(error => { report.checks.push({name:'harness',passed:false,error:error.stack||String(error)}); console.error(error); }).finally(async () => {

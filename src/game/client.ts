@@ -164,6 +164,7 @@ export function createGameClient(ui: TheatreState) {
     $('rematch-btn').disabled = false; $('rematch-btn').textContent = '再来一场';
     hudState.forEach((s) => { s.id = null; s.hp = null; }); calloutText = ''; $('battle-callout').textContent = '';
     versusShown = false; clearTimeout(versusTimer); $('versus').hidden = true;
+    actionButtons.forEach((button) => button.classList.remove('cooling', 'refresh')); // 上一局的冷却状态不带进新一局
     $('combo').hidden = true; $('ko-banner').hidden = true; $('cutin').hidden = true; $('cutin').classList.remove('play');
     for (const id of ['left-skill', 'right-skill'] as const) { $(id).textContent = ''; $(id).classList.remove('on'); }
     $('battle').classList.remove('portrait-allowed');
@@ -243,7 +244,11 @@ export function createGameClient(ui: TheatreState) {
       button.style.setProperty('--cooldown', String(Math.max(0, Math.min(1, fraction))));
       const cdElement = button.querySelector('.cooldown');
       if (cdElement) cdElement.textContent = slot === 'ult' ? own.mp < 200 ? `${Math.floor(own.mp / 2)}%` : 'READY' : cd > 0 ? (cd / 60).toFixed(1) : '';
-      button.classList.toggle('ready', slot === 'ult' && own.mp >= 200);
+      if (slot === 's0' || slot === 's1' || slot === 's2') {
+        // 三个小技能：冷却中变暗并显示倒计时，转好后亮起；转好的那一帧再闪一下，余光也能看到
+        if (cd <= 0 && button.classList.contains('cooling')) { button.classList.remove('refresh'); void button.offsetWidth; button.classList.add('refresh'); }
+        button.classList.toggle('cooling', cd > 0); button.classList.toggle('ready', cd <= 0);
+      } else button.classList.toggle('ready', slot === 'ult' && own.mp >= 200);
     }
     setCallout(snapshot.intro);
   }

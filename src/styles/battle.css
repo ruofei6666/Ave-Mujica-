@@ -1,6 +1,6 @@
 /*
  * Battle screen. client.ts owns the state: it toggles .low .ult-ready .hurt .on .pop .play .ready
- * .pressed .fight .delayed .portrait-allowed, sets --hc/--hc2 on each .xxx-hud, --cooldown on
+ * .cooling .refresh .pressed .fight .delayed .portrait-allowed, sets --hc/--hc2 on each .xxx-hud, --cooldown on
  * each [data-action] and --accent/--dark/--glow on #vs-left/#vs-right/#cutin. Keep those names.
  * Plain CSS (not a Tailwind layer) so state-only selectors are never purged.
  */
@@ -269,6 +269,27 @@ html[data-art~='fx-speed'] .vs-speed { background: var(--art-fx-speed) center / 
 .skill-btn[data-action='special'] { right: calc(var(--punch) / 2 + var(--fan) - var(--skill) / 2); bottom: calc(var(--punch) / 2 - var(--skill) / 2); }
 .skill-btn[data-action='skill1'] { right: calc(var(--punch) / 2 + var(--fan) * .866 - var(--skill) / 2); bottom: calc(var(--punch) / 2 + var(--fan) * .5 - var(--skill) / 2); }
 .skill-btn[data-action='skill2'] { right: calc(var(--punch) / 2 + var(--fan) * .5 - var(--skill) / 2); bottom: calc(var(--punch) / 2 + var(--fan) * .866 - var(--skill) / 2); }
+/*
+ * The three small skills work like lamps. client.ts marks each one .ready (cooldown over) or .cooling (cooldown running),
+ * sets --cooldown from 1 down to 0, and adds .refresh once on the frame a cooldown ends. The two states differ in rim,
+ * face and content at the same time, so they still read apart in the last fraction of a second:
+ *   ready    thick bone rim, lit slate face with an inner glow, full-strength icon and name
+ *   cooling  near-black face, faint rim, ghosted icon and name, a big countdown, and a pale wedge that grows clockwise
+ */
+.skill-btn::after { background: none; }
+.skill-btn.ready { --edge: var(--bone); }
+.skill-btn.ready::before {
+  inset: 3px;
+  background: radial-gradient(closest-side, transparent 58%, rgb(255 255 255 / .34)), linear-gradient(165deg, #5b6785, #293047);
+}
+.skill-btn.ready .action-key { color: var(--bone); }
+.skill-btn.cooling { --edge: rgb(255 255 255 / .16); }
+.skill-btn.cooling::before { background: rgb(4 5 8 / .95); }
+.skill-btn.cooling::after { background: conic-gradient(rgb(255 255 255 / .18) calc((1 - var(--cooldown, 0)) * 100%), transparent 0%); }
+.skill-btn.cooling .ic, .skill-btn.cooling .action-name, .skill-btn.cooling .action-key { opacity: .22; }
+.skill-btn.cooling .cooldown { font-size: calc(var(--u) * 1.7); }
+.skill-btn.cooling.pressed { filter: none; } /* a tap on a skill that cannot fire must not light the button up */
+.skill-btn.refresh { animation: kf-skill-ready .45s var(--ease-snap); }
 .ult-btn { --edge: rgb(255 232 26 / .55); right: calc(var(--punch) / 2 - var(--ult) / 2); bottom: calc(var(--punch) / 2 + var(--fan) - var(--ult) / 2); width: var(--ult); height: var(--ult); color: var(--volt); }
 .ult-btn .action-key { color: rgb(255 232 26 / .7); }
 .ult-btn.ready { --edge: var(--volt); }
@@ -371,6 +392,7 @@ html[data-art~='fx-speed'] .vs-speed { background: var(--art-fx-speed) center / 
 @keyframes kf-spin { to { transform: rotate(360deg); } }
 @keyframes kf-skill-flash { 0% { opacity: 0; transform: translateY(.35rem); } 12% { opacity: 1; transform: none; } 70% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes kf-pop { 0% { transform: scale(1.75); } 100% { transform: none; } }
+@keyframes kf-skill-ready { 0% { transform: scale(1.14); filter: brightness(2); } 100% { transform: none; filter: none; } }
 @keyframes kf-callout {
   0% { opacity: 0; transform: skewX(-8deg) scale(2.4); filter: blur(6px); }
   30% { opacity: 1; transform: skewX(-8deg) scale(.96); filter: none; }
@@ -401,6 +423,7 @@ body.low-motion .rec i,
 body.low-motion .seat-name p.waiting::after,
 body.low-motion .rotate-hint .ui-ic,
 body.low-motion .btn .ui-chev,
+body.low-motion .skill-btn.refresh,
 body.low-motion .combo.pop b { animation: none !important; }
 body.low-motion .battle-callout.pop { animation: kf-fade .3s linear both; }
 body.low-motion .ko-banner span,

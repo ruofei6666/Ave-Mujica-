@@ -31,7 +31,7 @@ const ui = useTheatreState();
     <ol class="help-steps">
       <li><b>选择角色与模式</b><p>人机立即开始；人人对战由一人建房，另一人输入房间码。双方准备后开场。</p></li>
       <li><b>移动、跳跃、抓住空隙</b><p>左侧摇杆移动，向上推跳跃；右侧五个按钮攻击。电脑用 A / D 移动，W / 空格跳跃。</p></li>
-      <li><b>技能冷却，蓄能放大招</b><p>命中可以积蓄能量，大招需要满能量。按钮显示剩余冷却。出招期间提前按下的动作会短暂保留。</p></li>
+      <li><b>技能冷却，蓄能放大招</b><p>命中可以积蓄能量，大招需要满能量。三个小技能键亮着就能放；变暗并显示数字是在冷却，走完会闪一下。出招期间提前按下的动作会短暂保留。</p></li>
     </ol>
     <p class="subtle">每场 90 秒，时间到按剩余生命判胜，双方同时倒下则平局。没有防御操作。</p>
     <button id="help-done" class="btn btn-primary btn-block">知道了，开始选人<svg class="ui-ic ui-chev" aria-hidden="true"><use href="#ui-chevrons" /></svg></button>
