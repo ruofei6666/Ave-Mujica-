@@ -1,6 +1,6 @@
 import { ARENA } from './arena';
 import { planChallenge } from './ai-tactics';
-import type { Character, Difficulty, DifficultyConfig, FighterSnapshot, Hazard, Input, Projectile, Seat } from './types';
+import type { AiProfile, Character, Difficulty, DifficultyConfig, FighterSnapshot, Hazard, Input, Projectile, Seat } from './types';
 
 // Difficulty changes decisions only. Health, damage, movement and cooldowns stay shared.
 export const AI_DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
@@ -13,6 +13,7 @@ export interface AiMemory { wait: number; left: boolean; right: boolean; evade: 
 type Owner = Seat | { seat: Seat } | null;
 interface AiScene {
   difficulty: Difficulty;
+  profile?: AiProfile;
   projectiles: readonly Projectile<Owner>[];
   hazards: readonly Hazard<Owner>[];
   random: () => number;
@@ -34,9 +35,9 @@ const ATTACK_WINDOWS: Readonly<Record<string, readonly [number, number]>> = {
 // Only visible positions, velocities and attack animations are inspected. No future
 // player input or RNG is read, and this controller never writes fighter state.
 export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Character, memory: AiMemory, scene: AiScene): Input {
-  const cfg = AI_DIFFICULTIES[scene.difficulty];
+  const cfg = scene.profile?.config ?? AI_DIFFICULTIES[scene.difficulty];
   // Normal preserves the former challenge controller, including its prediction lead.
-  const rank = scene.difficulty === 'easy' ? 0 : 2;
+  const rank = scene.profile?.rank ?? (scene.difficulty === 'easy' ? 0 : 2);
   const out: Input = { left: memory.left, right: memory.right, down: false, up: false,
     punch: false, special: false, skill1: false, skill2: false, ult: false };
   const move = (direction: number) => {
@@ -57,6 +58,9 @@ export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Characte
   if (memory.evade > 0 && me.y < ARENA.ground - .01) return done();
 
   const roll = (p: number) => scene.random() < p;
+  // At level 20 this takes the exact original challenge path without consuming
+  // an extra random number. Earlier levels gradually learn its tactical planner.
+  const challenge = scene.profile ? scene.profile.tactics >= 1 || scene.profile.tactics > 0 && roll(scene.profile.tactics) : scene.difficulty === 'hard';
   const dist = opp.x - me.x, abs = Math.abs(dist), toward = Math.sign(dist) || me.facing;
   const cornered = toward > 0 ? me.x < ARENA.leftWall + 130 : me.x > ARENA.rightWall - 130;
   const grounded = me.y >= ARENA.ground - .01;
@@ -133,7 +137,7 @@ export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Characte
       }
     }
     // Challenge compares interruption timing and protected counters below.
-    if (meleeThreat && !punish && scene.difficulty !== 'hard') {
+    if (meleeThreat && !punish && !challenge) {
       if (attack === 'iron_s0' && opp.stateT < 7 && grounded) {
         move(cornered ? toward : -toward); out.up = true; return done();
       }
@@ -151,9 +155,13 @@ export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Characte
     }
   }
 
-  if (scene.difficulty === 'hard') {
+  if (challenge) {
+    if (cfg.miss > 0 && roll(cfg.miss)) { move(abs > 120 ? toward : 0); return done(); }
     const plan = planChallenge(me, opp, def);
-    if (plan.action) return use(plan.action);
+    if (plan.action) {
+      const chance = plan.action === 'ult' ? cfg.ult : plan.action === 'punch' ? cfg.aggro : cfg.skill;
+      if (chance >= 1 || roll(chance)) return use(plan.action);
+    }
     move(plan.direction);
     out.up = plan.jump && grounded && me.heavyT <= 0;
     return done();

@@ -146,6 +146,7 @@ html[data-art~='deco-shards-1'] .hero-shard { opacity: .7; }
   transition: background-color .15s ease, color .15s ease;
 }
 .opponent-card .chip-dot { width: .5rem; height: .5rem; background: var(--c); }
+.opponent-level { font: 700 max(11px, .7rem)/1 var(--font-mono); white-space: nowrap; }
 .opponent-card:hover { color: var(--bone); background: rgb(255 255 255 / .14); }
 .opponent-card[aria-pressed='true'] { background: var(--c); color: var(--ink); }
 .opponent-card[aria-pressed='true'] .chip-dot { background: var(--ink); }
@@ -170,6 +171,13 @@ html[data-art~='deco-shards-1'] .hero-shard { opacity: .7; }
 .deploy-body { display: flex; flex-direction: column; gap: .6rem; }
 .opt-head { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
 .opt-value { font: 800 1.15rem/1 var(--font-display); letter-spacing: .08em; color: var(--volt); }
+.ladder-info { padding: .55rem .7rem; border-left: 2px solid var(--accent); background: rgb(255 255 255 / .04); }
+.ladder-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .2rem .6rem; }
+.ladder-heading strong { color: var(--bone); font-size: max(14px, .95rem); }
+.ladder-heading span, .ladder-strength, .ladder-save { font-size: max(11px, .72rem); line-height: 1.45; }
+.ladder-heading span, .ladder-save { color: var(--fog); }
+.ladder-strength, .ladder-save { margin: .15rem 0 0; }
+.ladder-strength { color: var(--accent2); }
 .room-hint { margin: 0; font-size: .85rem; line-height: 1.5; color: #cfd3dc; }
 .join-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .4rem; }
 .join-form input {
@@ -318,11 +326,16 @@ html[data-art~='deco-shards-1'] .hero-shard { opacity: .7; }
   .brand-text b { font-size: 1.4rem; }
   .menu-body { grid-template-columns: minmax(0, 1fr) minmax(18rem, 23rem); }
   .hero { min-height: 0; }
-  .deploy { gap: .5rem; padding: .7rem .9rem .6rem; }
-  .deploy-head .headline { margin-top: .25rem; font-size: 1.5rem; }
-  .deploy-no, .mode-tab span, .opt-head .kicker { display: none; }
+  .deploy { gap: .45rem; padding: .4rem .9rem .5rem; }
+  .deploy-head .headline { margin-top: 0; font-size: 1.5rem; }
+  .deploy-no, .deploy-head .kicker, .mode-tab span, .opt-head .kicker { display: none; }
   .mode-tab { padding-block: .4rem; }
   .deploy-body { gap: .45rem; }
+  #pve-options > .opt-head { display: none; }
+  .opponents { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .25rem; }
+  .opponent-card { justify-content: center; flex-wrap: wrap; gap: .2rem; padding: .35rem .15rem; }
+  .opponent-card .chip-dot { display: none; }
+  .ladder-info { padding: .3rem .5rem; }
   .hero-code { font-size: clamp(3rem, min(11vw, 24vh), 6rem); }
   .hero-name { font-size: 2.2rem; }
   .hero-no b { font-size: 1.5rem; }

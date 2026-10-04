@@ -3,6 +3,7 @@ import { crossedFootPlant, cyclePhase, WALK_CYCLE_DISTANCE } from './locomotion'
 import { ARENA } from './arena';
 import { AI_DIFFICULTIES, createAiMemory, thinkAi } from './ai';
 import type { AiMemory } from './ai';
+import { getLadderStage } from './ladder';
 interface ImpactRing { x: number; y: number; life: number; max: number; radius: number; speed: number; color: string }
   const CANVAS_W = ARENA.width, CANVAS_H = ARENA.height, GROUND = ARENA.ground, SIZE = 1.5;
   const GRAVITY = 0.82, LEFT_WALL = ARENA.leftWall, RIGHT_WALL = ARENA.rightWall, MAX_MP = 200;
@@ -124,6 +125,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
     const right = CHARACTERS.find((c) => c.id === (options.right || "shadow"));
     if (!left || !right) throw new Error("Unknown character");
     const mode = options.mode === "pvp" ? "pvp" : "pve";
+    const ladder = mode === 'pve' && options.ladderLevel !== undefined ? getLadderStage(options.ladderLevel) : null;
     // Only the offline balance tool uses this; room servers choose human inputs.
     const autoplay = options.autoplay === true;
     const selection: { difficulty: Difficulty } = { difficulty: options.difficulty && DIFFICULTIES[options.difficulty] ? options.difficulty : "easy" };
@@ -369,7 +371,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
     takeHit(hit: Hit, from: Fighter) {
       if (this.dead || this.invuln > 0) return false;
       const armored = this.armor > 0 && hit.kind !== "counter";
-      const damage = Math.max(0, hit.dmg) * (armored ? hit.kind === "projectile" ? 0.69 : 0.72 : 1);
+      const damage = Math.max(0, hit.dmg) * (armored ? hit.kind === "projectile" ? 0.69 : 0.72 : 1) * (ladder && from.seat === 1 ? ladder.damageMultiplier : 1);
       const actualDamage = Math.min(this.hp, damage);
       this.hp = Math.max(0, this.hp - damage);
       this.hitFlash = armored ? 6 : 8;
@@ -997,6 +999,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
   function cpuThink() {
     return thinkAi(cpu, player, cpu.def, cpu.ai, {
       difficulty: cpu.seat === 0 ? options?.autoplayDifficulty ?? selection.difficulty : selection.difficulty,
+      profile: cpu.seat === 1 ? ladder?.ai : undefined,
       projectiles, hazards, random,
     });
   }
@@ -1012,6 +1015,7 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
     }
     player = new Fighter(left, CANVAS_W / 2 - 240, 1, false); player.seat = 0;
     cpu = new Fighter(right, CANVAS_W / 2 + 240, -1, mode === "pve"); cpu.seat = 1;
+    if (ladder) cpu.hp = cpu.maxHp = right.hp * ladder.healthMultiplier;
     const fighters = [player, cpu];
     function bufferedInput(seat: Seat, raw: unknown) {
       const input = sanitizeInput(raw);

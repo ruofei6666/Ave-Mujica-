@@ -31,7 +31,6 @@ interface GameElements {
   'pve-options': HTMLElement;
   'opponent-name': HTMLElement;
   'opponent-roster': HTMLElement;
-  'difficulty': HTMLElement;
   'start-btn': HTMLButtonElement;
   'pvp-options': HTMLElement;
   'create-btn': HTMLButtonElement;

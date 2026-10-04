@@ -202,12 +202,29 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
   await app.listen();
   browser = await chromium.launch({ headless: true, executablePath: process.env.UI_EDGE, args: ['--autoplay-policy=no-user-gesture-required'] });
   report.runtime = { edge: process.env.UI_EDGE, playwright: require(path.join(process.env.UI_PLAYWRIGHT, 'package.json')).version, testServer: { port: Number(process.env.UI_PORT), pvpDuration: 10, introFrames: 0 } };
-  await group('AI difficulty selection and challenge matchup labels', async () => {
+  await group('AI ladder selection, independent saves and challenge matchup labels', async () => {
     const balance = JSON.parse(fs.readFileSync(path.join(root, 'tests/balance-report.json'), 'utf8'));
-    for (const [difficulty, label] of [['normal', '困难'], ['hard', '挑战']]) {
-      const page = await newPage('ai-' + difficulty, {width:844,height:390}, true);
-      assert.equal(await page.evaluate(() => AveCombat.difficulties.normal.think), 4);
+    for (const level of [1, 20, 21]) {
+      const page = await newPage('ai-level-' + level, {width:844,height:390}, true);
       assert.equal(await page.evaluate(() => AveCombat.difficulties.hard.think), 2);
+      assert.equal(await page.locator('[data-difficulty], #difficulty').count(), 0);
+      assert.equal(await page.locator('#opponent-roster .opponent-level').count(), 5);
+      assert.deepEqual(await page.locator('#opponent-roster .opponent-level').allTextContents(), Array(5).fill('1级'));
+      if (level > 1) {
+        await page.evaluate(level => {
+          localStorage.setItem('ave-theatre-ladder-v1', JSON.stringify({ version: 1, cleared: { pyro: { shadow: level - 1 }, gale: { iron: 6 } } }));
+          window.dispatchEvent(new StorageEvent('storage', { key: 'ave-theatre-ladder-v1' }));
+        }, level);
+        await page.locator('#character-roster [data-character="gale"]').tap();
+        assert.match(await page.locator('#opponent-roster [data-character="iron"]').textContent(), /7级/);
+        assert.match(await page.locator('#opponent-roster [data-character="shadow"]').textContent(), /1级/);
+        await page.locator('#character-roster [data-character="pyro"]').tap();
+      }
+      await page.locator('#opponent-roster [data-character="shadow"]').tap();
+      assert.match(await page.locator('#start-btn').textContent(), new RegExp(`挑战初华 · 第 ${level} 级`));
+      await overflow(page, 'ladder level ' + level + ' landscape menu');
+      assert.ok(await page.locator('.menu-foot').evaluate(el => el.getBoundingClientRect().bottom <= innerHeight + 1), 'landscape menu footer must fit on screen');
+      await capture(page, 'ladder-menu-' + level);
       await page.locator('#balance-btn').tap();
       assert.match(await page.locator('#balance-method').textContent(), /挑战 AI/);
       assert.match(await page.locator('.balance-note').textContent(), /目标针对总体胜率/);
@@ -216,25 +233,61 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
       })));
       assert.deepEqual(rows, balance.result.matrix.map(pair => ({ pair: `${pair.a}-${pair.b}`,
         rates: [pair.aRate.toFixed(3) + '%', pair.bRate.toFixed(3) + '%'] })));
-      await capture(page, 'challenge-balance-' + difficulty);
+      await capture(page, 'challenge-balance-' + level);
       await page.locator('#balance-dialog .dialog-close').tap();
-      await page.locator(`[data-difficulty="${difficulty}"]`).tap();
-      assert.equal(await page.locator(`[data-difficulty="${difficulty}"]`).getAttribute('aria-pressed'), 'true');
-      await page.locator('#opponent-roster [data-character="shadow"]').tap();
       await page.locator('#start-btn').tap();
       await pauseClock(page); await clockAdvance(page, 6500);
       const s = await state(page);
       assert.equal(s.screen, 'battle');
-      assert.equal(await page.locator('#right-seat').textContent(), label);
+      assert.equal(await page.locator('#right-seat').textContent(), `第 ${level} 级`);
+      assert.deepEqual(s.ladderMatch, { player: 'pyro', opponent: 'shadow', level });
       assert.equal(s.snapshot.fighters[0].maxHp, 600);
-      assert.equal(s.snapshot.fighters[1].maxHp, 600);
+      assert.equal(s.snapshot.fighters[1].maxHp, level === 21 ? 630 : 600);
       assert.ok(s.snapshot.fighters[0].hp < 600, 'selected AI must actually engage');
       assert.ok(s.snapshot.fighters.every(f => Number.isFinite(f.x) && Number.isFinite(f.y)));
-      record(label + ' selection starts a working PVE match with equal character stats');
-      await capture(page, 'ai-' + difficulty);
+      record('level ' + level + ' starts the matching AI and CPU-only attributes');
+      await capture(page, 'ai-level-' + level);
+      for (let tick = 0; tick < 35 && !(await state(page)).finished; tick++) await clockAdvance(page, 4000);
+      assert.equal((await state(page)).snapshot.result.winner, 1, 'idle player loses');
+      assert.equal((await state(page)).ladderProgress.cleared.pyro.shadow, level - 1);
+      assert.match(await page.locator('#rematch-btn').textContent(), new RegExp(`第 ${level} 级`));
+      await clickClock(page, '#rematch-btn');
+      assert.equal((await state(page)).ladderMatch.level, level);
+      await clickClock(page, '#pause-btn'); await clickClock(page, '#quit-btn');
+      assert.equal((await state(page)).ladderProgress.cleared.pyro.shadow, level - 1);
+      record('level ' + level + ' loss, retry and early quit preserve progression');
       await page.context().close();
     }
     record('challenge matchup table displays every pair from the current simulation report');
+  });
+  await group('ladder saves reload for all 25 ordered pairings and ignore legacy difficulty', async () => {
+    const page = await newPage('ladder-save-reload', {width:390,height:844}, false);
+    const ids = ['pyro', 'shadow', 'gale', 'bastion', 'iron'];
+    await page.evaluate(ids => {
+      const cleared = Object.fromEntries(ids.map((p, pi) => [p, Object.fromEntries(ids.map((o, oi) => [o, pi * 5 + oi]))]));
+      localStorage.setItem('ave-theatre-ladder-v1', JSON.stringify({ version: 1, cleared }));
+      const settings = JSON.parse(localStorage.getItem('ave-theatre-settings-v2'));
+      localStorage.setItem('ave-theatre-settings-v2', JSON.stringify({ ...settings, player: 'gale', opponent: 'iron', difficulty: 'hard', music: .42 }));
+    }, ids);
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForFunction(() => !!window.AveGame);
+    await page.locator('#install-later-btn').tap();
+    assert.equal(await page.locator('#help-dialog').evaluate(el => el.open), false);
+    const settings = await page.evaluate(() => JSON.parse(localStorage.getItem('ave-theatre-settings-v2')));
+    assert.equal(settings.music, .42); assert.equal(settings.difficulty, undefined);
+    for (let pi = 0; pi < ids.length; pi++) {
+      await page.locator(`#character-roster [data-character="${ids[pi]}"]`).tap();
+      assert.deepEqual(await page.locator('#opponent-roster [data-character]').evaluateAll(cards => Object.fromEntries(cards.map(card => [card.dataset.character, Number(card.querySelector('.opponent-level').textContent.replace('级', ''))]))),
+        Object.fromEntries(ids.map((o, oi) => [o, pi * 5 + oi + 1])));
+      for (let oi = 0; oi < ids.length; oi++) {
+        await page.locator(`#opponent-roster [data-character="${ids[oi]}"]`).tap();
+        assert.match(await page.locator('#start-btn').textContent(), new RegExp(`第 ${pi * 5 + oi + 1} 级`));
+      }
+    }
+    await overflow(page, 'ladder portrait menu no horizontal overflow');
+    await capture(page, 'ladder-portrait', true);
+    record('all 25 ordered pairing levels survive reload and selecting another role; legacy audio settings retained');
+    await page.context().close();
   });
   await group('desktop layout, selection, keyboard, pause and room', async () => {
     const page = await newPage('desktop', {width:1440,height:900}, true, false);
@@ -373,9 +426,19 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
       if (i % 10 === 0) console.log(`PVE progress ${i} time=${(await state(page)).snapshot.timeLeft.toFixed(1)}`);
     }
     s = await state(page); assert.equal(s.finished, true); assert.ok(s.snapshot.result); assert.equal(s.records.played, 1);
+    const completedLadder = s.ladderMatch;
+    const nextLadderLevel = completedLadder.level + (s.snapshot.result.winner === 0 ? 1 : 0);
+    assert.equal(s.ladderProgress.cleared[completedLadder.player][completedLadder.opponent], nextLadderLevel - 1);
+    if (s.snapshot.result.winner === 0) {
+      assert.match(await page.locator('#result-title').textContent(), /第 1 级通关/);
+      const progress = await page.evaluate(() => JSON.parse(localStorage.getItem('ave-theatre-ladder-v1')));
+      assert.equal(progress.cleared[completedLadder.player][completedLadder.opponent], 1);
+      record('real PVE victory saves only the completed pairing and unlocks the next level');
+    }
     assert.equal(await page.locator('#result-overlay').isVisible(), true); await capture(page, 'result-pve');
     record('PVE real combat produces result and record', { fromFrame: combatStart, frame: s.snapshot.frame, result: s.snapshot.result, records: s.records });
     await clickClock(page, '#rematch-btn'); s = await state(page); assert.equal(s.finished, false); assert.ok(s.snapshot.frame < 10); assert.equal(s.records.played, 1);
+    assert.equal(s.ladderMatch.level, nextLadderLevel);
     record('PVE rematch starts fresh world and retains record');
     await clickClock(page, '#pause-btn'); await clickClock(page, '#quit-btn'); assert.equal((await state(page)).screen, 'menu');
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ave-theatre-records-v2'))); assert.equal(saved.played, 1); record('PVE record persisted without counting early quit');

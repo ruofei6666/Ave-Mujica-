@@ -1,5 +1,6 @@
 // The same input, state and event contracts are used by simulation, H5 and rooms.
-export type CharacterId = 'pyro' | 'shadow' | 'gale' | 'bastion' | 'iron';
+export const CHARACTER_IDS = ['pyro', 'shadow', 'gale', 'bastion', 'iron'] as const;
+export type CharacterId = typeof CHARACTER_IDS[number];
 export type Difficulty = 'easy' | 'normal' | 'hard';
 export type Mode = 'pve' | 'pvp';
 export type Seat = 0 | 1;
@@ -29,6 +30,7 @@ export interface DifficultyConfig {
   label: string; miss: number; skill: number; ult: number; aggro: number;
   jump: number; think: number; precision: number;
 }
+export interface AiProfile { config: DifficultyConfig; rank: number; tactics: number }
 export interface Hit {
   dmg: number; kb: number; stun: number; sfx?: string; id?: string;
   kind?: HitKind; empowered?: number; ultimate?: boolean;
@@ -74,6 +76,8 @@ export interface Snapshot {
 }
 export interface WorldOptions {
   left?: CharacterId; right?: CharacterId; mode?: Mode; difficulty?: Difficulty;
+  /** PVE ladder only. Omit for the unchanged balance-simulation controllers. */
+  ladderLevel?: number;
   seed?: number; duration?: number; introFrames?: number; autoplay?: boolean;
   /** Offline diagnostics: difficulty of the autoplay-controlled left seat. */
   autoplayDifficulty?: Difficulty;

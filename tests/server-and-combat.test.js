@@ -121,6 +121,8 @@ test('HTTP serves public assets and health without exposing server files or trav
     'assets/tone.wav': 'public-audio',
     'assets/game.js': 'console.log("public-game")',
     'assets/game.css': 'body { color: blue; }',
+    'assets/license.txt': 'Public audio license included in the offline cache',
+    'private.txt': 'SECRET-TEXT',
     'CREDITS.md': 'Music and artwork credits',
     'lib/combat.ts': 'SECRET-SOURCE',
     'server.js': 'SECRET-SERVER',
@@ -136,11 +138,13 @@ test('HTTP serves public assets and health without exposing server files or trav
   const health = await request(service.address, '/health');
   assert.equal(health.status, 200);
   assert.deepEqual(JSON.parse(health.body), { ok: true, pid: process.pid });
-  for (const url of ['/assets/gale.png', '/assets/tone.wav', '/assets/game.js', '/assets/game.css', '/CREDITS.md']) {
+  for (const url of ['/assets/gale.png', '/assets/tone.wav', '/assets/game.js', '/assets/game.css', '/assets/license.txt', '/CREDITS.md']) {
     assert.equal((await request(service.address, url)).status, 200, url);
   }
   assert.equal((await request(service.address, '/assets/game.css')).headers['content-type'], 'text/css; charset=utf-8');
   assert.equal((await request(service.address, '/CREDITS.md')).headers['content-type'], 'text/plain; charset=utf-8');
+  assert.equal((await request(service.address, '/assets/license.txt')).headers['content-type'], 'text/plain; charset=utf-8');
+  assert.equal((await request(service.address, '/private.txt')).status, 404);
   const head = await request(service.address, '/assets/gale.png', 'HEAD');
   assert.equal(head.status, 200);
   assert.equal(head.body, '');

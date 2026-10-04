@@ -58,20 +58,19 @@ const picked = computed(() => {
         <CharacterRoster roster-id="character-roster" />
 
         <div class="deploy-modes" role="group" aria-label="对战模式">
-          <button id="mode-pve" class="mode-tab active" aria-pressed="true"><b>人机对战</b><span>选择对手，随时练习</span></button>
+          <button id="mode-pve" class="mode-tab active" aria-pressed="true"><b>人机对战</b><span>逐级挑战，每组对手独立存档</span></button>
           <button id="mode-pvp" class="mode-tab" aria-pressed="false"><b>人人对战</b><span>房间码邀请朋友</span></button>
         </div>
 
         <div id="pve-options" class="deploy-body">
           <div class="opt-head"><span class="kicker">OPPONENT · 对手</span><span id="opponent-name" class="opt-value">初华</span></div>
           <CharacterRoster roster-id="opponent-roster" compact />
-          <div class="opt-head"><span class="kicker">DIFFICULTY · 难度</span></div>
-          <div id="difficulty" class="segmented">
-            <button data-difficulty="easy" class="active">普通</button>
-            <button data-difficulty="normal" title="原挑战级：快速反应、追击与闪避">困难</button>
-            <button data-difficulty="hard" title="进阶人机：预判命中、抓后摇、选择反击与连招">挑战</button>
+          <div id="ladder-info" class="ladder-info" aria-live="polite">
+            <div class="ladder-heading"><strong>{{ ui.ladder.opponentName }} · 第 {{ ui.ladder.level }} 级</strong><span>{{ ui.ladder.cleared ? `已通关 ${ui.ladder.cleared} 级` : '从第 1 级开始' }}</span></div>
+            <p class="ladder-strength">{{ ui.ladder.strength }}</p>
+            <p class="ladder-save">{{ ui.ladder.playerName }}出战 · 各对手独立存档</p>
           </div>
-          <button id="start-btn" class="btn btn-primary btn-block">开始对战<svg class="ui-ic ui-chev" aria-hidden="true"><use href="#ui-chevrons" /></svg></button>
+          <button id="start-btn" class="btn btn-primary btn-block">挑战{{ ui.ladder.opponentName }} · 第 {{ ui.ladder.level }} 级<svg class="ui-ic ui-chev" aria-hidden="true"><use href="#ui-chevrons" /></svg></button>
         </div>
 
         <div id="pvp-options" class="deploy-body" hidden>

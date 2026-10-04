@@ -1,5 +1,6 @@
 import { nextTick } from 'vue';
 import engine from '../../shared/combat';
+import { getLadderStage } from '../../shared/ladder';
 import Art from './art';
 import effects from './fx';
 import characterAssets from './character-assets';
@@ -9,8 +10,9 @@ import { element as $ } from './elements';
 import { setupPwa } from './pwa';
 import { createBattleTouchGuard } from './touch-guard';
 import { createJoystick } from './joystick';
+import { LADDER_STORAGE_KEY, ladderLevel, mergeLadderProgress, readLadderProgress, settleLadderMatch, type LadderMatch } from './ladder-progress';
 import type { TheatreState } from './theatre-state';
-import type { Action, AttackAction, CharacterId, ClientMessage, CombatWorld, Difficulty, Input, Mode, Records, RoomState, Screen, Seat, ServerMessage, Settings, SkillDetail, SkillSlot, Snapshot, VoiceCue } from './types';
+import type { Action, AttackAction, CharacterId, ClientMessage, CombatWorld, Input, Mode, Records, RoomState, Screen, Seat, ServerMessage, Settings, SkillDetail, SkillSlot, Snapshot, VoiceCue } from './types';
 
 type AudioMethod = 'unlock' | 'setScene' | 'setVolumes' | 'setListenerView' | 'handle' | 'handleCombatVoices' | 'playVoice' | 'playAnnouncer' | 'playResult' | 'playUI';
 export function createGameClient(ui: TheatreState) {
@@ -33,11 +35,12 @@ export function createGameClient(ui: TheatreState) {
   const characters = engine.characters;
   const character = (id: CharacterId) => characters.find((item) => item.id === id) || characters[0];
   const read = <T>(key: string, fallback: T): T => { try { return JSON.parse(localStorage.getItem(key) || 'null') as T || fallback; } catch { return fallback; } };
-  const write = (key: string, value: unknown) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private browsing still supports matches */ } };
+  const write = (key: string, value: unknown) => { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } };
   const defaultVolumes = GameAudio.defaultVolumes;
-  const defaults: Settings = { player: 'pyro', opponent: 'shadow', difficulty: 'easy', ...defaultVolumes, lowMotion: matchMedia('(prefers-reduced-motion: reduce)').matches };
+  const defaults: Settings = { player: 'pyro', opponent: 'shadow', ...defaultVolumes, lowMotion: matchMedia('(prefers-reduced-motion: reduce)').matches };
   const saved = read<Partial<Settings>>('ave-theatre-settings-v2', {});
-  const settings: Settings = { ...defaults, ...saved };
+  const settings: Settings & { difficulty?: unknown } = { ...defaults, ...saved };
+  delete settings.difficulty;
   // The old sticker/procedural figures have been removed, including their settings.
   settings.artRev = characterAssets.version;
   // Apply the requested full-volume defaults once for existing saves; later
@@ -46,10 +49,12 @@ export function createGameClient(ui: TheatreState) {
   settings.audioRev = 3;
   if (!characters.some((c) => c.id === settings.player)) settings.player = defaults.player;
   if (!characters.some((c) => c.id === settings.opponent)) settings.opponent = defaults.opponent;
-  if (!engine.difficulties[settings.difficulty]) settings.difficulty = 'easy';
   for (const key of ['music', 'sfx', 'voice'] as const) settings[key] = Number.isFinite(settings[key]) ? Math.max(0, Math.min(1, settings[key])) : defaults[key];
   write('ave-theatre-settings-v2', settings);
   const records: Records = { played: 0, won: 0, drawn: 0, bestStreak: 0, streak: 0, ...read<Partial<Records>>('ave-theatre-records-v2', {}) };
+  let ladderProgress = readLadderProgress(read<unknown>(LADDER_STORAGE_KEY, null));
+  let ladderMatch: LadderMatch | null = null;
+  const refreshLadderProgress = () => { ladderProgress = mergeLadderProgress(ladderProgress, readLadderProgress(read<unknown>(LADDER_STORAGE_KEY, null))); };
   const audio = new GameAudio(settings);
   const renderer = new ArenaRenderer($('arena'), characters);
   const touchGuard = createBattleTouchGuard();
@@ -113,7 +118,7 @@ export function createGameClient(ui: TheatreState) {
     screen = name;
     touchGuard.setActive(name === 'battle');
     clearInputs();
-    if (name !== 'battle') { world = null; paused = false; $('pause-overlay').hidden = true; }
+    if (name !== 'battle') { world = null; ladderMatch = null; paused = false; $('pause-overlay').hidden = true; }
     sound('setScene', name === 'battle' ? 'battle' : 'menu');
     if (name === 'menu') updateRecordLine();
   }
@@ -139,6 +144,7 @@ export function createGameClient(ui: TheatreState) {
     }
   }
   function renderMenu() {
+    refreshLadderProgress();
     const c = character(settings.player);
     $('portrait').dataset.character = c.id;
     $('portrait').setAttribute('aria-label', `${fullNames[c.id]}的立绘`);
@@ -147,8 +153,10 @@ export function createGameClient(ui: TheatreState) {
     $('voice-preview-role').textContent = `${c.name} · 语音试听`;
     makeRoster($('character-roster'), settings.player, (id) => { settings.player = id; persist(); renderMenu(); sound('unlock'); sound('playVoice', id, 'select'); });
     makeRoster($('opponent-roster'), settings.opponent, (id) => { settings.opponent = id; persist(); renderMenu(); });
+    ui.rosters['opponent-roster'].levels = Object.fromEntries(characters.map(opponent => [opponent.id, ladderLevel(ladderProgress, c.id, opponent.id)]));
+    const level = ladderLevel(ladderProgress, c.id, settings.opponent);
+    ui.ladder = { level, cleared: level - 1, playerName: c.name, opponentName: character(settings.opponent).name, strength: getLadderStage(level).description };
     $('start-btn').disabled = !Art.assetReady(settings.player) || !Art.assetReady(settings.opponent);
-    for (const button of document.querySelectorAll<HTMLButtonElement>('[data-difficulty]')) { const active = (button.dataset.difficulty as Difficulty) === settings.difficulty; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); }
   }
   function changeMode(next: Mode) {
     mode = next; $('pve-options').hidden = next !== 'pve'; $('pvp-options').hidden = next !== 'pvp';
@@ -178,7 +186,9 @@ export function createGameClient(ui: TheatreState) {
   function startPve() {
     if (!Art.assetReady(settings.player) || !Art.assetReady(settings.opponent)) { toast('角色图片正在加载，请稍候。'); return; }
     disconnect(false); mode = 'pve'; room = null; seat = 0;
-    world = engine.createWorld({ left: settings.player, right: settings.opponent, mode: 'pve', difficulty: settings.difficulty, duration: 90 });
+    refreshLadderProgress();
+    ladderMatch = { player: settings.player, opponent: settings.opponent, level: ladderLevel(ladderProgress, settings.player, settings.opponent) };
+    world = engine.createWorld({ left: ladderMatch.player, right: ladderMatch.opponent, mode: 'pve', ladderLevel: ladderMatch.level, duration: 90 });
     latest = world.snapshot();
     matchDuration = Math.ceil(latest.timeLeft);
     const nextWorld = world; openBattle(); world = nextWorld;
@@ -214,7 +224,7 @@ export function createGameClient(ui: TheatreState) {
         $(`${id}-lag`).style.width = '100%';
       }
       $(`${id}-name`).textContent = def.name;
-      $(`${id}-seat`).textContent = index === seat ? '你' : mode === 'pve' ? engine.difficulties[settings.difficulty].label : '对手';
+      $(`${id}-seat`).textContent = index === seat ? '你' : mode === 'pve' && ladderMatch ? `第 ${ladderMatch.level} 级` : '对手';
       const hp = Math.max(0, f.hp / f.maxHp * 100);
       state.hp = hp;
       $(`${id}-hp`).style.width = `${hp}%`; $(`${id}-lag`).style.width = `${hp}%`;
@@ -316,6 +326,19 @@ export function createGameClient(ui: TheatreState) {
     ];
     records.played += 1; if (win) { records.won += 1; records.streak += 1; } else { records.streak = 0; if (draw) records.drawn += 1; }
     records.bestStreak = Math.max(records.bestStreak, records.streak); write('ave-theatre-records-v2', records);
+    if (mode === 'pve' && ladderMatch) {
+      const { player, opponent, level } = ladderMatch;
+      const opponentName = character(opponent).name;
+      refreshLadderProgress();
+      ladderProgress = settleLadderMatch(ladderProgress, ladderMatch, snapshot.result);
+      const nextLevel = ladderLevel(ladderProgress, player, opponent);
+      $('result-title').textContent = win ? `第 ${level} 级通关` : draw ? '平局 · 层数保留' : '挑战未过 · 层数保留';
+      $('result-description').textContent += win ? ` 已击败${opponentName}，解锁第 ${nextLevel} 级。` : ` ${opponentName}第 ${nextLevel} 级仍可继续挑战。`;
+      $('rematch-btn').textContent = win ? `继续挑战 · 第 ${nextLevel} 级` : `再次挑战 · 第 ${nextLevel} 级`;
+      $('rematch-status').textContent = win ? write(LADDER_STORAGE_KEY, ladderProgress)
+        ? `${character(player).name} → ${opponentName}的进度已保存到当前浏览器。`
+        : '本次进度仅暂存：浏览器无法保存，刷新后可能丢失。' : '失败、平局或中途退出都不会降低已解锁层数。';
+    }
     // 击倒时让 K.O. 演出先播一小会儿：浮层立即存在，但卡片延迟淡入
     $('result-overlay').classList.toggle('delayed', (reason === 'ko' || reason === 'double-ko') && !settings.lowMotion);
     $('result-overlay').hidden = false; sound('setScene', 'result'); sound('playResult', snapshot);
@@ -329,7 +352,7 @@ export function createGameClient(ui: TheatreState) {
   function enterRoom(type: 'create' | 'join', code?: string) {
     if (location.protocol === 'file:') { status('请双击“启动游戏”后，通过网页地址进入联机。'); return; }
     if (/(^|\.)github\.io$/i.test(location.hostname)) { status('GitHub Pages 没有房间服务。人人对战请使用本机或云服务器上的游戏地址。'); return; }
-    mode = 'pvp'; sound('unlock'); disconnect(false);
+    mode = 'pvp'; ladderMatch = null; sound('unlock'); disconnect(false);
     const generation = ++socketGeneration;
     inputSeq = 0;
     pendingEntry = type === 'join' ? { type, character: settings.player, code: code || '' } : { type, character: settings.player };
@@ -435,7 +458,7 @@ export function createGameClient(ui: TheatreState) {
   listen($('leave-room'), 'click', backToMenu);
   listen($('ready-btn'), 'click', () => { if (room && characters.every(c => Art.assetReady(c.id))) send({ type: 'ready', ready: !room.players[seat]?.ready }); });
   listen($('copy-room'), 'click', async () => { if (!room) return; const url = new URL(location.href); url.searchParams.set('room', room.code); try { await navigator.clipboard.writeText(url.href); toast('邀请链接已复制。'); } catch { toast(`房间码：${room.code}。请手动发给朋友。`); } });
-  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-difficulty]')) listen(button, 'click', () => { settings.difficulty = (button.dataset.difficulty as Difficulty); persist(); renderMenu(); });
+  listen(window, 'storage', event => { if (event.key === LADDER_STORAGE_KEY && screen === 'menu') renderMenu(); });
   listen($('pause-btn'), 'click', pauseGame); listen($('resume-btn'), 'click', () => { paused = false; accumulator = 0; $('pause-overlay').hidden = true; }); listen($('quit-btn'), 'click', backToMenu); listen($('result-menu'), 'click', backToMenu);
   listen($('rematch-btn'), 'click', () => { if (mode === 'pve') startPve(); else if (send({ type: 'rematch' })) { $('rematch-btn').disabled = true; $('rematch-btn').textContent = '已请求重赛'; $('rematch-status').textContent = '等待对方同意。'; } });
   listen($('portrait-play'), 'click', () => $('battle').classList.add('portrait-allowed'));
@@ -451,7 +474,7 @@ export function createGameClient(ui: TheatreState) {
   listen(document, 'click', event => {
     const button = (event.target as HTMLElement | null)?.closest('button'); if (!button || button.disabled || (button.dataset.action as AttackAction)) return;
     if (button.classList.contains('character-card') || button.classList.contains('voice-preview') || (button.dataset.voiceCue as VoiceCue)) { sound('playUI', 'confirm'); return; }
-    const cue = buttonCues[button.id] || (button.dataset.difficulty as Difficulty) || (button.classList.contains('opponent-card') ? 'opponent' : button.classList.contains('dialog-close') ? 'back' : button.closest('#join-form') ? 'join' : 'confirm');
+    const cue = buttonCues[button.id] || (button.classList.contains('opponent-card') ? 'opponent' : button.classList.contains('dialog-close') ? 'back' : button.closest('#join-form') ? 'join' : 'confirm');
     sound('playUI', cue);
   });
   listen(window, 'mujica:assets', () => { renderCardArt(); if (screen === 'menu') renderMenu(); else if (screen === 'room') renderRoom(); });
@@ -542,7 +565,8 @@ export function createGameClient(ui: TheatreState) {
   if (isPwaLaunch()) showFirstHelp();
   else installDialog.showModal();
   // Read-only diagnostics used by the bundled smoke checks.
-  window.AveGame = { getState: () => ({ mode, screen, seat, room: room?.code || null, snapshot: latest, camera: renderer.camera.view, paused, finished, records: { ...records } }) };
+  window.AveGame = { getState: () => ({ mode, screen, seat, room: room?.code || null, snapshot: latest, camera: renderer.camera.view, paused, finished, records: { ...records },
+    ladderMatch: ladderMatch ? { ...ladderMatch } : null, ladderProgress: readLadderProgress(ladderProgress) }) };
 
   // Compatibility diagnostics only; gameplay uses module imports.
   Object.assign(window, { AveCombat: engine, MujicaArt: Art, MujicaFx: effects, ArenaRenderer, GameAudio, MujicaCharacterAssets: characterAssets });

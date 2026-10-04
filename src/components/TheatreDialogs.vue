@@ -23,17 +23,18 @@ const ui = useTheatreState();
       </div>
     </div>
     <label class="check-row"><input id="low-motion" type="checkbox"><span class="check-box" aria-hidden="true"></span>减少动态效果</label>
-    <p class="subtle">设置与战绩保存在这台设备的浏览器中。</p>
+    <p class="subtle">设置、战绩与爬层进度保存在这台设备的浏览器中。每个角色对五位人机的层数独立保存；清除网站数据会清除存档。</p>
   </ModalFrame>
 
   <ModalFrame id="help-dialog" wide close-label="关闭说明">
     <template #head><p class="kicker">FIRST SHOW · 第一次出演</p><h2 class="headline">三步开场</h2></template>
     <ol class="help-steps">
-      <li><b>选择角色与模式</b><p>人机立即开始；人人对战由一人建房，另一人输入房间码。双方准备后开场。</p></li>
+      <li><b>选择角色与模式</b><p>人机从第 1 级开始，获胜升级，失败不掉层。每个角色对五位人机分别存档。人人对战由一人建房，另一人输入房间码，双方准备后开场。</p></li>
       <li><b>移动、跳跃、抓住空隙</b><p>左侧摇杆移动，向上推跳跃；右侧五个按钮攻击。电脑用 A / D 移动，W / 空格跳跃。</p></li>
       <li><b>技能冷却，蓄能放大招</b><p>命中可以积蓄能量，大招需要满能量。三个小技能键亮着就能放；变暗并显示数字是在冷却，走完会闪一下。出招期间提前按下的动作会短暂保留。</p></li>
     </ol>
     <p class="subtle">每场 90 秒，时间到按剩余生命判胜，双方同时倒下则平局。没有防御操作。</p>
+    <p class="subtle">前 20 级逐步增强人机的反应与战术，第 20 级达到挑战 AI 水平。之后每级增加基础生命的 5%、基础伤害的 3%，可以无限爬层。</p>
     <button id="help-done" class="btn btn-primary btn-block">知道了，开始选人<svg class="ui-ic ui-chev" aria-hidden="true"><use href="#ui-chevrons" /></svg></button>
   </ModalFrame>
 
