@@ -996,7 +996,8 @@ interface ImpactRing { x: number; y: number; life: number; max: number; radius: 
   }
   function cpuThink() {
     return thinkAi(cpu, player, cpu.def, cpu.ai, {
-      difficulty: selection.difficulty, projectiles, hazards, random,
+      difficulty: cpu.seat === 0 ? options?.autoplayDifficulty ?? selection.difficulty : selection.difficulty,
+      projectiles, hazards, random,
     });
   }
 

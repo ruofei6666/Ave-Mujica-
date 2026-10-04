@@ -11,7 +11,7 @@ const number = (value: number) => value.toLocaleString('en-US');
 <template>
   <ModalFrame id="balance-dialog" class="balance-dialog" wide close-label="关闭对战胜率" aria-labelledby="balance-title" aria-describedby="balance-method">
     <template #head>
-      <p class="kicker">MATCHUPS · 挑战 AI 模拟</p>
+      <p class="kicker">MATCHUPS · {{ report.aiLabel }} 模拟</p>
       <h2 id="balance-title" class="headline">对战胜率</h2>
     </template>
 
@@ -19,7 +19,7 @@ const number = (value: number) => value.toLocaleString('en-US');
       <span><b>{{ result.matrix.length }}</b> 组对阵</span>
       <span><b>{{ number(result.matches) }}</b> 场模拟</span>
     </div>
-    <p id="balance-method" class="balance-method">双方均由挑战 AI 操作；每组 {{ number(result.rounds * 2) }} 场，交换左右各 {{ number(result.rounds) }} 场，每局上限 {{ result.duration }} 秒。平局计 {{ rules.drawScore }} 胜。</p>
+    <p id="balance-method" class="balance-method">双方均由{{ report.aiLabel }}操作；每组 {{ number(result.rounds * 2) }} 场，交换左右各 {{ number(result.rounds) }} 场，每局上限 {{ result.duration }} 秒。平局计 {{ rules.drawScore }} 胜。</p>
 
     <table class="balance-table">
       <caption class="sr-only">十组角色之间的模拟胜率，已交换左右位置</caption>
@@ -39,7 +39,7 @@ const number = (value: number) => value.toLocaleString('en-US');
       </dl>
       <p>每位角色与其余四位等量对战，共 {{ number(result.stats[0].matches) }} 场。</p>
     </details>
-    <p class="balance-note">这是固定版本的 AI 模拟结果，不是玩家实战胜率。总体接近 50%，角色之间仍存在明显克制。</p>
+    <p class="balance-note">这是原挑战级（现困难级）的历史模拟结果，不代表新版挑战级或玩家实战胜率。总体接近 50%，角色之间仍存在明显克制。</p>
   </ModalFrame>
 </template>
 

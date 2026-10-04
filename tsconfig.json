@@ -32,6 +32,7 @@
     "shared/**/*.ts",
     "server/**/*.ts",
     "simulate-balance.ts",
+    "simulate-ai.ts",
     "vite.config.mts"
   ]
 }

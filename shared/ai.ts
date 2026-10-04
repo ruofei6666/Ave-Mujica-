@@ -1,11 +1,12 @@
 import { ARENA } from './arena';
+import { planChallenge } from './ai-tactics';
 import type { Character, Difficulty, DifficultyConfig, FighterSnapshot, Hazard, Input, Projectile, Seat } from './types';
 
 // Difficulty changes decisions only. Health, damage, movement and cooldowns stay shared.
 export const AI_DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
   easy: { label: '普通', miss: .14, skill: .6, ult: .6, aggro: .72, jump: .04, think: 14, precision: .64 },
-  normal: { label: '困难', miss: .06, skill: .86, ult: .86, aggro: .92, jump: .08, think: 8, precision: .82 },
-  hard: { label: '挑战', miss: .008, skill: .99, ult: .99, aggro: .995, jump: .12, think: 4, precision: .98 },
+  normal: { label: '困难', miss: .008, skill: .99, ult: .99, aggro: .995, jump: .12, think: 4, precision: .98 },
+  hard: { label: '挑战', miss: 0, skill: 1, ult: 1, aggro: 1, jump: .12, think: 2, precision: 1 },
 };
 
 export interface AiMemory { wait: number; left: boolean; right: boolean; evade: number }
@@ -34,7 +35,8 @@ const ATTACK_WINDOWS: Readonly<Record<string, readonly [number, number]>> = {
 // player input or RNG is read, and this controller never writes fighter state.
 export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Character, memory: AiMemory, scene: AiScene): Input {
   const cfg = AI_DIFFICULTIES[scene.difficulty];
-  const rank = scene.difficulty === 'hard' ? 2 : scene.difficulty === 'normal' ? 1 : 0;
+  // Normal preserves the former challenge controller, including its prediction lead.
+  const rank = scene.difficulty === 'easy' ? 0 : 2;
   const out: Input = { left: memory.left, right: memory.right, down: false, up: false,
     punch: false, special: false, skill1: false, skill2: false, ult: false };
   const move = (direction: number) => {
@@ -130,7 +132,8 @@ export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Characte
         out.up = true; memory.evade = 22; move(cornered ? toward : -toward); return done();
       }
     }
-    if (meleeThreat && !punish) {
+    // Challenge compares interruption timing and protected counters below.
+    if (meleeThreat && !punish && scene.difficulty !== 'hard') {
       if (attack === 'iron_s0' && opp.stateT < 7 && grounded) {
         move(cornered ? toward : -toward); out.up = true; return done();
       }
@@ -146,6 +149,14 @@ export function thinkAi(me: FighterSnapshot, opp: FighterSnapshot, def: Characte
         return done();
       }
     }
+  }
+
+  if (scene.difficulty === 'hard') {
+    const plan = planChallenge(me, opp, def);
+    if (plan.action) return use(plan.action);
+    move(plan.direction);
+    out.up = plan.jump && grounded && me.heavyT <= 0;
+    return done();
   }
 
   const skillChance = punish ? Math.max(.9, cfg.skill) : cfg.skill;

@@ -202,6 +202,33 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
   await app.listen();
   browser = await chromium.launch({ headless: true, executablePath: process.env.UI_EDGE, args: ['--autoplay-policy=no-user-gesture-required'] });
   report.runtime = { edge: process.env.UI_EDGE, playwright: require(path.join(process.env.UI_PLAYWRIGHT, 'package.json')).version, testServer: { port: Number(process.env.UI_PORT), pvpDuration: 10, introFrames: 0 } };
+  await group('AI difficulty selection and historical matchup labels', async () => {
+    for (const [difficulty, label] of [['normal', '困难'], ['hard', '挑战']]) {
+      const page = await newPage('ai-' + difficulty, {width:844,height:390}, true);
+      assert.equal(await page.evaluate(() => AveCombat.difficulties.normal.think), 4);
+      assert.equal(await page.evaluate(() => AveCombat.difficulties.hard.think), 2);
+      await page.locator('#balance-btn').tap();
+      assert.match(await page.locator('#balance-method').textContent(), /困难 AI（原挑战）/);
+      assert.match(await page.locator('.balance-note').textContent(), /不代表新版挑战级/);
+      await page.locator('#balance-dialog .dialog-close').tap();
+      await page.locator(`[data-difficulty="${difficulty}"]`).tap();
+      assert.equal(await page.locator(`[data-difficulty="${difficulty}"]`).getAttribute('aria-pressed'), 'true');
+      await page.locator('#opponent-roster [data-character="shadow"]').tap();
+      await page.locator('#start-btn').tap();
+      await pauseClock(page); await clockAdvance(page, 6500);
+      const s = await state(page);
+      assert.equal(s.screen, 'battle');
+      assert.equal(await page.locator('#right-seat').textContent(), label);
+      assert.equal(s.snapshot.fighters[0].maxHp, 600);
+      assert.equal(s.snapshot.fighters[1].maxHp, 600);
+      assert.ok(s.snapshot.fighters[0].hp < 600, 'selected AI must actually engage');
+      assert.ok(s.snapshot.fighters.every(f => Number.isFinite(f.x) && Number.isFinite(f.y)));
+      record(label + ' selection starts a working PVE match with equal character stats');
+      await capture(page, 'ai-' + difficulty);
+      await page.context().close();
+    }
+    record('historical matchup table explicitly refers to the former challenge controller');
+  });
   await group('desktop layout, selection, keyboard, pause and room', async () => {
     const page = await newPage('desktop', {width:1440,height:900}, true, false);
     const media = await page.evaluate(() => ({fine:matchMedia('(pointer:fine)').matches,coarse:matchMedia('(pointer:coarse)').matches,touches:navigator.maxTouchPoints}));

@@ -1,6 +1,8 @@
 {
-  "description": "Final fixed cooldowns validated against held-out seeds using challenge AI. This measures aggregate character score rates, not each matchup being 50/50 or human player balance.",
-  "reproduce": "pnpm balance 5000 hard 3181750267",
+  "description": "Historical fixed-cooldown validation with the former challenge controller, now preserved as normal (困难). Source hashes and result.difficulty describe the original run. These figures do not measure the new challenge controller or human player balance.",
+  "aiLabel": "困难 AI（原挑战）",
+  "currentDifficulty": "normal",
+  "reproduce": "pnpm balance 5000 normal 3181750267",
   "rules": {
     "framesPerSecond": 60,
     "cooldownFrameRange": [

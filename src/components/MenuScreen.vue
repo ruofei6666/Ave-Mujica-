@@ -68,8 +68,8 @@ const picked = computed(() => {
           <div class="opt-head"><span class="kicker">DIFFICULTY · 难度</span></div>
           <div id="difficulty" class="segmented">
             <button data-difficulty="easy" class="active">普通</button>
-            <button data-difficulty="normal">困难</button>
-            <button data-difficulty="hard">挑战</button>
+            <button data-difficulty="normal" title="原挑战级：快速反应、追击与闪避">困难</button>
+            <button data-difficulty="hard" title="进阶人机：预判命中、抓后摇、选择反击与连招">挑战</button>
           </div>
           <button id="start-btn" class="btn btn-primary btn-block">开始对战<svg class="ui-ic ui-chev" aria-hidden="true"><use href="#ui-chevrons" /></svg></button>
         </div>

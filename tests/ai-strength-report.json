@@ -1,0 +1,78 @@
+{
+  "roundsPerSeatAndPair": 100,
+  "seed": 20261004,
+  "matches": 5000,
+  "description": "Challenge versus hard (former challenge), all 25 ordered character pairs, swapped seats; equal stats and cooldowns.",
+  "sourceSha256": {
+    "shared/ai.ts": "24bc085609ccf5c33a7b5ddc61043594ae65409b6d6d98107a3f227020205844",
+    "shared/ai-tactics.ts": "832c38bceb590729cb91ded39ccffffb32036bb0a3fce6100a70dfccd4fbf46b",
+    "shared/combat.ts": "3b565e9d13bd93ce4c2bd284479c197980a08f1e8b7b389ff7ea58eb37bd04a8"
+  },
+  "wins": 4542,
+  "losses": 455,
+  "draws": 3,
+  "scoreRate": 0.9087,
+  "stats": [
+    {
+      "id": "gale",
+      "name": "睦",
+      "wins": 895,
+      "losses": 105,
+      "draws": 0,
+      "mirrors": [
+        200,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "iron",
+      "name": "喵梦",
+      "wins": 852,
+      "losses": 147,
+      "draws": 1,
+      "mirrors": [
+        198,
+        2,
+        0
+      ]
+    },
+    {
+      "id": "shadow",
+      "name": "初华",
+      "wins": 979,
+      "losses": 21,
+      "draws": 0,
+      "mirrors": [
+        199,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "pyro",
+      "name": "祥子",
+      "wins": 854,
+      "losses": 145,
+      "draws": 1,
+      "mirrors": [
+        131,
+        69,
+        0
+      ]
+    },
+    {
+      "id": "bastion",
+      "name": "海铃",
+      "wins": 962,
+      "losses": 37,
+      "draws": 1,
+      "mirrors": [
+        197,
+        3,
+        0
+      ]
+    }
+  ],
+  "elapsedMs": 41027
+}

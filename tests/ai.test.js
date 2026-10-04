@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { thinkAi, createAiMemory } = require('../shared/ai.ts');
+const { thinkAi, createAiMemory, AI_DIFFICULTIES } = require('../shared/ai.ts');
 const { createWorld, characters } = require('../shared/combat.ts');
 const { ARENA } = require('../shared/arena.ts');
 
@@ -23,6 +23,74 @@ function wave(overrides = {}) {
     r: 32, sfx: 'pyro_s2', ...overrides };
 }
 function noAttack(input) { assert.ok(attacks.every(action => !input[action]), JSON.stringify(input)); }
+
+test('hard difficulty inherits the complete former challenge configuration', () => {
+  assert.deepEqual(AI_DIFFICULTIES.normal, { label: '困难', miss: .008, skill: .99, ult: .99,
+    aggro: .995, jump: .12, think: 4, precision: .98 });
+});
+
+test('challenge counters a visible jab quickly and chooses a multi-hit combo during stun', () => {
+  const scenario = situation('gale');
+  Object.assign(scenario.me, { cd1: 0, cd2: 0 });
+  Object.assign(scenario.opp, { x: 600, state: 'punch', stateT: 1 });
+  assert.equal(decide(scenario).skill1, true, 'one-frame dash can interrupt a jab');
+  Object.assign(scenario.opp, { state: 'stun', stunMax: 24, stateT: 1 });
+  assert.equal(decide(scenario).skill2, true, 'longer combo exploits confirmed hitstun');
+});
+
+test('challenge can punish a missed charge during recovery even if attackHit is false', () => {
+  const scenario = situation('bastion', 'bastion');
+  scenario.me.cd0 = 0;
+  Object.assign(scenario.opp, { x: 680, state: 'skill', skillMove: 'bastion_s1',
+    stateT: 45, armor: 3, attackHit: false });
+  assert.equal(decide(scenario).special, true);
+});
+
+test('challenge drain interrupts an armored charge before it releases', () => {
+  const world = createWorld({ left: 'shadow', right: 'bastion', mode: 'pvp', introFrames: 0 });
+  const [me, opp] = world.fighters;
+  Object.assign(me, { x: 500, mp: 0, cd0: 600, cd1: 600, cd2: 0 });
+  Object.assign(opp, { x: 620, mp: 150, state: 'skill', skillMove: 'bastion_s1', stateT: 12, armor: 36 });
+  const input = decide({ me, opp, def: characters.find(c => c.id === me.id) });
+  assert.equal(input.skill2, true);
+  world.step([input, {}]);
+  for (let n = 0; n < 10; n++) world.step([{}, {}]);
+  assert.equal(opp.skillMove, null);
+  assert.equal(opp.state, 'stun');
+  assert.equal(opp.mp, 110);
+  assert.equal(me.hp, me.maxHp);
+});
+
+test('challenge counter lands against a close jab where the old slow opener is interrupted', () => {
+  const damage = {};
+  for (const difficulty of ['normal', 'hard']) {
+    const world = createWorld({ left: 'bastion', right: 'pyro', mode: 'pvp', introFrames: 0 });
+    const [me, opp] = world.fighters;
+    Object.assign(me, { x: 500, mp: 0 }); Object.assign(opp, { x: 590, mp: 0 });
+    const input = decide({ me, opp, def: characters.find(c => c.id === me.id) }, { difficulty });
+    world.step([input, { punch: true }]);
+    for (let n = 0; n < 40; n++) world.step([{}, {}]);
+    damage[difficulty] = opp.maxHp - opp.hp;
+  }
+  assert.equal(damage.normal, 0);
+  assert.ok(damage.hard > 18, JSON.stringify(damage));
+});
+
+test('challenge keeps ranged cooldowns when a retreating target will leave projectile range', () => {
+  const scenario = situation('pyro');
+  Object.assign(scenario.me, { cd1: 0, cd2: 0 });
+  Object.assign(scenario.opp, { x: 1080, state: 'walk', vx: 5.15 });
+  noAttack(decide(scenario));
+  assert.equal(decide(scenario).right, true);
+});
+
+test('challenge forecasts approach using actual skill travel, not stale stored velocity', () => {
+  const scenario = situation('bastion', 'gale');
+  scenario.me.cd0 = 0;
+  Object.assign(scenario.opp, { x: 730, state: 'skill', skillMove: 'gale_s1',
+    stateT: 10, facing: 1, vx: 0, attackHit: true });
+  assert.equal(decide(scenario).special, false, 'dash is visibly travelling out of reach');
+});
 
 test('AI decisions do not mutate either fighter, including facing during a skill', () => {
   for (const difficulty of ['easy', 'normal', 'hard']) {

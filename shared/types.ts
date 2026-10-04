@@ -75,6 +75,8 @@ export interface Snapshot {
 export interface WorldOptions {
   left?: CharacterId; right?: CharacterId; mode?: Mode; difficulty?: Difficulty;
   seed?: number; duration?: number; introFrames?: number; autoplay?: boolean;
+  /** Offline diagnostics: difficulty of the autoplay-controlled left seat. */
+  autoplayDifficulty?: Difficulty;
 }
 export interface CombatWorld {
   step(inputs?: readonly Partial<Input>[]): boolean;

@@ -17,6 +17,7 @@
     "typecheck": "vue-tsc --noEmit",
     "test": "pnpm run build:server && node --import tsx --test tests/server-and-combat.test.js tests/audio-events.test.js tests/camera.test.js tests/ai.test.js",
     "balance": "node --import tsx simulate-balance.ts",
+    "ai:benchmark": "node --import tsx simulate-ai.ts",
     "check": "pnpm run lint && pnpm run typecheck && pnpm test && pnpm run build"
   },
   "engines": {
