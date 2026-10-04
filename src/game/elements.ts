@@ -44,6 +44,9 @@ interface GameElements {
   'menu-status': HTMLElement;
   'record-line': HTMLElement;
   'install-btn': HTMLButtonElement;
+  'install-dialog': HTMLDialogElement;
+  'install-now-btn': HTMLButtonElement;
+  'install-status': HTMLElement;
   'credits-btn': HTMLButtonElement;
   'room': HTMLElement;
   'leave-room': HTMLButtonElement;

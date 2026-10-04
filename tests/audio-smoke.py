@@ -69,6 +69,8 @@ async function pageFor(name, savedSettings=null) {
   page.on('response',response=>{if(response.url().includes('/assets/audio/'))report.requests.push({name,url:response.url(),status:response.status()});});
   await page.goto(`http://127.0.0.1:${process.env.UI_PORT}`,{waitUntil:'networkidle'});
   assert.equal(await page.evaluate(()=>window.__nativeAudioAudit.contexts.length),0,'audio must wait for a real first gesture');
+  // Close onboarding without consuming the first gesture that the audio checks exercise.
+  await page.locator('#install-dialog').evaluate(el=>el.close());
   return page;
 }
 async function inspect(page) {return page.evaluate(()=>{
@@ -116,6 +118,7 @@ async function selectVoiceFromSettings(page,id) {
     const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('ave-theatre-settings-v2')));
     assert.equal(saved.audioRev,3);assert.equal(saved.music,.67);assert.equal(saved.voice,.39);
     await page.reload({waitUntil:'networkidle'});
+    await page.locator('#install-dialog').evaluate(el=>el.close());
     assert.equal(await page.locator('#music-volume').inputValue(),'67');
     assert.equal(await page.locator('#voice-volume').inputValue(),'39');
     assert.equal(await page.locator('#sfx-volume').inputValue(),'100');

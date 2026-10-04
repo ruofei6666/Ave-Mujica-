@@ -89,8 +89,8 @@ def main():
             page.goto(url, wait_until='networkidle', timeout=120000)
             page.wait_for_function("document.querySelector('#pwa-status')?.textContent === '离线可玩'", timeout=120000)
             page.wait_for_function('window.AveGame && window.MujicaArt?.ready')
-            if page.locator('#help-dialog').evaluate('(el) => el.open'):
-                page.locator('#help-done').click()
+            page.locator('#install-later-btn').click()
+            page.locator('#help-done').click()
             keys = page.evaluate("async () => { const key = (await caches.keys()).find(k => k.startsWith('ave-mujica-pwa-')); return (await (await caches.open(key)).keys()).map(r => r.url); }")
             assert len(keys) > 70, f'Incomplete precache: {len(keys)}'
             assert all(key.startswith(url) for key in keys)
@@ -130,6 +130,7 @@ def main():
             }""", keys)
             assert not failures, failures
             passed('offline reload with query strings loads all images, sounds, fonts and chunks')
+            page.locator('#install-later-btn').click()
             page.locator('#start-btn').click()
             page.wait_for_function("window.AveGame.getState().screen === 'battle' && window.AveGame.getState().snapshot?.frame > 100")
             passed('offline PVE reaches a running combat simulation')

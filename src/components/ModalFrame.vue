@@ -12,6 +12,7 @@ defineProps<{ closeLabel: string; wide?: boolean }>();
         <form method="dialog"><button class="dialog-close icon-btn frame frame-sm" :aria-label="closeLabel"><svg class="ui-ic" aria-hidden="true"><use href="#ui-close" /></svg></button></form>
       </header>
       <div class="modal-body"><slot /></div>
+      <footer v-if="$slots.footer" class="modal-foot"><slot name="footer" /></footer>
     </div>
   </dialog>
 </template>

@@ -472,32 +472,70 @@ export function createGameClient(ui: TheatreState) {
   function releaseOnBackground() { clearInputs(); if (screen === 'battle' && !finished) { if (mode === 'pve') pauseGame(); else send({ type: 'input', input: takeInput(), seq: ++inputSeq }); } }
   listen(window, 'blur', releaseOnBackground); listen(document, 'visibilitychange', () => { if (document.hidden) releaseOnBackground(); }); listen(window, 'pagehide', () => disconnect(true)); listen(window, 'resize', () => { renderer.resize(); renderCardArt(); });
   repeat(() => { syncVoiceStatus(); if (socket?.readyState !== WebSocket.OPEN) return; send({ type: 'ping', at: performance.now() }); if (performance.now() - lastMessageAt > 15000 && !document.hidden) { disconnect(false); if (screen === 'battle') interrupted('连接长时间没有响应，请重新建房。'); else { show('menu'); status('连接超时，请重试。'); } } }, 3000);
-  const installedApp = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
+  const appDisplayModes = ['standalone', 'fullscreen', 'minimal-ui'].map(mode => matchMedia(`(display-mode: ${mode})`));
+  const isPwaLaunch = () => navigator.standalone === true || appDisplayModes.some(query => query.matches);
   const installButton = $('install-btn');
+  const installDialog = $('install-dialog');
+  const installNowButton = $('install-now-btn');
+  const installStatus = $('install-status');
   let deferredInstall: BeforeInstallPromptEvent | null = null;
-  if (installButton && !installedApp) {
-    const wechat = /MicroMessenger/i.test(navigator.userAgent);
-    const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (wechat || ios || (import.meta.env.PROD && window.isSecureContext)) installButton.hidden = false;
-    listen(window, 'beforeinstallprompt', (event) => { event.preventDefault(); deferredInstall = event as BeforeInstallPromptEvent; installButton.hidden = false; });
-    listen(window, 'appinstalled', () => { deferredInstall = null; installButton.hidden = true; });
-    listen(installButton, 'click', async () => {
-      if (wechat) { toast('请点右上角 ···，选择在浏览器中打开，再添加到主屏幕。'); return; }
-      if (deferredInstall) {
-        try {
-          await deferredInstall.prompt();
-          const choice = await deferredInstall.userChoice;
-          installButton.hidden = choice.outcome === 'accepted';
-        } catch { toast('请从浏览器菜单选择「安装应用」或「添加到主屏幕」。'); }
-        deferredInstall = null;
-        return;
-      }
-      toast(ios ? '点底部分享按钮，选择「添加到主屏幕」，再从桌面图标打开。' : '打开浏览器菜单，选择「安装应用」或「添加到主屏幕」。');
-    });
+  let installPending = false, appInstalled = false;
+  function showInstallStatus(message: string) {
+    installStatus.textContent = message;
+    installStatus.hidden = !message;
+    if (message && installDialog.open) installStatus.scrollIntoView({ block: 'nearest' });
   }
+  function syncInstallMode() {
+    const launched = isPwaLaunch();
+    installButton.hidden = launched;
+    installNowButton.hidden = launched || !deferredInstall;
+    if (launched && installDialog.open) installDialog.close();
+  }
+  function showFirstHelp() {
+    if (disposed || screen !== 'menu' || read('ave-theatre-help-seen-v2', false)) return;
+    $('help-dialog').showModal();
+    write('ave-theatre-help-seen-v2', true);
+  }
+  const installedMessage = '安装完成！请回到桌面，点击「乱斗剧场」图标进入全屏模式。当前浏览器页面仍是普通网页。';
+  for (const query of appDisplayModes) query.addEventListener('change', syncInstallMode, { signal: subscriptions.signal });
+  listen(window, 'pageshow', syncInstallMode);
+  listen(window, 'beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstall = event;
+    syncInstallMode();
+  });
+  listen(window, 'appinstalled', () => {
+    appInstalled = true;
+    deferredInstall = null;
+    showInstallStatus(installedMessage);
+    syncInstallMode();
+  });
+  listen(installButton, 'click', () => { if (!isPwaLaunch() && !installDialog.open) installDialog.showModal(); });
+  listen(installDialog, 'close', showFirstHelp);
+  listen(installNowButton, 'click', async () => {
+    if (!deferredInstall || installPending) return;
+    const prompt = deferredInstall;
+    deferredInstall = null;
+    installPending = true;
+    installNowButton.disabled = true;
+    try {
+      await prompt.prompt();
+      const choice = await prompt.userChoice;
+      if (!disposed) showInstallStatus(appInstalled ? installedMessage : choice.outcome === 'accepted'
+        ? '已确认安装。完成后请回到桌面，点击「乱斗剧场」图标进入全屏模式。'
+        : '已取消安装。你可以按上方教程从浏览器菜单安装，或暂时用浏览器玩。');
+    } catch {
+      if (!disposed) showInstallStatus('未能打开安装窗口，请按上方教程从浏览器菜单安装。');
+    } finally {
+      installPending = false;
+      if (!disposed) { installNowButton.disabled = false; syncInstallMode(); }
+    }
+  });
+  syncInstallMode();
   renderMenu(); updateRecordLine(); sound('setScene', 'menu'); requestFrame(frame);
   const invited = new URLSearchParams(location.search).get('room'); if (invited && /^\d{6}$/.test(invited)) { changeMode('pvp'); $('room-code').value = invited; status(/(^|\.)github\.io$/i.test(location.hostname) ? '邀请链接需要游戏服务器。GitHub Pages 只能进行人机对战。' : '已填入邀请房间码，选择角色后点击加入。'); }
-  if (!read('ave-theatre-help-seen-v2', false)) { $('help-dialog').showModal(); write('ave-theatre-help-seen-v2', true); }
+  if (isPwaLaunch()) showFirstHelp();
+  else installDialog.showModal();
   // Read-only diagnostics used by the bundled smoke checks.
   window.AveGame = { getState: () => ({ mode, screen, seat, room: room?.code || null, snapshot: latest, camera: renderer.camera.view, paused, finished, records: { ...records } }) };
 

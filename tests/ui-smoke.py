@@ -106,6 +106,10 @@ async function newPage(name, viewport = { width: 844, height: 390 }, clock = fal
   assert.equal(compiledStyles.preflight, '0px', 'Tailwind preflight did not reset button borders');
   assert.equal(compiledStyles.nativeCanvas, true);
   assert.equal(await page.evaluate(() => MujicaArt.ready), true, 'generated character images did not load');
+  assert.equal(await page.locator('#install-dialog').evaluate(el => el.open), true);
+  assert.equal(await page.locator('#help-dialog').evaluate(el => el.open), false);
+  if (mobile) await page.locator('#install-later-btn').tap(); else await page.locator('#install-later-btn').click();
+  await page.locator('#help-dialog').waitFor({ state: 'visible' });
   assert.equal(await page.locator('#help-dialog').evaluate(el => el.open), true);
   if (mobile) await page.locator('#help-done').tap(); else await page.locator('#help-done').click();
   record(name + ' input emulation', await page.evaluate(() => ({coarse:matchMedia('(pointer:coarse)').matches,fine:matchMedia('(pointer:fine)').matches,hover:matchMedia('(hover:hover)').matches,touches:navigator.maxTouchPoints})));
@@ -261,6 +265,7 @@ async function clickClock(page, selector) { await cdpTouch(page, selector); awai
     await page.locator('#low-motion').check();
     await page.locator('#settings-dialog .dialog-close').tap();
     await page.reload({ waitUntil: 'networkidle' });
+    await page.locator('#install-later-btn').tap();
     assert.equal(await page.locator('#help-dialog').evaluate(el => el.open), false);
     await page.locator('#settings-btn').tap();
     assert.equal(await page.locator('#music-volume').inputValue(), savedMusicVolume); assert.equal(await page.locator('#low-motion').isChecked(), true);

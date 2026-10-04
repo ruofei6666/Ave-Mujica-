@@ -2,6 +2,7 @@
 import { useTheatreState } from '../game/theatre-state';
 import ModalFrame from './ModalFrame.vue';
 import BalanceDialog from './BalanceDialog.vue';
+import PwaInstallDialog from './PwaInstallDialog.vue';
 const ui = useTheatreState();
 </script>
 
@@ -59,6 +60,7 @@ const ui = useTheatreState();
   </ModalFrame>
 
   <BalanceDialog />
+  <PwaInstallDialog />
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </template>
