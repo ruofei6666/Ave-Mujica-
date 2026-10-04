@@ -148,18 +148,18 @@ async function controlBounds(page, name) {
     const gap = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dx + dy) / Math.SQRT2, Math.abs(dx - dy) / Math.SQRT2) - (a.width + b.width) / 2;
     assert.ok(gap >= 2, `attack buttons overlap: ${a.action}/${b.action} (${gap.toFixed(1)}px)`);
   }
-  // Honor of Kings thumb layout: the attack button owns the corner, and 技能一 → 技能二 → 技能三 → 大招 sit on ONE arc
-  // around it, from its left (9 o'clock) up to straight above it (12 o'clock).
+  // The four skills retain their original arc; the larger punch button is raised independently inside it.
+  // The leftmost and topmost skills identify the unchanged lower-right anchor.
   const centre = action => { const box = boxes.find(item => item.action === action); return { x: box.x + box.width / 2, y: box.y + box.height / 2 }; };
-  const punch = centre('punch');
+  const anchor = { x: centre('ult').x, y: centre('special').y };
   const expectedAngle = { special: 180, skill1: 150, skill2: 120, ult: 90 };
   const fan = Object.keys(expectedAngle).map(action => {
-    const c = centre(action), dx = c.x - punch.x, dy = punch.y - c.y;
+    const c = centre(action), dx = c.x - anchor.x, dy = anchor.y - c.y;
     return { action, angle: +(((Math.atan2(dy, dx) * 180 / Math.PI) + 360) % 360).toFixed(1), radius: +Math.hypot(dx, dy).toFixed(1) };
   });
   for (const item of fan) assert.ok(Math.abs(item.angle - expectedAngle[item.action]) <= 6, `${item.action} is off its Honor of Kings position: ${JSON.stringify(fan)}`);
   const radii = fan.map(item => item.radius);
-  assert.ok(Math.max(...radii) / Math.min(...radii) <= 1.05, 'skills are not on one arc around the attack button: ' + JSON.stringify(fan));
+  assert.ok(Math.max(...radii) / Math.min(...radii) <= 1.05, 'skills are not on one arc around their original anchor: ' + JSON.stringify(fan));
   const clearance = await page.evaluate(() => {
     const stick = document.getElementById('joystick');
     return stick.offsetParent ? document.querySelector('.attack-controls').getBoundingClientRect().left - stick.getBoundingClientRect().right : null;

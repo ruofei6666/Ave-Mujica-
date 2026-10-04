@@ -218,15 +218,15 @@ html[data-art~='fx-speed'] .vs-speed { background: var(--art-fx-speed) center / 
 }
 
 /*
- * Thumb layout copied from Honor of Kings (王者荣耀): the attack button owns the bottom-right corner and the skills
- * sit on ONE arc around it, counter-clockwise from its left to straight above it:
+ * Thumb layout copied from Honor of Kings (王者荣耀): the skills keep one arc around a fixed bottom-right anchor.
+ * The larger attack button is raised independently inside that arc:
  *
  *                     大招            (12 o'clock, 90°)   the last and strongest skill is on top
  *               技能三                (11 o'clock, 120°)
  *            技能二                   (10 o'clock, 150°)
  *        技能一            普攻       ( 9 o'clock, 180°)
  *
- * A skill's centre = the attack button's centre + --fan × (cos θ, sin θ), so the offsets below are --fan × 1, .866, .5, 0.
+ * The anchor stays at --punch / 2 from the corner; skill offsets are --fan × 1, .866, .5, 0.
  * Buttons are regular octagons (cut 29.3%), which lets neighbours on the arc sit as close as round ones would.
  */
 .attack-controls {
@@ -260,10 +260,11 @@ html[data-art~='fx-speed'] .vs-speed { background: var(--art-fx-speed) center / 
 .cooldown:empty { display: none; }
 .action-btn.pressed { transform: scale(.92); filter: brightness(1.3); }
 
-.punch-btn { --edge: var(--volt); right: 0; bottom: 0; width: var(--punch); height: var(--punch); color: var(--ink); }
+.punch-btn { --edge: var(--volt); right: 0; bottom: var(--u); width: calc(var(--punch) * 1.5); height: calc(var(--punch) * 1.5); color: var(--ink); }
 .punch-btn::before { background: var(--volt); }
-.punch-btn .ic { width: calc(var(--u) * 1.9); height: calc(var(--u) * 1.9); }
-.punch-btn .action-key { color: rgb(7 8 12 / .7); }
+.punch-btn .ic { width: calc(var(--u) * 2.85); height: calc(var(--u) * 2.85); }
+.punch-btn .action-key { top: calc(var(--u) * .27); font-size: max(10.5px, calc(var(--u) * .825)); color: rgb(7 8 12 / .7); }
+.punch-btn .action-name { font-size: calc(var(--u) * .93); }
 .skill-btn { width: var(--skill); height: var(--skill); }
 .skill-btn[data-action='special'] { right: calc(var(--punch) / 2 + var(--fan) - var(--skill) / 2); bottom: calc(var(--punch) / 2 - var(--skill) / 2); }
 .skill-btn[data-action='skill1'] { right: calc(var(--punch) / 2 + var(--fan) * .866 - var(--skill) / 2); bottom: calc(var(--punch) / 2 + var(--fan) * .5 - var(--skill) / 2); }
