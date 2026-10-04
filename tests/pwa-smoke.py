@@ -136,6 +136,10 @@ def main():
             passed('offline PVE reaches a running combat simulation')
 
             if server:
+                # Service-worker update checks may outlast a match. Keep the
+                # unfinished fight paused so a KO cannot cover the test controls.
+                page.locator('#pause-btn').click()
+                assert page.locator('#quit-btn').is_visible()
                 context.set_offline(False)
                 page.evaluate('window.__pwaDocument = true')
                 release['suffix'] = 'upgrade-'
@@ -143,8 +147,7 @@ def main():
                 page.wait_for_function('async () => !!(await navigator.serviceWorker.getRegistration()).waiting')
                 assert page.evaluate('window.__pwaDocument') is True
                 assert page.evaluate('window.AveGame.getState().screen') == 'battle'
-                passed('new release waits without refreshing an active fight')
-                page.locator('#pause-btn').click()
+                passed('new release waits without refreshing a paused fight')
                 page.locator('#quit-btn').click()
                 with page.expect_navigation(wait_until='networkidle'):
                     page.locator('#update-app-btn').click()

@@ -66,6 +66,8 @@ PRTS 是玩家 Wiki，公开下载不代表取得游戏音频的再使用许可�
 
 ## UI 美术
 
+2026-10-04 应用图标改为祥子主题：以游戏现有祥子立绘和菜单舞台为参考，由内置 `image_gen` 生成，结合低双马尾、舞台服、键盘和音刃攻击。完整提示词、参考与导出尺寸见 `scripts/app-icon-spec.json`，使用 `scripts/prepare-app-icons.cjs` 导出 `assets/icons/` 下的 512、192、180 和 32 像素 PNG；32 像素标签页图标单独放大面部取景。主图为不透明方图，手机圆角或圆形遮罩由系统处理。与角色立绘同属 AI 同人再创作。
+
 2026-10-03 起的“暗色广播控制台”界面以《明日方舟：终末地》的工业科幻界面语言与《绝区零》的街头直播视觉为风格参考，只借鉴整体气质，没有使用这两款游戏的 Logo、界面截图、角色或任何素材。切角面板、按钮、血条、图标和全部文字由 Vue、CSS 与 SVG 在代码中绘制。
 
 生成背景与纹理（`bg-menu`、`bg-arena-a/b`、`fx-grunge`、`fx-speed`、`fx-burst`、`emblem`、`deco-shards`、`deco-marks`）已于 2026-10-03 交付：由内置图像生成工具（`image_gen`）按 `art-inbox/PROMPTS.md` 的提示词生成，共 36 张候选，择优 9 张原图；两张舞台图只做了轻微裁切，使地面亮线落在 83.6% 高度（实测 83.70% 和 83.61%）。经 `scripts/prepare-ui-art.py` 处理成 27 个 WebP（背景 1920×1080，遮罩为白色加透明度，两张图集切出 8 张 `deco-shards` 和 12 张 `deco-marks`），放在 `assets/ui/art/`，清单为 `assets/ui/art/manifest.json`。工具实际返回的是 1672×941 的背景、1254×1254 的方图和 1536×1024 的图集，背景是插值放大到 1920×1080，并非原生 1080p。选择理由、各张提示词和裁切框记在本机的 `art-inbox/generation-record-20261003.json` 与 `art-inbox/crop-alignment-20261003.json`，候选原图在 `art-inbox/candidates-20261003/`，这些记录不随仓库提交。清单缺失或为空时，界面自动使用代码绘制的备用效果。

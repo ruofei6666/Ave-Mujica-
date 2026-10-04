@@ -1,0 +1,40 @@
+{
+  "name": "祥子 · 音刃剧场",
+  "generatedAt": "2026-10-04",
+  "generator": "built-in image_gen",
+  "sourceImage": "art-inbox/sakiko-app-icon.png",
+  "references": [
+    "assets/characters/pyro/portrait.png",
+    "assets/ui/art/bg-menu.webp"
+  ],
+  "prompt": "Use case: stylized-concept.\nAsset type: final square game application icon, full-bleed 1024x1024 opaque illustration.\n\nCreate a striking polished anime fighting-game app icon for the user's existing Ave Mujica theatre fighter, centered on Togawa Sakiko / 丰川祥子.\nReference image 1 is the character identity and costume reference: preserve her pale periwinkle-blue hair in long LOW twin ponytails with black bows, straight bangs, golden eyes, burgundy puff-sleeve blouse, black ruffled jabot, blue gemstone brooch, black corset and black gloves. Redraw her as a crisp chest-up hero portrait with a confident, commanding expression, looking directly toward the viewer. Keep her recognizable and faithful to the supplied game art.\nReference image 2 supplies only the game's stage atmosphere: dark gothic industrial theatre, a luminous cyan arched window, warm signal-yellow stage lights. Simplify this into a few bold graphic background shapes.\n\nCombine the MUSIC and FIGHTING elements of the actual game: a compact black keyboard with clearly readable white keys cuts diagonally across the lower foreground, held like her in-game instrument, while her gloved conducting hand summons TWO sweeping cyan-gold sonic crescent blades, with a small sharp impact flare. These are the character's curtain-blade combat effects, not a real sword. The musical instrument and attack arcs must remain secondary to the face.\nComposition: strong centered silhouette, face large and exceptionally readable even at 48px, eyes near 43% image height, upper body and keyboard filling the center. Essential face, brooch and recognizable keyboard portion stay within the central 75% of the square so the icon survives a circular phone launcher crop. Hair can flow outward; edge details are expendable. Do not make a full-body portrait.\nStyle: premium 2D cel-shaded anime game key art, bold clean contours, confident color blocks, controlled bright highlights, very little microtexture. Pale blue hair contrasts with dark midnight theatre; burgundy costume, restrained cyan and gold combat light.\nOutput only the actual square icon artwork. Opaque background continuing to all four edges. No rounded corners, no outer frame, no device or app mockup, no additional characters, no written text, no letters, no brand/model marks on the keyboard, no watermark.",
+  "exports": [
+    {
+      "file": "assets/icons/icon-512.png",
+      "size": 512,
+      "purpose": "PWA any and maskable; opaque full-bleed artwork"
+    },
+    {
+      "file": "assets/icons/icon-192.png",
+      "size": 192,
+      "purpose": "Android install and large browser icon"
+    },
+    {
+      "file": "assets/icons/apple-touch-icon.png",
+      "size": 180,
+      "purpose": "iOS home screen"
+    },
+    {
+      "file": "assets/icons/favicon-32.png",
+      "size": 32,
+      "purpose": "Browser tab; enlarged face for tiny display",
+      "crop": [
+        0.235,
+        0.065,
+        0.53,
+        0.53
+      ]
+    }
+  ],
+  "note": "Full generated source is kept in the local art-inbox. Runtime PNGs are committed. Only resizing and the documented favicon crop are applied; character artwork is not redrawn by code."
+}
